@@ -14,6 +14,7 @@ class Order extends Model
 
     protected $fillable = [
         'user_id',
+        'order_number',
         'total_amount',
         'status',
         'shipping_address',
@@ -62,5 +63,35 @@ class Order extends Model
         $thirtyMinutesAfterOrder = $orderTime->copy()->addMinutes(30);
 
         return now()->lt($thirtyMinutesAfterOrder);
+    }
+
+    /**
+     * Generate a unique 8-digit order number
+     * Format: SOS-YYYYMMDD-XXXX where XXXX is a sequential number
+     *
+     * @return string
+     */
+    public static function generateOrderNumber(): string
+    {
+        $prefix = 'SOS';
+        $datePart = now()->format('Ymd');
+
+        // Get the latest order with the same date prefix
+        $latestOrder = self::where('order_number', 'like', "{$prefix}-{$datePart}-%")
+            ->orderBy('id', 'desc')
+            ->first();
+
+        // Extract the sequence number or start with 0001
+        $sequenceNumber = 1;
+        if ($latestOrder) {
+            $parts = explode('-', $latestOrder->order_number);
+            $lastSequence = intval(end($parts));
+            $sequenceNumber = $lastSequence + 1;
+        }
+
+        // Format the sequence number with leading zeros
+        $sequencePart = str_pad($sequenceNumber, 4, '0', STR_PAD_LEFT);
+
+        return "{$prefix}-{$datePart}-{$sequencePart}";
     }
 }

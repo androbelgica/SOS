@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Facades\Socialite;
-use Exception;
 
 class GoogleController extends Controller
 {
@@ -20,21 +22,28 @@ class GoogleController extends Controller
     {
         // Check if Google OAuth is configured
         if (empty(config('services.google.client_id')) || empty(config('services.google.client_secret'))) {
-            \Log::error('Google OAuth not configured properly. Missing client ID or client secret.');
+            Log::error('Google OAuth not configured properly. Missing client ID or client secret.');
             return redirect()->route('login')->with('error', 'Google authentication is not configured properly. Please contact the administrator.');
         }
 
         // Log the configuration for debugging
-        \Log::info('Google OAuth Configuration', [
+        Log::info('Google OAuth Configuration', [
             'client_id' => config('services.google.client_id'),
             'redirect' => config('services.google.redirect'),
             'app_url' => config('app.url')
         ]);
 
         try {
-            return Socialite::driver('google')->stateless()->redirect();
+            // Disable SSL verification in local environment
+            if (app()->environment('local')) {
+                Config::set('services.google.guzzle', [
+                    'verify' => false,
+                ]);
+            }
+
+            return Socialite::driver('google')->redirect();
         } catch (Exception $e) {
-            \Log::error('Google OAuth Redirect Error', [
+            Log::error('Google OAuth Redirect Error', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
@@ -52,18 +61,25 @@ class GoogleController extends Controller
         try {
             // Check if there's an error parameter in the callback
             if ($request->has('error')) {
-                \Log::error('Google OAuth Error', [
+                Log::error('Google OAuth Error', [
                     'error' => $request->error,
                     'error_description' => $request->error_description ?? 'No description provided'
                 ]);
                 return redirect()->route('login')->with('error', 'Google authentication error: ' . ($request->error_description ?? $request->error));
             }
 
+            // Disable SSL verification in local environment
+            if (app()->environment('local')) {
+                Config::set('services.google.guzzle', [
+                    'verify' => false,
+                ]);
+            }
+
             // Get the user data from Google
-            $googleUser = Socialite::driver('google')->stateless()->user();
+            $googleUser = Socialite::driver('google')->user();
 
             // Log successful user retrieval
-            \Log::info('Google OAuth User Retrieved', [
+            Log::info('Google OAuth User Retrieved', [
                 'id' => $googleUser->getId(),
                 'email' => $googleUser->getEmail()
             ]);
@@ -83,7 +99,7 @@ class GoogleController extends Controller
                     ]);
 
                     $user = $existingUser;
-                    \Log::info('Existing user updated with Google ID', ['user_id' => $user->id]);
+                    Log::info('Existing user updated with Google ID', ['user_id' => $user->id]);
                 } else {
                     // Create new user
                     $user = User::create([
@@ -94,19 +110,18 @@ class GoogleController extends Controller
                         'role' => 'customer',
                         'email_verified_at' => now(), // Google accounts are already verified
                     ]);
-                    \Log::info('New user created from Google login', ['user_id' => $user->id]);
+                    Log::info('New user created from Google login', ['user_id' => $user->id]);
                 }
             } else {
-                \Log::info('Existing Google user logged in', ['user_id' => $user->id]);
+                Log::info('Existing Google user logged in', ['user_id' => $user->id]);
             }
 
             // Login the user
             Auth::login($user);
 
             return redirect()->intended(route('dashboard', absolute: false));
-
         } catch (Exception $e) {
-            \Log::error('Google OAuth Callback Error', [
+            Log::error('Google OAuth Callback Error', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);

@@ -25,8 +25,10 @@ class OrderStatusChanged extends Notification
 
     public function toMail($notifiable): MailMessage
     {
+        $orderIdentifier = $this->order->order_number ?? "#{$this->order->id}";
+
         $message = (new MailMessage)
-            ->subject("Order #{$this->order->id} Status Update")
+            ->subject("Order {$orderIdentifier} Status Update")
             ->greeting("Hello {$notifiable->name}")
             ->line("Your order status has been updated to: " . ucfirst($this->order->status));
 

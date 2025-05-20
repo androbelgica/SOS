@@ -30,11 +30,12 @@ export default function OrdersIndex({ auth, orders }) {
             result = result.filter(order => order.status === filters.status);
         }
 
-        // Filter by search term (order ID)
+        // Filter by search term (order ID or order number)
         if (filters.search) {
             const searchTerm = filters.search.toLowerCase();
             result = result.filter(order =>
                 order.id.toString().includes(searchTerm) ||
+                (order.order_number && order.order_number.toLowerCase().includes(searchTerm)) ||
                 order.total_amount.toString().includes(searchTerm)
             );
         }
@@ -127,7 +128,7 @@ export default function OrdersIndex({ auth, orders }) {
                                             id="search"
                                             value={filters.search}
                                             onChange={handleFilterChange}
-                                            placeholder="Order # or amount"
+                                            placeholder="Order number or amount"
                                             className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-md"
                                         />
                                     </div>
@@ -292,7 +293,7 @@ export default function OrdersIndex({ auth, orders }) {
                                         <tr key={order.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150">
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="text-sm font-medium text-gray-900 dark:text-white">
-                                                    #{order.id}
+                                                    {order.order_number || '#' + order.id}
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">

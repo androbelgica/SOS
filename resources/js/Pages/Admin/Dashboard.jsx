@@ -77,7 +77,7 @@ export default function AdminDashboard({ auth, stats, recentOrders }) {
                                     Revenue (Today)
                                 </h2>
                                 <p className="mt-1 text-3xl font-semibold text-gray-900 dark:text-white">
-                                    ${parseFloat(stats?.revenue?.today || 0).toFixed(2)}
+                                    ₱{parseFloat(stats?.revenue?.today || 0).toFixed(2)}
                                 </p>
                             </div>
                         </div>
@@ -409,7 +409,7 @@ export default function AdminDashboard({ auth, stats, recentOrders }) {
                             <div>
                                 <div className="flex justify-between mb-1">
                                     <span className="text-sm text-gray-500 dark:text-gray-400">Today</span>
-                                    <span className="text-sm font-medium text-gray-900 dark:text-white">${parseFloat(stats?.revenue?.today || 0).toFixed(2)}</span>
+                                    <span className="text-sm font-medium text-gray-900 dark:text-white">₱{parseFloat(stats?.revenue?.today || 0).toFixed(2)}</span>
                                 </div>
                                 <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                                     <div className="bg-green-500 h-2 rounded-full" style={{ width: '100%' }}></div>
@@ -419,7 +419,7 @@ export default function AdminDashboard({ auth, stats, recentOrders }) {
                             <div>
                                 <div className="flex justify-between mb-1">
                                     <span className="text-sm text-gray-500 dark:text-gray-400">Yesterday</span>
-                                    <span className="text-sm font-medium text-gray-900 dark:text-white">${parseFloat(stats?.revenue?.yesterday || 0).toFixed(2)}</span>
+                                    <span className="text-sm font-medium text-gray-900 dark:text-white">₱{parseFloat(stats?.revenue?.yesterday || 0).toFixed(2)}</span>
                                 </div>
                                 <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                                     <div className="bg-blue-500 h-2 rounded-full" style={{
@@ -433,7 +433,7 @@ export default function AdminDashboard({ auth, stats, recentOrders }) {
                             <div>
                                 <div className="flex justify-between mb-1">
                                     <span className="text-sm text-gray-500 dark:text-gray-400">This Week</span>
-                                    <span className="text-sm font-medium text-gray-900 dark:text-white">${parseFloat(stats?.revenue?.thisWeek || 0).toFixed(2)}</span>
+                                    <span className="text-sm font-medium text-gray-900 dark:text-white">₱{parseFloat(stats?.revenue?.thisWeek || 0).toFixed(2)}</span>
                                 </div>
                                 <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                                     <div className="bg-indigo-500 h-2 rounded-full" style={{ width: '100%' }}></div>
@@ -443,7 +443,7 @@ export default function AdminDashboard({ auth, stats, recentOrders }) {
                             <div>
                                 <div className="flex justify-between mb-1">
                                     <span className="text-sm text-gray-500 dark:text-gray-400">This Month</span>
-                                    <span className="text-sm font-medium text-gray-900 dark:text-white">${parseFloat(stats?.revenue?.thisMonth || 0).toFixed(2)}</span>
+                                    <span className="text-sm font-medium text-gray-900 dark:text-white">₱{parseFloat(stats?.revenue?.thisMonth || 0).toFixed(2)}</span>
                                 </div>
                                 <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                                     <div className="bg-purple-500 h-2 rounded-full" style={{ width: '100%' }}></div>
@@ -465,7 +465,7 @@ export default function AdminDashboard({ auth, stats, recentOrders }) {
                                 <div className="flex items-center justify-between mb-2">
                                     <span className="text-sm text-gray-500 dark:text-gray-400">Average Order Value</span>
                                     <span className="text-lg font-semibold text-gray-900 dark:text-white">
-                                        ${stats?.orders?.total && stats?.revenue?.thisMonth
+                                        ₱{stats?.orders?.total && stats?.revenue?.thisMonth
                                             ? (stats.revenue.thisMonth / stats.orders.total).toFixed(2)
                                             : "0.00"}
                                     </span>
@@ -533,7 +533,7 @@ export default function AdminDashboard({ auth, stats, recentOrders }) {
                                                     {order.user.name}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                                    ${parseFloat(order.total_amount).toFixed(2)}
+                                                    ₱{parseFloat(order.total_amount).toFixed(2)}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${statusColors[order.status]}`}>

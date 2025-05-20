@@ -9,9 +9,16 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Notifications\OrderStatusChanged;
 use App\Notifications\OrderPaymentStatusChanged;
+use App\Services\LabelGenerationService;
 
 class OrderController extends Controller
 {
+    protected $labelService;
+
+    public function __construct(LabelGenerationService $labelService)
+    {
+        $this->labelService = $labelService;
+    }
     public function index()
     {
         $orders = Order::with(['items.product'])
@@ -145,9 +152,13 @@ class OrderController extends Controller
                     }
                 }
 
+                // Generate a unique order number
+                $orderNumber = Order::generateOrderNumber();
+
                 // Create the order
                 $order = Order::create([
                     'user_id' => auth()->id(),
+                    'order_number' => $orderNumber,
                     'total_amount' => $total,
                     'status' => 'pending',
                     'shipping_address' => $shippingAddress,
@@ -206,6 +217,12 @@ class OrderController extends Controller
         // Send notification if status has changed
         if ($oldStatus !== $validated['status']) {
             $order->user->notify(new OrderStatusChanged($order));
+
+            // Generate labels if status is changed to processing
+            if ($validated['status'] === 'processing') {
+                $this->labelService->generateLabelsForOrder($order);
+                return redirect()->back()->with('success', 'Order status updated successfully. Product labels have been generated.');
+            }
         }
 
         return redirect()->back()->with('success', 'Order status updated successfully.');
@@ -313,7 +330,7 @@ class OrderController extends Controller
         $orders = $query->latest()->get();
 
         // Create CSV content
-        $csvContent = "Order ID,Customer,Email,Total Amount,Status,Payment Status,Order Date,Items\n";
+        $csvContent = "Order ID,Order Number,Customer,Email,Total Amount,Status,Payment Status,Order Date,Items\n";
 
         foreach ($orders as $order) {
             $items = [];
@@ -323,6 +340,7 @@ class OrderController extends Controller
 
             $csvContent .= implode(',', [
                 $order->id,
+                '"' . str_replace('"', '""', $order->order_number ?? '') . '"',
                 '"' . str_replace('"', '""', $order->user->name) . '"',
                 '"' . str_replace('"', '""', $order->user->email) . '"',
                 number_format($order->total_amount, 2),

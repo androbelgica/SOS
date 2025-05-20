@@ -5,6 +5,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ProductLabelController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -65,6 +66,9 @@ Route::get('/recipes', [RecipeController::class, 'index'])->name('recipes.index'
 Route::get('/recipes/{recipe}', [RecipeController::class, 'show'])->name('recipes.show');
 Route::post('/recipes', [RecipeController::class, 'store'])->middleware(['auth', 'can:create,App\\Models\\Recipe'])->name('recipes.store');
 Route::post('/recipes/{recipe}/reviews', [RecipeController::class, 'addReview'])->middleware(['auth'])->name('recipes.reviews.store');
+
+// Order verification route (accessible without authentication)
+Route::get('/orders/{order}/verify/{product}', [ProductLabelController::class, 'verify'])->name('orders.verify');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
@@ -169,6 +173,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.status.update');
         Route::put('/orders/{order}/payment-status', [OrderController::class, 'updatePaymentStatus'])->name('orders.payment-status.update');
 
+        // Product Labels Management
+        Route::post('/orders/{order}/labels', [ProductLabelController::class, 'generateLabels'])->name('orders.labels.generate');
+        Route::get('/labels/{label}', [ProductLabelController::class, 'viewLabel'])->name('labels.view');
+        Route::get('/orders/{order}/labels/print', [ProductLabelController::class, 'printAllLabels'])->name('orders.labels.print');
+
         // Recipe Management
         Route::get('/recipes', [RecipeController::class, 'adminIndex'])->name('recipes.index');
         Route::get('/recipes/create', [RecipeController::class, 'create'])->name('recipes.create');
@@ -198,9 +207,9 @@ Route::get('/test-google-config', function () {
     ]);
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
 // Include debug routes (only for development)
 if (app()->environment('local')) {
-    require __DIR__.'/web-debug.php';
+    require __DIR__ . '/web-debug.php';
 }

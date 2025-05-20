@@ -25,18 +25,20 @@ class OrderPaymentStatusChanged extends Notification
 
     public function toMail($notifiable): MailMessage
     {
+        $orderIdentifier = $this->order->order_number ?? "#{$this->order->id}";
+
         $message = (new MailMessage)
-            ->subject("Order #{$this->order->id} Payment Status Update")
+            ->subject("Order {$orderIdentifier} Payment Status Update")
             ->greeting("Hello {$notifiable->name}")
             ->line("Your order payment status has been updated to: " . ucfirst($this->order->payment_status));
 
         // Add order details
         $message->line('Order Details:');
         foreach ($this->order->items as $item) {
-            $message->line("- {$item->product->name} x {$item->quantity} (${$item->price} each)");
+            $message->line("- {$item->product->name} x {$item->quantity} (₱{$item->price} each)");
         }
 
-        $message->line("Total Amount: ${$this->order->total_amount}")
+        $message->line("Total Amount: ₱{$this->order->total_amount}")
             ->action('View Order', route('orders.show', $this->order))
             ->line('Thank you for shopping with us!');
 

@@ -66,7 +66,7 @@ class CartController extends Controller
                 'quantity' => 'required|integer|min:1|max:' . $maxQuantity
             ], [
                 'quantity.max' => "Sorry, we only have " . ($product->unit_type === 'kg' ?
-                    $maxQuantity . "g (" . number_format($maxQuantity/1000, 2) . "kg)" :
+                    $maxQuantity . "g (" . number_format($maxQuantity / 1000, 2) . "kg)" :
                     $maxQuantity . " pieces") . " of this product in stock."
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -83,11 +83,12 @@ class CartController extends Controller
 
             // Check if the total quantity exceeds available stock
             if ($totalQuantity > $maxQuantity) {
-                return redirect()->back()->with('error',
+                return redirect()->back()->with(
+                    'error',
                     "Cannot add " . $quantity . ($product->unit_type === 'kg' ? 'g' : ' pieces') .
-                    " more to your cart. You already have " . $cart[$product->id] .
-                    ($product->unit_type === 'kg' ? 'g' : ' pieces') . " in your cart, and we only have " .
-                    $maxQuantity . ($product->unit_type === 'kg' ? 'g' : ' pieces') . " in stock."
+                        " more to your cart. You already have " . $cart[$product->id] .
+                        ($product->unit_type === 'kg' ? 'g' : ' pieces') . " in your cart, and we only have " .
+                        $maxQuantity . ($product->unit_type === 'kg' ? 'g' : ' pieces') . " in stock."
                 );
             }
 
@@ -158,7 +159,7 @@ class CartController extends Controller
                 'quantity' => 'required|integer|min:1|max:' . $maxQuantity
             ], [
                 'quantity.max' => "Sorry, we only have " . ($product->unit_type === 'kg' ?
-                    $maxQuantity . "g (" . number_format($maxQuantity/1000, 2) . "kg)" :
+                    $maxQuantity . "g (" . number_format($maxQuantity / 1000, 2) . "kg)" :
                     $maxQuantity . " pieces") . " of this product in stock."
             ]);
 
@@ -520,8 +521,12 @@ class CartController extends Controller
                     }
                 }
 
+                // Generate a unique order number
+                $orderNumber = \App\Models\Order::generateOrderNumber();
+
                 // Create the order
                 $order = auth()->user()->orders()->create([
+                    'order_number' => $orderNumber,
                     'total_amount' => $total,
                     'status' => 'pending',
                     'shipping_address' => auth()->user()->address ?? 'No address provided',

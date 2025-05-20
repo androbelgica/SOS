@@ -58,14 +58,14 @@ export default function OrderShow({ auth, order }) {
     };
 
     return (
-        <MainLayout auth={auth} title={`Order #${order.id}`}>
-            <Head title={`Order #${order.id} - Seafood Online Store`} />
+        <MainLayout auth={auth} title={`Order ${order.order_number || '#' + order.id}`}>
+            <Head title={`Order ${order.order_number || '#' + order.id} - Seafood Online Store`} />
 
             <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
                 <div className="px-4 py-5 sm:p-6">
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                            Order #{order.id}
+                            Order {order.order_number || '#' + order.id}
                         </h2>
                         <div className="flex space-x-3">
                             <button

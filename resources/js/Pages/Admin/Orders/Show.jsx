@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { Head, Link, useForm } from "@inertiajs/react";
+import { Head, Link, useForm, router } from "@inertiajs/react";
 import AdminLayout from "@/Layouts/AdminLayout";
 
 export default function Show({ auth, order }) {
     const [isUpdating, setIsUpdating] = useState(false);
     const [isUpdatingPayment, setIsUpdatingPayment] = useState(false);
+    const [isGeneratingLabels, setIsGeneratingLabels] = useState(false);
 
     const { data, setData, put, processing, errors, reset } = useForm({
         status: order.status,
@@ -62,6 +63,23 @@ export default function Show({ auth, order }) {
                 setIsUpdatingPayment(false);
             },
         });
+    };
+
+    const generateLabels = () => {
+        setIsGeneratingLabels(true);
+
+        router.post(route("admin.orders.labels.generate", order.id), {}, {
+            onSuccess: () => {
+                setIsGeneratingLabels(false);
+            },
+            onError: () => {
+                setIsGeneratingLabels(false);
+            }
+        });
+    };
+
+    const printAllLabels = () => {
+        window.open(route("admin.orders.labels.print", order.id), "_blank");
     };
 
     const formatDate = (dateString) => {
@@ -313,6 +331,56 @@ export default function Show({ auth, order }) {
                                     )}
                                 </button>
                             </form>
+
+                            {/* Product Labels Section */}
+                            {order.status === 'processing' && (
+                                <div className="mt-6 border-t border-gray-200 dark:border-gray-700 pt-6 mb-6">
+                                    <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
+                                        Product Labels
+                                    </h3>
+                                    <div className="space-y-4">
+                                        <button
+                                            type="button"
+                                            onClick={generateLabels}
+                                            disabled={isGeneratingLabels}
+                                            className={`w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 ${
+                                                isGeneratingLabels ? "opacity-50 cursor-not-allowed" : ""
+                                            }`}
+                                        >
+                                            {isGeneratingLabels ? (
+                                                <>
+                                                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                    </svg>
+                                                    Generating Labels...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                                                    </svg>
+                                                    Generate Product Labels
+                                                </>
+                                            )}
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            onClick={printAllLabels}
+                                            className="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md shadow-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                            </svg>
+                                            Print All Labels
+                                        </button>
+                                    </div>
+                                    <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                        Labels include QR codes that customers can scan to verify products before payment.
+                                    </p>
+                                </div>
+                            )}
 
                             <div className="mt-6 border-t border-gray-200 dark:border-gray-700 pt-4">
                                 <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Order Timeline</h3>
