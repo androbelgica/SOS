@@ -142,9 +142,9 @@ export default function Edit({ auth, recipe, products, timestamp }) {
 
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="p-6">
-                            <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+                            <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-6">
                                 Edit Recipe
                             </h2>
 
@@ -181,7 +181,7 @@ export default function Edit({ auth, recipe, products, timestamp }) {
                                                 e.target.value
                                             )
                                         }
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200"
+                                        className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-300 dark:focus:border-blue-400 focus:ring focus:ring-blue-200 dark:focus:ring-blue-400"
                                         rows="4"
                                         required
                                     />
@@ -230,7 +230,7 @@ export default function Edit({ auth, recipe, products, timestamp }) {
                                                 e.target.value
                                             )
                                         }
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200"
+                                        className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-300 dark:focus:border-blue-400 focus:ring focus:ring-blue-200 dark:focus:ring-blue-400"
                                         required
                                     >
                                         <option value="easy">Easy</option>
@@ -262,7 +262,7 @@ export default function Edit({ auth, recipe, products, timestamp }) {
                                             id="image"
                                             type="file"
                                             onChange={handleImageChange}
-                                            className="block w-full"
+                                            className="block w-full text-gray-700 dark:text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-50 dark:file:bg-gray-700 file:text-gray-700 dark:file:text-gray-300 hover:file:bg-gray-100 dark:hover:file:bg-gray-600"
                                             accept="image/*"
                                         />
                                     </div>
@@ -291,10 +291,10 @@ export default function Edit({ auth, recipe, products, timestamp }) {
                                             id="video"
                                             type="file"
                                             onChange={handleVideoChange}
-                                            className="block w-full"
+                                            className="block w-full text-gray-700 dark:text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-50 dark:file:bg-gray-700 file:text-gray-700 dark:file:text-gray-300 hover:file:bg-gray-100 dark:hover:file:bg-gray-600"
                                             accept="video/mp4,video/quicktime,video/x-msvideo,video/x-flv,video/x-ms-wmv"
                                         />
-                                        <p className="text-sm text-gray-500 mt-1">
+                                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                                             Supported formats: MP4, MOV, AVI, FLV, WMV (max 20MB)
                                         </p>
                                     </div>
@@ -319,7 +319,7 @@ export default function Edit({ auth, recipe, products, timestamp }) {
                                         className="mt-1 block w-full"
                                         placeholder="https://www.youtube.com/watch?v=..."
                                     />
-                                    <p className="text-sm text-gray-500 mt-1">
+                                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                                         Enter a YouTube video URL (e.g., https://www.youtube.com/watch?v=...)
                                     </p>
                                     <InputError
@@ -327,16 +327,16 @@ export default function Edit({ auth, recipe, products, timestamp }) {
                                         className="mt-2"
                                     />
                                     {data.youtube_url && (
-                                        <div className="mt-4 p-2 border border-gray-200 rounded-md">
-                                            <p className="text-sm font-medium text-gray-700 mb-2">Current YouTube Video:</p>
-                                            <p className="text-sm text-blue-600 break-all">{data.youtube_url}</p>
+                                        <div className="mt-4 p-2 border border-gray-200 dark:border-gray-700 rounded-md">
+                                            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Current YouTube Video:</p>
+                                            <p className="text-sm text-blue-600 dark:text-blue-400 break-all">{data.youtube_url}</p>
                                         </div>
                                     )}
                                 </div>
 
                                 {progress && (
                                     <div className="mt-2">
-                                        <p className="text-sm text-gray-600 mb-1">Uploading files...</p>
+                                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Uploading files...</p>
                                         <progress
                                             value={progress.percentage}
                                             max="100"
@@ -373,7 +373,7 @@ export default function Edit({ auth, recipe, products, timestamp }) {
                                                 onClick={() =>
                                                     removeIngredient(index)
                                                 }
-                                                className="ml-2 text-red-600 hover:text-red-800"
+                                                className="ml-2 text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
                                                 disabled={
                                                     ingredients.length === 1
                                                 }
@@ -385,7 +385,7 @@ export default function Edit({ auth, recipe, products, timestamp }) {
                                     <button
                                         type="button"
                                         onClick={addIngredient}
-                                        className="mt-2 text-blue-600 hover:text-blue-800"
+                                        className="mt-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
                                     >
                                         Add Ingredient
                                     </button>
@@ -402,7 +402,7 @@ export default function Edit({ auth, recipe, products, timestamp }) {
                                             key={index}
                                             className="flex items-start mt-2"
                                         >
-                                            <div className="flex-shrink-0 mt-2 mr-2">
+                                            <div className="flex-shrink-0 mt-2 mr-2 text-gray-900 dark:text-gray-100">
                                                 {index + 1}.
                                             </div>
                                             <textarea
@@ -413,7 +413,7 @@ export default function Edit({ auth, recipe, products, timestamp }) {
                                                         e.target.value
                                                     )
                                                 }
-                                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200"
+                                                className="block w-full rounded-md border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-300 dark:focus:border-blue-400 focus:ring focus:ring-blue-200 dark:focus:ring-blue-400"
                                                 rows="2"
                                                 placeholder={`Step ${
                                                     index + 1
@@ -424,7 +424,7 @@ export default function Edit({ auth, recipe, products, timestamp }) {
                                                 onClick={() =>
                                                     removeInstruction(index)
                                                 }
-                                                className="ml-2 text-red-600 hover:text-red-800"
+                                                className="ml-2 text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
                                                 disabled={
                                                     instructions.length === 1
                                                 }
@@ -436,7 +436,7 @@ export default function Edit({ auth, recipe, products, timestamp }) {
                                     <button
                                         type="button"
                                         onClick={addInstruction}
-                                        className="mt-2 text-blue-600 hover:text-blue-800"
+                                        className="mt-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
                                     >
                                         Add Step
                                     </button>
@@ -477,9 +477,9 @@ export default function Edit({ auth, recipe, products, timestamp }) {
                                                             newIds
                                                         );
                                                     }}
-                                                    className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200"
+                                                    className="rounded border-gray-300 dark:border-gray-700 text-blue-600 shadow-sm focus:border-blue-300 dark:focus:border-blue-400 focus:ring focus:ring-blue-200 dark:focus:ring-blue-400"
                                                 />
-                                                <span className="ml-2">
+                                                <span className="ml-2 text-gray-900 dark:text-gray-100">
                                                     {product.name}
                                                 </span>
                                             </label>
@@ -494,7 +494,7 @@ export default function Edit({ auth, recipe, products, timestamp }) {
                                 <div className="flex items-center justify-end mt-4">
                                     <Link
                                         href={route("admin.recipes.index")}
-                                        className="underline text-sm text-gray-600 hover:text-gray-900 mr-4"
+                                        className="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 mr-4"
                                     >
                                         Cancel
                                     </Link>
