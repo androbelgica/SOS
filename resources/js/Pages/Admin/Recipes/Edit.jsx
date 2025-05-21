@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Head, useForm, Link, usePage } from "@inertiajs/react";
+import axios from "axios";
 import MainLayout from "@/Layouts/MainLayout";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
@@ -14,12 +15,12 @@ export default function Edit({ auth, recipe, products, timestamp }) {
 
     // Initialize image preview with the recipe's image URL
     const [imagePreview, setImagePreview] = useState(
-        getImageUrl(recipe.image_url, cacheTimestamp)
+        getImageUrl(recipe.image_url, cacheTimestamp, 'recipe')
     );
 
     // Initialize video preview with the recipe's video URL
     const [videoPreview, setVideoPreview] = useState(
-        recipe.video_url ? getImageUrl(recipe.video_url, cacheTimestamp) : null
+        recipe.video_url ? getImageUrl(recipe.video_url, cacheTimestamp, 'recipe') : null
     );
 
     // For dynamic ingredients and instructions
@@ -30,6 +31,107 @@ export default function Edit({ auth, recipe, products, timestamp }) {
     useEffect(() => {
         console.log("Edit Recipe component mounted");
     }, []);
+
+    // State for AI generation
+    const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
+    const [isGeneratingIngredients, setIsGeneratingIngredients] = useState(false);
+    const [isGeneratingInstructions, setIsGeneratingInstructions] = useState(false);
+    const [generationError, setGenerationError] = useState(null);
+
+    // Function to generate recipe description using AI
+    const generateRecipeDescription = async () => {
+        if (!data.title || data.title.trim() === '') {
+            setGenerationError("Please enter a recipe title first");
+            return;
+        }
+
+        setIsGeneratingDescription(true);
+        setGenerationError(null);
+
+        try {
+            const response = await axios.post(route('api.ai.generate-recipe-description'), {
+                recipe_title: data.title
+            });
+
+            if (response.data.success) {
+                setData({
+                    ...data,
+                    description: response.data.description || data.description
+                });
+            } else {
+                setGenerationError(response.data.message || "Failed to generate recipe description");
+            }
+        } catch (error) {
+            console.error("AI Description Generation Error:", error);
+            setGenerationError(error.response?.data?.message || "An error occurred during description generation");
+        } finally {
+            setIsGeneratingDescription(false);
+        }
+    };
+
+    // Function to generate recipe ingredients using AI
+    const generateRecipeIngredients = async () => {
+        if (!data.title || data.title.trim() === '') {
+            setGenerationError("Please enter a recipe title first");
+            return;
+        }
+
+        setIsGeneratingIngredients(true);
+        setGenerationError(null);
+
+        try {
+            const response = await axios.post(route('api.ai.generate-recipe-ingredients'), {
+                recipe_title: data.title
+            });
+
+            if (response.data.success && response.data.ingredients && response.data.ingredients.length > 0) {
+                setIngredients(response.data.ingredients);
+                setData({
+                    ...data,
+                    ingredients: response.data.ingredients
+                });
+            } else {
+                setGenerationError(response.data.message || "Failed to generate recipe ingredients");
+            }
+        } catch (error) {
+            console.error("AI Ingredients Generation Error:", error);
+            setGenerationError(error.response?.data?.message || "An error occurred during ingredients generation");
+        } finally {
+            setIsGeneratingIngredients(false);
+        }
+    };
+
+    // Function to generate recipe instructions using AI
+    const generateRecipeInstructions = async () => {
+        if (!data.title || data.title.trim() === '') {
+            setGenerationError("Please enter a recipe title first");
+            return;
+        }
+
+        setIsGeneratingInstructions(true);
+        setGenerationError(null);
+
+        try {
+            const response = await axios.post(route('api.ai.generate-recipe-instructions'), {
+                recipe_title: data.title
+            });
+
+            if (response.data.success && response.data.instructions && response.data.instructions.length > 0) {
+                setInstructions(response.data.instructions);
+                setData({
+                    ...data,
+                    instructions: response.data.instructions
+                });
+            } else {
+                setGenerationError(response.data.message || "Failed to generate recipe instructions");
+            }
+        } catch (error) {
+            console.error("AI Instructions Generation Error:", error);
+            setGenerationError(error.response?.data?.message || "An error occurred during instructions generation");
+        } finally {
+            setIsGeneratingInstructions(false);
+        }
+    };
 
     const { data, setData, post, processing, errors, reset, progress } =
         useForm({
@@ -168,10 +270,20 @@ export default function Edit({ auth, recipe, products, timestamp }) {
                                 </div>
 
                                 <div>
-                                    <InputLabel
-                                        htmlFor="description"
-                                        value="Description"
-                                    />
+                                    <div className="flex justify-between items-center">
+                                        <InputLabel
+                                            htmlFor="description"
+                                            value="Description"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={generateRecipeDescription}
+                                            disabled={isGeneratingDescription || !data.title}
+                                            className="px-2 py-1 text-xs bg-green-600 dark:bg-green-500 text-white rounded-md hover:bg-green-700 dark:hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-green-400 dark:focus:ring-offset-gray-800 disabled:opacity-50"
+                                        >
+                                            {isGeneratingDescription ? "Generating..." : "Generate with AI"}
+                                        </button>
+                                    </div>
                                     <textarea
                                         id="description"
                                         value={data.description}
@@ -189,6 +301,12 @@ export default function Edit({ auth, recipe, products, timestamp }) {
                                         message={errors.description}
                                         className="mt-2"
                                     />
+                                    {generationError && (
+                                        <div className="mt-2 bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded relative" role="alert">
+                                            <strong className="font-bold">Error: </strong>
+                                            <span className="block sm:inline">{generationError}</span>
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div>
@@ -255,6 +373,47 @@ export default function Edit({ auth, recipe, products, timestamp }) {
                                                     src={imagePreview}
                                                     alt="Preview"
                                                     className="h-32 w-32 object-cover rounded-md"
+                                                    onError={(e) => {
+                                                        console.error('Image preview failed to load:', imagePreview);
+                                                        e.target.onerror = null;
+
+                                                        // Try alternative URL formats
+                                                        const tryAlternativeUrls = () => {
+                                                            // Try alternative URL 1: add 'public/' after '/storage/'
+                                                            const altUrl1 = imagePreview.replace('/storage/', '/storage/public/');
+                                                            console.log('Trying alternative URL 1:', altUrl1);
+
+                                                            const img1 = new Image();
+                                                            img1.onload = () => {
+                                                                console.log('Alternative URL 1 loaded successfully:', altUrl1);
+                                                                e.target.src = altUrl1;
+                                                            };
+                                                            img1.onerror = () => {
+                                                                console.error('Alternative URL 1 failed:', altUrl1);
+
+                                                                // Try alternative URL 2: try direct path for recipes
+                                                                const altUrl2 = imagePreview.replace('/storage/recipes/', '/storage/public/recipes/');
+                                                                console.log('Trying alternative URL 2:', altUrl2);
+
+                                                                const img2 = new Image();
+                                                                img2.onload = () => {
+                                                                    console.log('Alternative URL 2 loaded successfully:', altUrl2);
+                                                                    e.target.src = altUrl2;
+                                                                };
+                                                                img2.onerror = () => {
+                                                                    console.error('Alternative URL 2 failed:', altUrl2);
+
+                                                                    // Use a data URI for the placeholder image
+                                                                    e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIiBmaWxsPSIjYWFhYWFhIj5JbWFnZSBOb3QgRm91bmQ8L3RleHQ+PC9zdmc+';
+                                                                };
+                                                                img2.src = altUrl2;
+                                                            };
+                                                            img1.src = altUrl1;
+                                                        };
+
+                                                        // Start trying alternative URLs
+                                                        tryAlternativeUrls();
+                                                    }}
                                                 />
                                             </div>
                                         )}
@@ -348,7 +507,17 @@ export default function Edit({ auth, recipe, products, timestamp }) {
                                 )}
 
                                 <div>
-                                    <InputLabel value="Ingredients" />
+                                    <div className="flex justify-between items-center">
+                                        <InputLabel value="Ingredients" />
+                                        <button
+                                            type="button"
+                                            onClick={generateRecipeIngredients}
+                                            disabled={isGeneratingIngredients || !data.title}
+                                            className="px-2 py-1 text-xs bg-green-600 dark:bg-green-500 text-white rounded-md hover:bg-green-700 dark:hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-green-400 dark:focus:ring-offset-gray-800 disabled:opacity-50"
+                                        >
+                                            {isGeneratingIngredients ? "Generating..." : "Generate with AI"}
+                                        </button>
+                                    </div>
                                     {ingredients.map((ingredient, index) => (
                                         <div
                                             key={index}
@@ -396,7 +565,17 @@ export default function Edit({ auth, recipe, products, timestamp }) {
                                 </div>
 
                                 <div>
-                                    <InputLabel value="Instructions" />
+                                    <div className="flex justify-between items-center">
+                                        <InputLabel value="Instructions" />
+                                        <button
+                                            type="button"
+                                            onClick={generateRecipeInstructions}
+                                            disabled={isGeneratingInstructions || !data.title}
+                                            className="px-2 py-1 text-xs bg-green-600 dark:bg-green-500 text-white rounded-md hover:bg-green-700 dark:hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-green-400 dark:focus:ring-offset-gray-800 disabled:opacity-50"
+                                        >
+                                            {isGeneratingInstructions ? "Generating..." : "Generate with AI"}
+                                        </button>
+                                    </div>
                                     {instructions.map((instruction, index) => (
                                         <div
                                             key={index}

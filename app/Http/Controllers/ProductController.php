@@ -287,8 +287,8 @@ class ProductController extends Controller
                     'size' => $file->getSize()
                 ]);
 
-                $product->image_url = $this->fileUploadService->uploadImage($file, 'products');
-                Log::info('Image URL', ['url' => $product->image_url]);
+                $product->image_url = $this->fileUploadService->uploadImage($file, 'products', $product->name);
+                Log::info('Image URL', ['url' => $product->image_url, 'product_name' => $product->name]);
             } catch (\Exception $e) {
                 Log::error('Image Upload Error', [
                     'message' => $e->getMessage(),
@@ -368,7 +368,7 @@ class ProductController extends Controller
                 // Instead, we just update the product's image_url
 
                 // Upload the image and get the URL
-                $imageUrl = $this->fileUploadService->uploadImage($file, 'products');
+                $imageUrl = $this->fileUploadService->uploadImage($file, 'products', $validated['name']);
 
                 // Ensure the URL is properly formatted
                 $validated['image_url'] = $imageUrl;

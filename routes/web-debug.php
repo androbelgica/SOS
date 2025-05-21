@@ -28,6 +28,8 @@ Route::get('/debug/storage-paths', function () {
         'app_public_public_path' => storage_path('app/public/public'),
         'products_path' => storage_path('app/public/products'),
         'public_products_path' => storage_path('app/public/public/products'),
+        'recipes_path' => storage_path('app/public/recipes'),
+        'public_recipes_path' => storage_path('app/public/public/recipes'),
     ];
 
     $exists = [];

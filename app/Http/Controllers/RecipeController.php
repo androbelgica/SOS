@@ -178,8 +178,8 @@ class RecipeController extends Controller
                     'size' => $file->getSize()
                 ]);
 
-                $recipe->image_url = $this->fileUploadService->uploadImage($file, 'recipes');
-                Log::info('Image URL', ['url' => $recipe->image_url]);
+                $recipe->image_url = $this->fileUploadService->uploadImage($file, 'recipes', $recipe->title);
+                Log::info('Image URL', ['url' => $recipe->image_url, 'recipe_title' => $recipe->title]);
             } catch (\Exception $e) {
                 Log::error('Image Upload Error', [
                     'message' => $e->getMessage(),
@@ -203,8 +203,8 @@ class RecipeController extends Controller
                     'size' => $file->getSize()
                 ]);
 
-                $recipe->video_url = $this->fileUploadService->uploadVideo($file, 'recipes/videos');
-                Log::info('Video URL', ['url' => $recipe->video_url]);
+                $recipe->video_url = $this->fileUploadService->uploadVideo($file, 'recipes/videos', $recipe->title);
+                Log::info('Video URL', ['url' => $recipe->video_url, 'recipe_title' => $recipe->title]);
             } catch (\Exception $e) {
                 Log::error('Video Upload Error', [
                     'message' => $e->getMessage(),
@@ -303,7 +303,7 @@ class RecipeController extends Controller
                 // Instead, we just update the recipe's image_url
 
                 // Upload the image and get the URL
-                $imageUrl = $this->fileUploadService->uploadImage($file, 'recipes');
+                $imageUrl = $this->fileUploadService->uploadImage($file, 'recipes', $validated['title']);
 
                 // Ensure the URL is properly formatted
                 $validated['image_url'] = $imageUrl;
@@ -345,7 +345,7 @@ class RecipeController extends Controller
                 }
 
                 // Upload the video and get the URL
-                $videoUrl = $this->fileUploadService->uploadVideo($file, 'recipes/videos');
+                $videoUrl = $this->fileUploadService->uploadVideo($file, 'recipes/videos', $validated['title']);
 
                 // Ensure the URL is properly formatted
                 $validated['video_url'] = $videoUrl;

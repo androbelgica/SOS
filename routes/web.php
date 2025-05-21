@@ -101,6 +101,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->middleware(['auth', 'admin'])
         ->name('api.ai.generate-product-info');
 
+    Route::post('/api/ai/generate-recipe-description', [App\Http\Controllers\API\AIGenerationController::class, 'generateRecipeDescription'])
+        ->middleware(['auth', 'admin'])
+        ->name('api.ai.generate-recipe-description');
+
+    Route::post('/api/ai/generate-recipe-ingredients', [App\Http\Controllers\API\AIGenerationController::class, 'generateRecipeIngredients'])
+        ->middleware(['auth', 'admin'])
+        ->name('api.ai.generate-recipe-ingredients');
+
+    Route::post('/api/ai/generate-recipe-instructions', [App\Http\Controllers\API\AIGenerationController::class, 'generateRecipeInstructions'])
+        ->middleware(['auth', 'admin'])
+        ->name('api.ai.generate-recipe-instructions');
+
     // File Browser API for admin
     Route::get('/api/files/{type}/images', [App\Http\Controllers\FileBrowserController::class, 'listImages'])
         ->middleware(['auth', 'admin'])

@@ -10,6 +10,33 @@ use Illuminate\Support\Str;
 class FileUploadService
 {
     /**
+     * Sanitize a string for use as a filename
+     *
+     * @param string $name The name to sanitize
+     * @return string The sanitized name
+     */
+    private function sanitizeFilename(string $name): string
+    {
+        // Convert to lowercase
+        $filename = strtolower($name);
+
+        // Replace spaces with underscores
+        $filename = str_replace(' ', '_', $filename);
+
+        // Remove any characters that aren't alphanumeric, underscore, or hyphen
+        $filename = preg_replace('/[^a-z0-9_-]/', '', $filename);
+
+        // Ensure the filename isn't too long (max 50 chars)
+        $filename = substr($filename, 0, 50);
+
+        // If the filename is empty after sanitization, use a fallback
+        if (empty($filename)) {
+            $filename = 'file_' . time();
+        }
+
+        return $filename;
+    }
+    /**
      * Check if an image with the same name already exists in storage
      * This helps with image reusability when products/recipes are recreated
      */
@@ -71,8 +98,13 @@ class FileUploadService
 
     /**
      * Upload an image file to storage
+     *
+     * @param UploadedFile $file The uploaded file
+     * @param string $folder The folder to store the file in
+     * @param string|null $name The name to use for the file (product or recipe name)
+     * @return string The URL of the uploaded file
      */
-    public function uploadImage(UploadedFile $file, string $folder = 'uploads'): string
+    public function uploadImage(UploadedFile $file, string $folder = 'uploads', ?string $name = null): string
     {
         // First check if a similar image already exists
         $existingImageUrl = $this->findExistingImage($file->getClientOriginalName(), $folder);
@@ -84,8 +116,21 @@ class FileUploadService
             return $existingImageUrl;
         }
 
-        // Generate a unique filename with timestamp to prevent caching issues
-        $filename = Str::uuid() . '_' . time() . '.' . $file->getClientOriginalExtension();
+        // Generate a filename based on the name if provided
+        if ($name) {
+            // Sanitize the name for use as a filename
+            $sanitizedName = $this->sanitizeFilename($name);
+            $filename = $sanitizedName . '_' . time() . '.' . $file->getClientOriginalExtension();
+
+            Log::info('Using product/recipe name for image filename', [
+                'original_name' => $name,
+                'sanitized_name' => $sanitizedName,
+                'final_filename' => $filename
+            ]);
+        } else {
+            // Fallback to the old method if no name is provided
+            $filename = Str::uuid() . '_' . time() . '.' . $file->getClientOriginalExtension();
+        }
 
         // Ensure the directory exists
         $storageDirectory = "public/{$folder}";
@@ -199,11 +244,29 @@ class FileUploadService
 
     /**
      * Upload a video file to storage
+     *
+     * @param UploadedFile $file The uploaded file
+     * @param string $folder The folder to store the file in
+     * @param string|null $name The name to use for the file (product or recipe name)
+     * @return string The URL of the uploaded file
      */
-    public function uploadVideo(UploadedFile $file, string $folder = 'videos'): string
+    public function uploadVideo(UploadedFile $file, string $folder = 'videos', ?string $name = null): string
     {
-        // Generate a unique filename with timestamp to prevent caching issues
-        $filename = Str::uuid() . '_' . time() . '.' . $file->getClientOriginalExtension();
+        // Generate a filename based on the name if provided
+        if ($name) {
+            // Sanitize the name for use as a filename
+            $sanitizedName = $this->sanitizeFilename($name);
+            $filename = $sanitizedName . '_' . time() . '.' . $file->getClientOriginalExtension();
+
+            Log::info('Using product/recipe name for video filename', [
+                'original_name' => $name,
+                'sanitized_name' => $sanitizedName,
+                'final_filename' => $filename
+            ]);
+        } else {
+            // Fallback to the old method if no name is provided
+            $filename = Str::uuid() . '_' . time() . '.' . $file->getClientOriginalExtension();
+        }
 
         // Ensure the directory exists
         $storageDirectory = "public/{$folder}";

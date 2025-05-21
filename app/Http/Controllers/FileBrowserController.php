@@ -72,6 +72,17 @@ class FileBrowserController extends Controller
                 $altBasePath = storage_path("app/public/public/{$type}");
                 $thirdBasePath = storage_path("app/public/public/public/{$type}");
 
+                // Log all paths we're checking
+                Log::info("Checking direct disk access paths", [
+                    'type' => $type,
+                    'basePath' => $basePath,
+                    'basePath_exists' => file_exists($basePath) && is_dir($basePath),
+                    'altBasePath' => $altBasePath,
+                    'altBasePath_exists' => file_exists($altBasePath) && is_dir($altBasePath),
+                    'thirdBasePath' => $thirdBasePath,
+                    'thirdBasePath_exists' => file_exists($thirdBasePath) && is_dir($thirdBasePath)
+                ]);
+
                 // Check the first path
                 if (file_exists($basePath) && is_dir($basePath)) {
                     $directFiles = scandir($basePath);
@@ -82,7 +93,11 @@ class FileBrowserController extends Controller
                         $files[] = "public/{$type}/{$file}";
                     }
 
-                    Log::info("Files found via direct disk access in standard path", ['count' => count($directFiles)]);
+                    Log::info("Files found via direct disk access in standard path", [
+                        'path' => $basePath,
+                        'count' => count($directFiles),
+                        'files' => $directFiles
+                    ]);
                 }
 
                 // Check the second path
@@ -95,7 +110,11 @@ class FileBrowserController extends Controller
                         $files[] = "public/public/{$type}/{$file}";
                     }
 
-                    Log::info("Files found via direct disk access in alternate path", ['count' => count($directFiles)]);
+                    Log::info("Files found via direct disk access in alternate path", [
+                        'path' => $altBasePath,
+                        'count' => count($directFiles),
+                        'files' => $directFiles
+                    ]);
                 }
 
                 // Check the third path
@@ -108,7 +127,27 @@ class FileBrowserController extends Controller
                         $files[] = "public/public/public/{$type}/{$file}";
                     }
 
-                    Log::info("Files found via direct disk access in third path", ['count' => count($directFiles)]);
+                    Log::info("Files found via direct disk access in third path", [
+                        'path' => $thirdBasePath,
+                        'count' => count($directFiles),
+                        'files' => $directFiles
+                    ]);
+                }
+
+                // If we still don't have any files, try to create the directories
+                if (empty($files)) {
+                    Log::warning("No files found in any directory, trying to create directories");
+
+                    // Create the directories if they don't exist
+                    if (!file_exists($basePath)) {
+                        mkdir($basePath, 0755, true);
+                        Log::info("Created directory: {$basePath}");
+                    }
+
+                    if (!file_exists($altBasePath)) {
+                        mkdir($altBasePath, 0755, true);
+                        Log::info("Created directory: {$altBasePath}");
+                    }
                 }
             }
 
@@ -146,6 +185,12 @@ class FileBrowserController extends Controller
 
                     // Ensure the relativePath doesn't have any double slashes
                     $relativePath = str_replace('//', '/', $relativePath);
+
+                    // Log the path conversion
+                    Log::info('Path conversion for ' . $type, [
+                        'original_file' => $file,
+                        'relativePath' => $relativePath
+                    ]);
 
                     $url = '/storage/' . $relativePath;
 

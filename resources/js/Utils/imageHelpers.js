@@ -36,6 +36,7 @@ export const getFallbackImage = (type) => {
  * Get the full image URL with optional cache busting
  * @param {string} imagePath - The image path or URL
  * @param {number} timestamp - The timestamp to use for cache busting
+ * @param {string} type - The type of image (product, recipe, etc.)
  * @returns {string} - The full image URL
  */
 export const getImageUrl = (imagePath, timestamp, type = 'product') => {
@@ -64,8 +65,24 @@ export const getImageUrl = (imagePath, timestamp, type = 'product') => {
         ? imagePath
         : `/storage/${imagePath}`;
 
+    // Fix common path issues for recipes
+    if (type === 'recipe' && path.includes('/recipes/')) {
+        // Try to fix the path for recipes
+        // Check if the path needs to be adjusted for the double public issue
+        if (!path.includes('/public/recipes/') && !path.includes('/public/public/recipes/')) {
+            // Add the public directory to the path
+            path = path.replace('/storage/recipes/', '/storage/public/recipes/');
+        }
+    }
+
     // Remove any existing timestamp parameters to prevent duplicates
     const cleanPath = path.split('?')[0];
+
+    // Log the path for debugging
+    console.log(`Image path for ${type}:`, {
+        original: imagePath,
+        processed: cleanPath
+    });
 
     // Return the relative path with timestamp
     // This will be resolved relative to the current page URL

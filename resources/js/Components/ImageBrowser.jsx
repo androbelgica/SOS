@@ -46,12 +46,26 @@ export default function ImageBrowser({
                     imageUrl = '/' + imageUrl;
                 }
 
+                // Fix common URL issues
+                // Remove any double slashes (except for http://)
+                imageUrl = imageUrl.replace(/([^:])\/\//g, '$1/');
+
+                // Ensure the URL has the correct format for the type
+                if (type === 'recipes' && !imageUrl.includes('/recipes/')) {
+                    console.warn('Recipe image URL does not contain /recipes/ path:', imageUrl);
+                    // Try to fix the URL
+                    if (imageUrl.includes('/products/')) {
+                        imageUrl = imageUrl.replace('/products/', '/recipes/');
+                    }
+                }
+
                 // Log the image URL for debugging
-                console.log('Image URL:', imageUrl);
+                console.log(`Image URL for ${type}:`, imageUrl);
 
                 return {
                     ...image,
-                    url: imageUrl
+                    url: imageUrl,
+                    original_url: image.url // Keep the original URL for reference
                 };
             });
 
@@ -166,22 +180,58 @@ export default function ImageBrowser({
                                                 console.error('Image failed to load:', image.url);
                                                 e.target.onerror = null;
 
-                                                // Try an alternative URL format
-                                                const altUrl = image.url.replace('/storage/', '/storage/public/');
-                                                console.log('Trying alternative URL:', altUrl);
+                                                // Try multiple alternative URL formats
+                                                const tryAlternativeUrls = () => {
+                                                    // First alternative: add 'public/' after '/storage/'
+                                                    const altUrl1 = image.url.replace('/storage/', '/storage/public/');
+                                                    console.log('Trying alternative URL 1:', altUrl1);
 
-                                                // Try the alternative URL
-                                                const img = new Image();
-                                                img.onload = () => {
-                                                    console.log('Alternative URL loaded successfully:', altUrl);
-                                                    e.target.src = altUrl;
+                                                    // Second alternative: try direct path for recipes
+                                                    const altUrl2 = image.url.replace(`/storage/${type}/`, `/storage/public/${type}/`);
+                                                    console.log('Trying alternative URL 2:', altUrl2);
+
+                                                    // Third alternative: try with double public
+                                                    const altUrl3 = image.url.replace(`/storage/${type}/`, `/storage/public/public/${type}/`);
+                                                    console.log('Trying alternative URL 3:', altUrl3);
+
+                                                    // Try the first alternative URL
+                                                    const img1 = new Image();
+                                                    img1.onload = () => {
+                                                        console.log('Alternative URL 1 loaded successfully:', altUrl1);
+                                                        e.target.src = altUrl1;
+                                                    };
+                                                    img1.onerror = () => {
+                                                        console.error('Alternative URL 1 failed:', altUrl1);
+
+                                                        // Try the second alternative URL
+                                                        const img2 = new Image();
+                                                        img2.onload = () => {
+                                                            console.log('Alternative URL 2 loaded successfully:', altUrl2);
+                                                            e.target.src = altUrl2;
+                                                        };
+                                                        img2.onerror = () => {
+                                                            console.error('Alternative URL 2 failed:', altUrl2);
+
+                                                            // Try the third alternative URL
+                                                            const img3 = new Image();
+                                                            img3.onload = () => {
+                                                                console.log('Alternative URL 3 loaded successfully:', altUrl3);
+                                                                e.target.src = altUrl3;
+                                                            };
+                                                            img3.onerror = () => {
+                                                                console.error('Alternative URL 3 failed:', altUrl3);
+                                                                // Use a data URI for the placeholder to avoid additional HTTP requests
+                                                                e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIiBmaWxsPSIjYWFhYWFhIj5JbWFnZSBOb3QgRm91bmQ8L3RleHQ+PC9zdmc+';
+                                                            };
+                                                            img3.src = altUrl3;
+                                                        };
+                                                        img2.src = altUrl2;
+                                                    };
+                                                    img1.src = altUrl1;
                                                 };
-                                                img.onerror = () => {
-                                                    console.error('Alternative URL also failed:', altUrl);
-                                                    // Use a data URI for the placeholder to avoid additional HTTP requests
-                                                    e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIiBmaWxsPSIjYWFhYWFhIj5JbWFnZSBOb3QgRm91bmQ8L3RleHQ+PC9zdmc+';
-                                                };
-                                                img.src = altUrl;
+
+                                                // Start trying alternative URLs
+                                                tryAlternativeUrls();
                                             }}
                                         />
                                         {selectedImage?.url === image.url && (
