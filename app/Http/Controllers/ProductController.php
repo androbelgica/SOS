@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Notifications\LowStockAlert;
 use App\Services\FileUploadService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class ProductController extends Controller
@@ -27,8 +28,8 @@ class ProductController extends Controller
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%")
-                  ->orWhere('category', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('category', 'like', "%{$search}%");
             });
         }
 
@@ -74,11 +75,11 @@ class ProductController extends Controller
             ->with('recipes')
             ->withCount('recipes')
             ->select('id', 'name', 'description', 'price', 'stock_quantity', 'category', 'unit_type', 'image_url', 'is_available', 'created_at', 'updated_at') // Explicitly select all needed fields
-            ->when(request('search'), function($query, $search) {
+            ->when(request('search'), function ($query, $search) {
                 $query->where('name', 'like', "%{$search}%")
-                      ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%");
             })
-            ->when(request('sort'), function($query, $sort) {
+            ->when(request('sort'), function ($query, $sort) {
                 $query->orderBy($sort, request('direction', 'asc'));
             });
 
@@ -110,7 +111,7 @@ class ProductController extends Controller
                     $product->image_url .= (strpos($product->image_url, '?') !== false ? '&' : '?') . 't=' . $timestamp;
                 }
 
-                \Log::info('Product image URL prepared', [
+                Log::info('Product image URL prepared', [
                     'product_id' => $product->id,
                     'image_url' => $product->image_url
                 ]);
@@ -170,7 +171,7 @@ class ProductController extends Controller
             }
 
             // Log the image URL for debugging
-            \Log::info('Show Product Image URL', [
+            Log::info('Show Product Image URL', [
                 'product_id' => $product->id,
                 'image_url' => $product->image_url,
                 'timestamp' => $timestamp
@@ -228,7 +229,7 @@ class ProductController extends Controller
             }
 
             // Log the image URL for debugging
-            \Log::info('Edit Product Image URL', [
+            Log::info('Edit Product Image URL', [
                 'product_id' => $product->id,
                 'image_url' => $product->image_url,
                 'timestamp' => $timestamp
@@ -244,7 +245,7 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
-        \Log::info('Product Create Request', [
+        Log::info('Product Create Request', [
             'has_file' => $request->hasFile('image'),
             'all_data' => $request->except(['image']),
             'files' => $request->hasFile('image') ? $request->file('image')->getClientOriginalName() : 'none'
@@ -253,11 +254,13 @@ class ProductController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
+            'nutritional_facts' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'stock_quantity' => 'required|integer|min:0',
             'category' => 'required|string|max:255',
             'unit_type' => 'required|string|in:kg,piece',
-            'image' => 'nullable|image|max:2048'
+            'image' => 'nullable|image|max:2048',
+            'image_url' => 'nullable|string' // For existing images selected from browser
         ]);
 
         // Remove image from validated data as it's not a column in the database
@@ -265,41 +268,53 @@ class ProductController extends Controller
             unset($validated['image']);
         }
 
+        // Remove image_url from validated data and store it separately
+        $existingImageUrl = null;
+        if (isset($validated['image_url'])) {
+            $existingImageUrl = $validated['image_url'];
+            unset($validated['image_url']);
+        }
+
         $product = new Product($validated);
 
+        // Handle image upload or reuse existing image
         if ($request->hasFile('image')) {
             try {
                 $file = $request->file('image');
-                \Log::info('Image File', [
+                Log::info('Image File', [
                     'original_name' => $file->getClientOriginalName(),
                     'mime_type' => $file->getMimeType(),
                     'size' => $file->getSize()
                 ]);
 
                 $product->image_url = $this->fileUploadService->uploadImage($file, 'products');
-                \Log::info('Image URL', ['url' => $product->image_url]);
+                Log::info('Image URL', ['url' => $product->image_url]);
             } catch (\Exception $e) {
-                \Log::error('Image Upload Error', [
+                Log::error('Image Upload Error', [
                     'message' => $e->getMessage(),
                     'trace' => $e->getTraceAsString()
                 ]);
                 return back()->withErrors(['image' => 'Failed to upload image: ' . $e->getMessage()]);
             }
+        } elseif ($existingImageUrl) {
+            // Use the existing image URL
+            $product->image_url = $existingImageUrl;
+            Log::info('Using existing image', ['url' => $existingImageUrl]);
         }
 
         try {
             $product->save();
-            \Log::info('Product Created', ['product_id' => $product->id]);
+            Log::info('Product Created', ['product_id' => $product->id]);
 
             if ($request->has('recipe_ids')) {
                 $product->recipes()->attach($request->recipe_ids);
-                \Log::info('Recipes Attached', ['recipe_ids' => $request->recipe_ids]);
+                Log::info('Recipes Attached', ['recipe_ids' => $request->recipe_ids]);
             }
 
             return redirect()->route('admin.products.index')
                 ->with('success', 'Product created successfully.');
         } catch (\Exception $e) {
-            \Log::error('Product Create Error', [
+            Log::error('Product Create Error', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
@@ -310,7 +325,7 @@ class ProductController extends Controller
     public function update(Request $request, Product $product)
     {
         // Log the request data for debugging
-        \Log::info('Product Update Request', [
+        Log::info('Product Update Request', [
             'has_file' => $request->hasFile('image'),
             'all_data' => $request->except(['image']), // Don't log the entire image data
             'files' => $request->hasFile('image') ? $request->file('image')->getClientOriginalName() : 'none'
@@ -320,30 +335,37 @@ class ProductController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
+            'nutritional_facts' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'stock_quantity' => 'required|integer|min:0',
             'category' => 'required|string|max:255',
             'unit_type' => 'required|string|in:kg,piece',
-            'image' => 'nullable|image|max:2048'
+            'image' => 'nullable|image|max:2048',
+            'image_url' => 'nullable|string' // For existing images selected from browser
         ]);
 
         // Log validated data
-        \Log::info('Validated Data', array_diff_key($validated, ['image' => '']));
+        Log::info('Validated Data', array_diff_key($validated, ['image' => '', 'image_url' => '']));
+
+        // Remove image_url from validated data and store it separately
+        $existingImageUrl = null;
+        if (isset($validated['image_url'])) {
+            $existingImageUrl = $validated['image_url'];
+            unset($validated['image_url']);
+        }
 
         // Handle image upload
         if ($request->hasFile('image')) {
             try {
                 $file = $request->file('image');
-                \Log::info('Image File', [
+                Log::info('Image File', [
                     'original_name' => $file->getClientOriginalName(),
                     'mime_type' => $file->getMimeType(),
                     'size' => $file->getSize()
                 ]);
 
-                // Delete old image if exists
-                if ($product->image_url) {
-                    $this->fileUploadService->deleteImage($product->image_url);
-                }
+                // Note: We don't delete the old image anymore to allow for image reusability
+                // Instead, we just update the product's image_url
 
                 // Upload the image and get the URL
                 $imageUrl = $this->fileUploadService->uploadImage($file, 'products');
@@ -351,18 +373,25 @@ class ProductController extends Controller
                 // Ensure the URL is properly formatted
                 $validated['image_url'] = $imageUrl;
 
-                \Log::info('Image URL', [
+                Log::info('Image URL', [
                     'url' => $validated['image_url'],
                     'product_id' => $product->id,
                     'timestamp' => time()
                 ]);
             } catch (\Exception $e) {
-                \Log::error('Image Upload Error', [
+                Log::error('Image Upload Error', [
                     'message' => $e->getMessage(),
                     'trace' => $e->getTraceAsString()
                 ]);
                 return back()->withErrors(['image' => 'Failed to upload image: ' . $e->getMessage()]);
             }
+        } elseif ($existingImageUrl) {
+            // Use the existing image URL
+            $validated['image_url'] = $existingImageUrl;
+            Log::info('Using existing image', [
+                'url' => $existingImageUrl,
+                'product_id' => $product->id
+            ]);
         }
 
         // Remove image from validated data as it's not a column in the database
@@ -372,18 +401,18 @@ class ProductController extends Controller
 
         try {
             $product->update($validated);
-            \Log::info('Product Updated', ['product_id' => $product->id]);
+            Log::info('Product Updated', ['product_id' => $product->id]);
 
             if ($request->has('recipe_ids')) {
                 $product->recipes()->sync($request->recipe_ids);
-                \Log::info('Recipes Synced', ['recipe_ids' => $request->recipe_ids]);
+                Log::info('Recipes Synced', ['recipe_ids' => $request->recipe_ids]);
             }
 
             // Redirect to the admin products index page with a success message
             return redirect()->route('admin.products.index')
                 ->with('success', 'Product updated successfully.');
         } catch (\Exception $e) {
-            \Log::error('Product Update Error', [
+            Log::error('Product Update Error', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
@@ -435,8 +464,11 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
+        // Note: We intentionally do not delete the image file to allow for image reusability
+        // if the same product is created again in the future
+
         $product->delete();
         return redirect()->route('admin.products.index')
-            ->with('success', 'Product deleted successfully.');
+            ->with('success', 'Product deleted successfully. (Note: Product image has been preserved for future reuse)');
     }
 }

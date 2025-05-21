@@ -6,15 +6,15 @@ use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductLabelController;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use App\Models\Product;
 use App\Models\Recipe;
 
 // Redirect to login for guests, dashboard for authenticated users
 Route::get('/', function () {
-    if (auth()->check()) {
+    if (Auth::check()) {
         return redirect()->route('dashboard');
     }
     return redirect()->route('login');
@@ -72,7 +72,7 @@ Route::get('/orders/{order}/verify/{product}', [ProductLabelController::class, '
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
-        $user = auth()->user();
+        $user = Auth::user();
 
         if ($user->role === 'admin') {
             return redirect()->route('admin.dashboard');
@@ -95,6 +95,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // AI Generation API
+    Route::post('/api/ai/generate-product-info', [App\Http\Controllers\API\AIGenerationController::class, 'generateProductInfo'])
+        ->middleware(['auth', 'admin'])
+        ->name('api.ai.generate-product-info');
+
+    // File Browser API for admin
+    Route::get('/api/files/{type}/images', [App\Http\Controllers\FileBrowserController::class, 'listImages'])
+        ->middleware(['auth', 'admin'])
+        ->where('type', 'products|recipes')
+        ->name('api.files.images');
+
+    // Temporary route for testing the file browser API without authentication
+    if (app()->environment('local')) {
+        Route::get('/test/files/{type}/images', [App\Http\Controllers\FileBrowserController::class, 'listImages'])
+            ->where('type', 'products|recipes')
+            ->name('test.files.images');
+    }
 
     // Admin Routes - Moved inside the 'auth' and 'verified' middleware group
     Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function () {

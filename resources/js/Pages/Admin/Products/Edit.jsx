@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Head, useForm, Link, usePage } from "@inertiajs/react";
+import axios from "axios";
 import MainLayout from "@/Layouts/MainLayout";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
@@ -16,6 +17,8 @@ export default function Edit({ auth, product, recipes, timestamp }) {
     const [imagePreview, setImagePreview] = useState(
         getImageUrl(product.image_url, cacheTimestamp)
     );
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [generationError, setGenerationError] = useState(null);
 
     // Log the image URL for debugging
     useEffect(() => {
@@ -30,11 +33,44 @@ export default function Edit({ auth, product, recipes, timestamp }) {
         }
     }, [product.image_url]);
 
+    // Function to generate product info using AI
+    const generateProductInfo = async () => {
+        if (!data.name || data.name.trim() === '') {
+            setGenerationError("Please enter a product name first");
+            return;
+        }
+
+        setIsGenerating(true);
+        setGenerationError(null);
+
+        try {
+            const response = await axios.post(route('api.ai.generate-product-info'), {
+                product_name: data.name
+            });
+
+            if (response.data.success) {
+                setData({
+                    ...data,
+                    description: response.data.description || data.description,
+                    nutritional_facts: response.data.nutritional_facts || data.nutritional_facts
+                });
+            } else {
+                setGenerationError(response.data.message || "Failed to generate product information");
+            }
+        } catch (error) {
+            console.error("AI Generation Error:", error);
+            setGenerationError(error.response?.data?.message || "An error occurred during generation");
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+
     const { data, setData, post, processing, errors, reset, progress } =
         useForm({
             _method: "PUT", // Use POST with _method for file uploads
             name: product.name,
             description: product.description,
+            nutritional_facts: product.nutritional_facts || "",
             price: product.price,
             stock_quantity: product.stock_quantity,
             category: product.category,
@@ -106,10 +142,20 @@ export default function Edit({ auth, product, recipes, timestamp }) {
                                 </div>
 
                                 <div>
-                                    <InputLabel
-                                        htmlFor="description"
-                                        value="Description"
-                                    />
+                                    <div className="flex justify-between items-center">
+                                        <InputLabel
+                                            htmlFor="description"
+                                            value="Description"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={generateProductInfo}
+                                            disabled={isGenerating || !data.name}
+                                            className="px-2 py-1 text-xs bg-green-600 dark:bg-green-500 text-white rounded-md hover:bg-green-700 dark:hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-green-400 dark:focus:ring-offset-gray-800 disabled:opacity-50"
+                                        >
+                                            {isGenerating ? "Generating..." : "Generate with AI"}
+                                        </button>
+                                    </div>
                                     <textarea
                                         id="description"
                                         value={data.description}
@@ -128,6 +174,37 @@ export default function Edit({ auth, product, recipes, timestamp }) {
                                         className="mt-2"
                                     />
                                 </div>
+
+                                <div>
+                                    <InputLabel
+                                        htmlFor="nutritional_facts"
+                                        value="Nutritional Facts"
+                                    />
+                                    <textarea
+                                        id="nutritional_facts"
+                                        value={data.nutritional_facts}
+                                        onChange={(e) =>
+                                            setData(
+                                                "nutritional_facts",
+                                                e.target.value
+                                            )
+                                        }
+                                        className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-300 dark:focus:border-blue-400 focus:ring focus:ring-blue-200 dark:focus:ring-blue-400"
+                                        rows="4"
+                                        placeholder="Enter nutritional information such as calories, protein, fats, etc."
+                                    />
+                                    <InputError
+                                        message={errors.nutritional_facts}
+                                        className="mt-2"
+                                    />
+                                </div>
+
+                                {generationError && (
+                                    <div className="bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded relative" role="alert">
+                                        <strong className="font-bold">Error: </strong>
+                                        <span className="block sm:inline">{generationError}</span>
+                                    </div>
+                                )}
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>

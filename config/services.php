@@ -41,4 +41,8 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI', 'auth/google/callback'),
     ],
 
+    'openai' => [
+        'api_key' => env('OPENAI_API_KEY', 'mock-api-key'),
+    ],
+
 ];

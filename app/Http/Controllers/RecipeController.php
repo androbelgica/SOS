@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\RecipeReview;
 use App\Services\FileUploadService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class RecipeController extends Controller
@@ -41,7 +42,8 @@ class RecipeController extends Controller
                 ->limit(3)
                 ->get()
         ]);
-    }    public function addReview(Request $request, Recipe $recipe)
+    }
+    public function addReview(Request $request, Recipe $recipe)
     {
         $validated = $request->validate([
             'rating' => 'required|integer|min:1|max:5',
@@ -75,11 +77,11 @@ class RecipeController extends Controller
             ->withCount('reviews')
             ->withAvg('reviews', 'rating')
             ->select('id', 'title', 'description', 'cooking_time', 'difficulty_level', 'image_url', 'created_at', 'updated_at')
-            ->when(request('search'), function($query, $search) {
+            ->when(request('search'), function ($query, $search) {
                 $query->where('title', 'like', "%{$search}%")
-                      ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%");
             })
-            ->when(request('sort'), function($query, $sort) {
+            ->when(request('sort'), function ($query, $sort) {
                 $query->orderBy($sort, request('direction', 'asc'));
             });
 
@@ -104,10 +106,10 @@ class RecipeController extends Controller
             'filters' => request()->only(['search', 'sort', 'direction']),
             'stats' => [
                 'total' => Recipe::count(),
-                'highRated' => Recipe::whereHas('reviews', function($query) {
+                'highRated' => Recipe::whereHas('reviews', function ($query) {
                     $query->select('recipe_id')
-                          ->groupBy('recipe_id')
-                          ->havingRaw('AVG(rating) >= ?', [4]);
+                        ->groupBy('recipe_id')
+                        ->havingRaw('AVG(rating) >= ?', [4]);
                 })->count(),
             ],
             'timestamp' => $timestamp, // Pass timestamp to the view for cache busting
@@ -123,7 +125,7 @@ class RecipeController extends Controller
 
     public function store(Request $request)
     {
-        \Log::info('Recipe Create Request', [
+        Log::info('Recipe Create Request', [
             'has_file' => $request->hasFile('image'),
             'all_data' => $request->except(['image']),
             'files' => $request->hasFile('image') ? $request->file('image')->getClientOriginalName() : 'none'
@@ -137,6 +139,7 @@ class RecipeController extends Controller
             'cooking_time' => 'required|integer|min:1',
             'difficulty_level' => 'required|string|in:easy,medium,hard',
             'image' => 'nullable|image|max:2048',
+            'image_url' => 'nullable|string', // For existing images selected from browser
             'video' => 'nullable|mimetypes:video/mp4,video/quicktime,video/x-msvideo,video/x-flv,video/x-ms-wmv|max:20480',
             'youtube_url' => 'nullable|string|url',
             'product_ids' => 'nullable|array',
@@ -152,47 +155,58 @@ class RecipeController extends Controller
             unset($validated['video']);
         }
 
+        // Remove image_url from validated data and store it separately
+        $existingImageUrl = null;
+        if (isset($validated['image_url'])) {
+            $existingImageUrl = $validated['image_url'];
+            unset($validated['image_url']);
+        }
+
         // Remove product_ids from validated data as it's not a column in the database
         $productIds = $validated['product_ids'] ?? [];
         unset($validated['product_ids']);
 
         $recipe = new Recipe($validated);
 
-        // Handle image upload
+        // Handle image upload or reuse existing image
         if ($request->hasFile('image')) {
             try {
                 $file = $request->file('image');
-                \Log::info('Image File', [
+                Log::info('Image File', [
                     'original_name' => $file->getClientOriginalName(),
                     'mime_type' => $file->getMimeType(),
                     'size' => $file->getSize()
                 ]);
 
                 $recipe->image_url = $this->fileUploadService->uploadImage($file, 'recipes');
-                \Log::info('Image URL', ['url' => $recipe->image_url]);
+                Log::info('Image URL', ['url' => $recipe->image_url]);
             } catch (\Exception $e) {
-                \Log::error('Image Upload Error', [
+                Log::error('Image Upload Error', [
                     'message' => $e->getMessage(),
                     'trace' => $e->getTraceAsString()
                 ]);
                 return back()->withErrors(['image' => 'Failed to upload image: ' . $e->getMessage()]);
             }
+        } elseif ($existingImageUrl) {
+            // Use the existing image URL
+            $recipe->image_url = $existingImageUrl;
+            Log::info('Using existing image', ['url' => $existingImageUrl]);
         }
 
         // Handle video upload
         if ($request->hasFile('video')) {
             try {
                 $file = $request->file('video');
-                \Log::info('Video File', [
+                Log::info('Video File', [
                     'original_name' => $file->getClientOriginalName(),
                     'mime_type' => $file->getMimeType(),
                     'size' => $file->getSize()
                 ]);
 
                 $recipe->video_url = $this->fileUploadService->uploadVideo($file, 'recipes/videos');
-                \Log::info('Video URL', ['url' => $recipe->video_url]);
+                Log::info('Video URL', ['url' => $recipe->video_url]);
             } catch (\Exception $e) {
-                \Log::error('Video Upload Error', [
+                Log::error('Video Upload Error', [
                     'message' => $e->getMessage(),
                     'trace' => $e->getTraceAsString()
                 ]);
@@ -203,7 +217,7 @@ class RecipeController extends Controller
         // Handle YouTube URL
         if ($request->filled('youtube_url')) {
             $recipe->video_url = $request->youtube_url;
-            \Log::info('YouTube URL', ['url' => $recipe->video_url]);
+            Log::info('YouTube URL', ['url' => $recipe->video_url]);
         }
 
         $recipe->save();
@@ -244,7 +258,7 @@ class RecipeController extends Controller
     public function update(Request $request, Recipe $recipe)
     {
         // Log the request data for debugging
-        \Log::info('Recipe Update Request', [
+        Log::info('Recipe Update Request', [
             'has_file' => $request->hasFile('image'),
             'all_data' => $request->except(['image']), // Don't log the entire image data
             'files' => $request->hasFile('image') ? $request->file('image')->getClientOriginalName() : 'none'
@@ -258,6 +272,7 @@ class RecipeController extends Controller
             'cooking_time' => 'required|integer|min:1',
             'difficulty_level' => 'required|string|in:easy,medium,hard',
             'image' => 'nullable|image|max:2048',
+            'image_url' => 'nullable|string', // For existing images selected from browser
             'video' => 'nullable|mimetypes:video/mp4,video/quicktime,video/x-msvideo,video/x-flv,video/x-ms-wmv|max:20480',
             'youtube_url' => 'nullable|string|url',
             'product_ids' => 'nullable|array',
@@ -265,22 +280,27 @@ class RecipeController extends Controller
         ]);
 
         // Log validated data
-        \Log::info('Validated Data', array_diff_key($validated, ['image' => '']));
+        Log::info('Validated Data', array_diff_key($validated, ['image' => '', 'image_url' => '']));
+
+        // Remove image_url from validated data and store it separately
+        $existingImageUrl = null;
+        if (isset($validated['image_url'])) {
+            $existingImageUrl = $validated['image_url'];
+            unset($validated['image_url']);
+        }
 
         // Handle image upload
         if ($request->hasFile('image')) {
             try {
                 $file = $request->file('image');
-                \Log::info('Image File', [
+                Log::info('Image File', [
                     'original_name' => $file->getClientOriginalName(),
                     'mime_type' => $file->getMimeType(),
                     'size' => $file->getSize()
                 ]);
 
-                // Delete old image if exists
-                if ($recipe->image_url) {
-                    $this->fileUploadService->deleteImage($recipe->image_url);
-                }
+                // Note: We don't delete the old image anymore to allow for image reusability
+                // Instead, we just update the recipe's image_url
 
                 // Upload the image and get the URL
                 $imageUrl = $this->fileUploadService->uploadImage($file, 'recipes');
@@ -288,25 +308,32 @@ class RecipeController extends Controller
                 // Ensure the URL is properly formatted
                 $validated['image_url'] = $imageUrl;
 
-                \Log::info('Image URL', [
+                Log::info('Image URL', [
                     'url' => $validated['image_url'],
                     'recipe_id' => $recipe->id,
                     'timestamp' => time()
                 ]);
             } catch (\Exception $e) {
-                \Log::error('Image Upload Error', [
+                Log::error('Image Upload Error', [
                     'message' => $e->getMessage(),
                     'trace' => $e->getTraceAsString()
                 ]);
                 return back()->withErrors(['image' => 'Failed to upload image: ' . $e->getMessage()]);
             }
+        } elseif ($existingImageUrl) {
+            // Use the existing image URL
+            $validated['image_url'] = $existingImageUrl;
+            Log::info('Using existing image', [
+                'url' => $existingImageUrl,
+                'recipe_id' => $recipe->id
+            ]);
         }
 
         // Handle video upload
         if ($request->hasFile('video')) {
             try {
                 $file = $request->file('video');
-                \Log::info('Video File', [
+                Log::info('Video File', [
                     'original_name' => $file->getClientOriginalName(),
                     'mime_type' => $file->getMimeType(),
                     'size' => $file->getSize()
@@ -323,13 +350,13 @@ class RecipeController extends Controller
                 // Ensure the URL is properly formatted
                 $validated['video_url'] = $videoUrl;
 
-                \Log::info('Video URL', [
+                Log::info('Video URL', [
                     'url' => $validated['video_url'],
                     'recipe_id' => $recipe->id,
                     'timestamp' => time()
                 ]);
             } catch (\Exception $e) {
-                \Log::error('Video Upload Error', [
+                Log::error('Video Upload Error', [
                     'message' => $e->getMessage(),
                     'trace' => $e->getTraceAsString()
                 ]);
@@ -345,7 +372,7 @@ class RecipeController extends Controller
             }
 
             $validated['video_url'] = $request->youtube_url;
-            \Log::info('YouTube URL', [
+            Log::info('YouTube URL', [
                 'url' => $validated['video_url'],
                 'recipe_id' => $recipe->id,
                 'timestamp' => time()
@@ -369,12 +396,11 @@ class RecipeController extends Controller
 
     public function destroy(Recipe $recipe)
     {
-        // Delete the image if it exists
-        if ($recipe->image_url) {
-            $this->fileUploadService->deleteImage($recipe->image_url);
-        }
+        // Note: We intentionally do not delete the image file to allow for image reusability
+        // if the same recipe is created again in the future
 
         // Delete the video if it exists and it's not a YouTube URL
+        // We still delete videos as they are typically larger files and less likely to be reused
         if ($recipe->video_url && !str_contains($recipe->video_url, 'youtube.com') && !str_contains($recipe->video_url, 'youtu.be')) {
             $this->fileUploadService->deleteVideo($recipe->video_url);
         }
@@ -382,6 +408,6 @@ class RecipeController extends Controller
         // Delete the recipe
         $recipe->delete();
 
-        return redirect()->route('admin.recipes.index')->with('success', 'Recipe deleted successfully.');
+        return redirect()->route('admin.recipes.index')->with('success', 'Recipe deleted successfully. (Note: Recipe image has been preserved for future reuse)');
     }
 }

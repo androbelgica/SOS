@@ -3,16 +3,87 @@
 namespace App\Services;
 
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class FileUploadService
 {
     /**
+     * Check if an image with the same name already exists in storage
+     * This helps with image reusability when products/recipes are recreated
+     */
+    public function findExistingImage(string $originalName, string $folder = 'uploads'): ?string
+    {
+        // Clean the original filename to use for searching
+        $cleanName = pathinfo($originalName, PATHINFO_FILENAME);
+        $extension = pathinfo($originalName, PATHINFO_EXTENSION);
+
+        // Search in the storage directory for files with similar names
+        $storageDirectory = "public/{$folder}";
+        $files = Storage::files($storageDirectory);
+
+        // Log the search attempt
+        Log::info('Searching for existing image', [
+            'original_name' => $originalName,
+            'clean_name' => $cleanName,
+            'extension' => $extension,
+            'folder' => $folder,
+            'files_count' => count($files)
+        ]);
+
+        // Look for files that might match the original name pattern
+        foreach ($files as $file) {
+            $filename = basename($file);
+
+            // If the filename contains the original name (case insensitive) and has the same extension
+            if (
+                stripos($filename, $cleanName) !== false &&
+                pathinfo($filename, PATHINFO_EXTENSION) === $extension
+            ) {
+
+                // Get the URL as a relative path
+                $url = Storage::url($file);
+
+                // Ensure it's a relative path by removing any domain
+                if (str_starts_with($url, 'http')) {
+                    $parsedUrl = parse_url($url);
+                    $url = $parsedUrl['path'];
+                }
+
+                Log::info('Found existing image', [
+                    'original_name' => $originalName,
+                    'found_file' => $filename,
+                    'url' => $url
+                ]);
+
+                return $url;
+            }
+        }
+
+        Log::info('No existing image found', [
+            'original_name' => $originalName,
+            'folder' => $folder
+        ]);
+
+        return null;
+    }
+
+    /**
      * Upload an image file to storage
      */
     public function uploadImage(UploadedFile $file, string $folder = 'uploads'): string
     {
+        // First check if a similar image already exists
+        $existingImageUrl = $this->findExistingImage($file->getClientOriginalName(), $folder);
+        if ($existingImageUrl) {
+            Log::info('Using existing image instead of uploading new one', [
+                'original_name' => $file->getClientOriginalName(),
+                'existing_url' => $existingImageUrl
+            ]);
+            return $existingImageUrl;
+        }
+
         // Generate a unique filename with timestamp to prevent caching issues
         $filename = Str::uuid() . '_' . time() . '.' . $file->getClientOriginalExtension();
 
@@ -35,7 +106,7 @@ class FileUploadService
         }
 
         // Log the URL for debugging
-        \Log::info('Generated image URL', [
+        Log::info('Generated image URL', [
             'storage_url' => Storage::url($path),
             'final_url' => $url,
             'path' => $path,
@@ -45,7 +116,7 @@ class FileUploadService
 
         // Verify the file was actually stored
         if (!Storage::exists($path)) {
-            \Log::error('File upload failed - file does not exist at path', [
+            Log::error('File upload failed - file does not exist at path', [
                 'original_name' => $file->getClientOriginalName(),
                 'stored_path' => $path,
                 'url' => $url,
@@ -60,7 +131,7 @@ class FileUploadService
         $fileIsAccessible = file_exists($publicPath);
 
         // Log the file path for debugging
-        \Log::info('File uploaded successfully', [
+        Log::info('File uploaded successfully', [
             'original_name' => $file->getClientOriginalName(),
             'stored_path' => $path,
             'url' => $url,
@@ -80,7 +151,7 @@ class FileUploadService
     public function deleteImage(?string $url): bool
     {
         if (!$url) {
-            \Log::info('No URL provided for image deletion');
+            Log::info('No URL provided for image deletion');
             return false;
         }
 
@@ -100,7 +171,7 @@ class FileUploadService
         }
 
         // Log the attempt
-        \Log::info('Attempting to delete image', [
+        Log::info('Attempting to delete image', [
             'url' => $url,
             'storage_path' => $storagePath,
             'public_path' => $publicPath,
@@ -122,7 +193,7 @@ class FileUploadService
             $success = true;
         }
 
-        \Log::info('Image deletion result', ['success' => $success]);
+        Log::info('Image deletion result', ['success' => $success]);
         return $success;
     }
 
@@ -153,7 +224,7 @@ class FileUploadService
         }
 
         // Log the URL for debugging
-        \Log::info('Generated video URL', [
+        Log::info('Generated video URL', [
             'storage_url' => Storage::url($path),
             'final_url' => $url,
             'path' => $path,
@@ -163,7 +234,7 @@ class FileUploadService
 
         // Verify the file was actually stored
         if (!Storage::exists($path)) {
-            \Log::error('Video upload failed - file does not exist at path', [
+            Log::error('Video upload failed - file does not exist at path', [
                 'original_name' => $file->getClientOriginalName(),
                 'stored_path' => $path,
                 'url' => $url,
@@ -178,7 +249,7 @@ class FileUploadService
         $fileIsAccessible = file_exists($publicPath);
 
         // Log the file path for debugging
-        \Log::info('Video uploaded successfully', [
+        Log::info('Video uploaded successfully', [
             'original_name' => $file->getClientOriginalName(),
             'stored_path' => $path,
             'url' => $url,
@@ -198,7 +269,7 @@ class FileUploadService
     public function deleteVideo(?string $url): bool
     {
         if (!$url) {
-            \Log::info('No URL provided for video deletion');
+            Log::info('No URL provided for video deletion');
             return false;
         }
 
@@ -218,7 +289,7 @@ class FileUploadService
         }
 
         // Log the attempt
-        \Log::info('Attempting to delete video', [
+        Log::info('Attempting to delete video', [
             'url' => $url,
             'storage_path' => $storagePath,
             'public_path' => $publicPath,
@@ -240,7 +311,7 @@ class FileUploadService
             $success = true;
         }
 
-        \Log::info('Video deletion result', ['success' => $success]);
+        Log::info('Video deletion result', ['success' => $success]);
         return $success;
     }
 }

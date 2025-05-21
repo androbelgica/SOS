@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Head, useForm, Link, usePage } from "@inertiajs/react";
+import axios from "axios";
 import MainLayout from "@/Layouts/MainLayout";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
+import ImageBrowser from "@/Components/ImageBrowser";
 import { getImageProps, getImageUrl, getFallbackImage } from "@/Utils/imageHelpers";
 
 export default function Create({ auth, recipes }) {
@@ -13,16 +15,52 @@ export default function Create({ auth, recipes }) {
 
     // Initialize image preview state
     const [imagePreview, setImagePreview] = useState(null);
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [generationError, setGenerationError] = useState(null);
+    const [imageBrowserOpen, setImageBrowserOpen] = useState(false);
 
     // For debugging image loading
     useEffect(() => {
         console.log("Create Product component mounted");
     }, []);
 
+    // Function to generate product info using AI
+    const generateProductInfo = async () => {
+        if (!data.name || data.name.trim() === '') {
+            setGenerationError("Please enter a product name first");
+            return;
+        }
+
+        setIsGenerating(true);
+        setGenerationError(null);
+
+        try {
+            const response = await axios.post(route('api.ai.generate-product-info'), {
+                product_name: data.name
+            });
+
+            if (response.data.success) {
+                setData({
+                    ...data,
+                    description: response.data.description || data.description,
+                    nutritional_facts: response.data.nutritional_facts || data.nutritional_facts
+                });
+            } else {
+                setGenerationError(response.data.message || "Failed to generate product information");
+            }
+        } catch (error) {
+            console.error("AI Generation Error:", error);
+            setGenerationError(error.response?.data?.message || "An error occurred during generation");
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+
     const { data, setData, post, processing, errors, reset, progress } =
         useForm({
             name: "",
             description: "",
+            nutritional_facts: "",
             price: "",
             stock_quantity: "",
             category: "",
@@ -44,6 +82,16 @@ export default function Create({ auth, recipes }) {
             };
             reader.readAsDataURL(file);
         }
+    };
+
+    // Handle selecting an existing image from the browser
+    const handleExistingImageSelect = (image) => {
+        // Set the image URL directly in the form data
+        // We'll use a special format to indicate this is an existing image
+        setData("image_url", image.url);
+
+        // Set the preview to the selected image
+        setImagePreview(image.url);
     };
 
     const handleSubmit = (e) => {
@@ -92,10 +140,20 @@ export default function Create({ auth, recipes }) {
                                 </div>
 
                                 <div>
-                                    <InputLabel
-                                        htmlFor="description"
-                                        value="Description"
-                                    />
+                                    <div className="flex justify-between items-center">
+                                        <InputLabel
+                                            htmlFor="description"
+                                            value="Description"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={generateProductInfo}
+                                            disabled={isGenerating || !data.name}
+                                            className="px-2 py-1 text-xs bg-green-600 dark:bg-green-500 text-white rounded-md hover:bg-green-700 dark:hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-green-400 dark:focus:ring-offset-gray-800 disabled:opacity-50"
+                                        >
+                                            {isGenerating ? "Generating..." : "Generate with AI"}
+                                        </button>
+                                    </div>
                                     <textarea
                                         id="description"
                                         value={data.description}
@@ -114,6 +172,37 @@ export default function Create({ auth, recipes }) {
                                         className="mt-2"
                                     />
                                 </div>
+
+                                <div>
+                                    <InputLabel
+                                        htmlFor="nutritional_facts"
+                                        value="Nutritional Facts"
+                                    />
+                                    <textarea
+                                        id="nutritional_facts"
+                                        value={data.nutritional_facts}
+                                        onChange={(e) =>
+                                            setData(
+                                                "nutritional_facts",
+                                                e.target.value
+                                            )
+                                        }
+                                        className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-300 dark:focus:border-blue-400 focus:ring focus:ring-blue-200 dark:focus:ring-blue-400"
+                                        rows="4"
+                                        placeholder="Enter nutritional information such as calories, protein, fats, etc."
+                                    />
+                                    <InputError
+                                        message={errors.nutritional_facts}
+                                        className="mt-2"
+                                    />
+                                </div>
+
+                                {generationError && (
+                                    <div className="bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded relative" role="alert">
+                                        <strong className="font-bold">Error: </strong>
+                                        <span className="block sm:inline">{generationError}</span>
+                                    </div>
+                                )}
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
@@ -231,13 +320,25 @@ export default function Create({ auth, recipes }) {
                                         htmlFor="image"
                                         value="Product Image"
                                     />
-                                    <input
-                                        type="file"
-                                        id="image"
-                                        onChange={handleImageChange}
-                                        className="mt-1 block w-full text-gray-700 dark:text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-50 dark:file:bg-gray-700 file:text-gray-700 dark:file:text-gray-300 hover:file:bg-gray-100 dark:hover:file:bg-gray-600"
-                                        accept="image/*"
-                                    />
+                                    <div className="flex flex-col sm:flex-row sm:items-center mt-1 space-y-2 sm:space-y-0 sm:space-x-2">
+                                        <input
+                                            type="file"
+                                            id="image"
+                                            onChange={handleImageChange}
+                                            className="block w-full text-gray-700 dark:text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-50 dark:file:bg-gray-700 file:text-gray-700 dark:file:text-gray-300 hover:file:bg-gray-100 dark:hover:file:bg-gray-600"
+                                            accept="image/*"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setImageBrowserOpen(true)}
+                                            className="px-4 py-2 bg-indigo-600 dark:bg-indigo-500 text-white rounded-md hover:bg-indigo-700 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 dark:focus:ring-offset-gray-800 whitespace-nowrap"
+                                        >
+                                            Browse Existing Images
+                                        </button>
+                                    </div>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                        Upload a new image or select an existing one from the products folder.
+                                    </p>
                                     {progress && (
                                         <div className="mt-2">
                                             <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full">
@@ -350,6 +451,15 @@ export default function Create({ auth, recipes }) {
                     </div>
                 </div>
             </div>
+
+            {/* Image Browser Modal */}
+            <ImageBrowser
+                isOpen={imageBrowserOpen}
+                onClose={() => setImageBrowserOpen(false)}
+                onSelect={handleExistingImageSelect}
+                type="products"
+                title="Select Product Image"
+            />
         </MainLayout>
     );
 }

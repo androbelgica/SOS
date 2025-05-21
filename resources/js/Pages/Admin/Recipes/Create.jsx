@@ -4,6 +4,7 @@ import MainLayout from "@/Layouts/MainLayout";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
+import ImageBrowser from "@/Components/ImageBrowser";
 import { getImageUrl, getFallbackImage } from "@/Utils/imageHelpers";
 
 export default function Create({ auth, products }) {
@@ -14,6 +15,7 @@ export default function Create({ auth, products }) {
     // Initialize image and video preview states
     const [imagePreview, setImagePreview] = useState(null);
     const [videoPreview, setVideoPreview] = useState(null);
+    const [imageBrowserOpen, setImageBrowserOpen] = useState(false);
 
     // For dynamic ingredients and instructions
     const [ingredients, setIngredients] = useState([""]);
@@ -51,6 +53,16 @@ export default function Create({ auth, products }) {
             };
             reader.readAsDataURL(file);
         }
+    };
+
+    // Handle selecting an existing image from the browser
+    const handleExistingImageSelect = (image) => {
+        // Set the image URL directly in the form data
+        // We'll use a special format to indicate this is an existing image
+        setData("image_url", image.url);
+
+        // Set the preview to the selected image
+        setImagePreview(image.url);
     };
 
     // Handle video file selection
@@ -240,13 +252,25 @@ export default function Create({ auth, products }) {
                                         htmlFor="image"
                                         value="Recipe Image"
                                     />
-                                    <input
-                                        id="image"
-                                        type="file"
-                                        onChange={handleImageChange}
-                                        className="mt-1 block w-full"
-                                        accept="image/*"
-                                    />
+                                    <div className="flex flex-col sm:flex-row sm:items-center mt-1 space-y-2 sm:space-y-0 sm:space-x-2">
+                                        <input
+                                            id="image"
+                                            type="file"
+                                            onChange={handleImageChange}
+                                            className="block w-full text-gray-700 dark:text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-50 dark:file:bg-gray-700 file:text-gray-700 dark:file:text-gray-300 hover:file:bg-gray-100 dark:hover:file:bg-gray-600"
+                                            accept="image/*"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setImageBrowserOpen(true)}
+                                            className="px-4 py-2 bg-indigo-600 dark:bg-indigo-500 text-white rounded-md hover:bg-indigo-700 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 dark:focus:ring-offset-gray-800 whitespace-nowrap"
+                                        >
+                                            Browse Existing Images
+                                        </button>
+                                    </div>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                        Upload a new image or select an existing one from the recipes folder.
+                                    </p>
                                     <InputError
                                         message={errors.image}
                                         className="mt-2"
@@ -493,6 +517,15 @@ export default function Create({ auth, products }) {
                     </div>
                 </div>
             </div>
+
+            {/* Image Browser Modal */}
+            <ImageBrowser
+                isOpen={imageBrowserOpen}
+                onClose={() => setImageBrowserOpen(false)}
+                onSelect={handleExistingImageSelect}
+                type="recipes"
+                title="Select Recipe Image"
+            />
         </MainLayout>
     );
 }
