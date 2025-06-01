@@ -1,9 +1,15 @@
 {
     "private": true,
+    "name": "seabasket-web-frontend",
+    "description": "SeaBasket Web Frontend - React application consuming Laravel backend API",
+    "version": "1.0.0",
     "type": "module",
     "scripts": {
         "build": "vite build",
-        "dev": "vite"
+        "dev": "vite",
+        "preview": "vite preview",
+        "lint": "eslint resources/js --ext .js,.jsx,.ts,.tsx",
+        "format": "prettier --write resources/js"
     },
     "devDependencies": {
         "@headlessui/react": "^2.0.0",
