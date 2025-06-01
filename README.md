@@ -1,61 +1,206 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# SeaBasket Backend API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A dedicated Laravel backend API for the SeaBasket Online Seafood Store, designed to serve both web and mobile frontends.
 
-## About Laravel
+## 🚀 Overview
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+This is a clean, API-focused Laravel backend that provides all the necessary endpoints for:
+- **Web Frontend** (React/Next.js - separate repository)
+- **Mobile App** (React Native/Flutter - separate repository)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 📋 Features
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Core API Functionality
+- **Authentication & Authorization** (Laravel Sanctum)
+- **Product Management** (CRUD operations, categories, search)
+- **Recipe Management** (CRUD operations, reviews, favorites)
+- **Order Management** (cart, checkout, order tracking)
+- **User Management** (profiles, addresses, preferences)
+- **Admin Panel APIs** (dashboard stats, management endpoints)
 
-## Learning Laravel
+### Advanced Features
+- **AI-Powered Content Generation** (product descriptions, recipe details)
+- **QR Code Label Generation** (for order verification)
+- **Google OAuth Integration**
+- **File Management** (image uploads, browsing)
+- **Order Verification System**
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## 🛠 Tech Stack
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+- **Framework**: Laravel 11.x
+- **Database**: SQLite (development) / MySQL (production)
+- **Authentication**: Laravel Sanctum
+- **File Storage**: Laravel Storage
+- **PDF Generation**: DomPDF
+- **QR Codes**: SimpleSoftwareIO/simple-qrcode
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## 📚 API Documentation
 
-## Laravel Sponsors
+### Base URL
+```
+http://localhost:8000/api/v1
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Quick Start Endpoints
+- **Health Check**: `GET /api/v1/health`
+- **API Documentation**: `GET /api/docs`
+- **Products**: `GET /api/v1/products`
+- **Recipes**: `GET /api/v1/recipes`
 
-### Premium Partners
+### Authentication
+```bash
+# Register
+POST /api/v1/register
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "password",
+  "password_confirmation": "password"
+}
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+# Login
+POST /api/v1/login
+{
+  "email": "john@example.com",
+  "password": "password"
+}
 
-## Contributing
+# Google OAuth
+POST /api/v1/auth/google
+{
+  "token": "google_oauth_token"
+}
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 🚀 Installation & Setup
 
-## Code of Conduct
+### Prerequisites
+- PHP 8.2+
+- Composer
+- SQLite or MySQL
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Installation Steps
 
-## Security Vulnerabilities
+1. **Clone the repository**
+```bash
+git clone <repository-url>
+cd seabasket-backend-api
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+2. **Install dependencies**
+```bash
+composer install
+```
 
-## License
+3. **Environment setup**
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+4. **Database setup**
+```bash
+php artisan migrate
+php artisan db:seed
+```
+
+5. **Storage setup**
+```bash
+php artisan storage:link
+```
+
+6. **Start the server**
+```bash
+php artisan serve
+```
+
+The API will be available at `http://localhost:8000`
+
+## 🔧 Configuration
+
+### Environment Variables
+```env
+# App Configuration
+APP_NAME="SeaBasket Backend API"
+APP_ENV=local
+APP_URL=http://localhost:8000
+
+# Database
+DB_CONNECTION=sqlite
+# DB_DATABASE=/path/to/database.sqlite
+
+# Google OAuth
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+GOOGLE_REDIRECT_URI=http://localhost:8000/auth/google/callback
+
+# CORS (for frontend apps)
+SANCTUM_STATEFUL_DOMAINS=localhost:3000,localhost:19006
+```
+
+## 📱 Frontend Integration
+
+### Web Frontend
+- **Technology**: React/Next.js
+- **Authentication**: Sanctum tokens
+- **Base URL**: Configure in frontend environment
+
+### Mobile App
+- **Technology**: React Native/Flutter
+- **Authentication**: Sanctum tokens
+- **Base URL**: Configure in mobile app environment
+
+## 🔐 Authentication Flow
+
+1. **Registration/Login** → Receive Sanctum token
+2. **Include token** in Authorization header: `Bearer {token}`
+3. **Access protected endpoints** with valid token
+
+## 📊 Admin Features
+
+### Admin API Endpoints
+- **Dashboard Stats**: `GET /admin/dashboard/stats`
+- **Order Management**: `PUT /admin/orders/{id}/status`
+- **Product Management**: Full CRUD via API
+- **Label Generation**: `POST /admin/orders/{id}/labels`
+
+## 🧪 Testing
+
+```bash
+# Run tests
+php artisan test
+
+# Run specific test suite
+php artisan test --testsuite=Feature
+```
+
+## 📦 Deployment
+
+### Production Checklist
+- [ ] Set `APP_ENV=production`
+- [ ] Configure production database
+- [ ] Set up proper CORS domains
+- [ ] Configure file storage (S3, etc.)
+- [ ] Set up SSL certificates
+- [ ] Configure caching (Redis)
+- [ ] Set up queue workers
+
+## 🤝 Contributing
+
+This is a dedicated backend API branch. For contributions:
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+**Branch**: `laravel-backend-api`
+**Purpose**: Dedicated Laravel backend API for SeaBasket
+**Serves**: Web frontend + Mobile app
+**Status**: ✅ Ready for development

@@ -1,31 +1,14 @@
 {
     "private": true,
-    "type": "module",
+    "name": "seabasket-backend-api",
+    "description": "SeaBasket Laravel Backend API - serves both web and mobile frontends",
     "scripts": {
-        "build": "vite build",
-        "dev": "vite"
+        "dev": "echo 'Laravel backend API - no frontend build required'",
+        "build": "echo 'Laravel backend API - no frontend build required'"
     },
     "devDependencies": {
-        "@headlessui/react": "^2.0.0",
-        "@inertiajs/react": "^2.0.0",
-        "@tailwindcss/forms": "^0.5.3",
-        "@tailwindcss/vite": "^4.0.0",
-        "@vitejs/plugin-react": "^4.2.0",
-        "autoprefixer": "^10.4.12",
         "axios": "^1.8.2",
-        "concurrently": "^9.0.1",
-        "laravel-vite-plugin": "^1.2.0",
-        "postcss": "^8.4.31",
-        "react": "^18.2.0",
-        "react-dom": "^18.2.0",
-        "tailwindcss": "^3.2.1",
-        "vite": "^6.2.4"
+        "concurrently": "^9.0.1"
     },
-    "dependencies": {
-        "@heroicons/react": "^2.2.0",
-        "@inertiajs/inertia": "^0.11.1",
-        "@inertiajs/inertia-react": "^0.8.1",
-        "@inertiajs/react": "^2.0.11",
-        "react-hot-toast": "^2.5.2"
-    }
+    "dependencies": {}
 }

@@ -1,7 +1,7 @@
+# Laravel Backend API - .gitignore
+
+# Laravel specific
 /.phpunit.cache
-/node_modules
-/public/build
-/public/hot
 /public/storage
 /storage/*.key
 /storage/pail
@@ -13,11 +13,28 @@
 .phpunit.result.cache
 Homestead.json
 Homestead.yaml
+/auth.json
+
+# Frontend build artifacts (not used in backend API)
+/node_modules
+/public/build
+/public/hot
 npm-debug.log
 yarn-error.log
-/auth.json
+package-lock.json
+
+# IDE and editor files
 /.fleet
 /.idea
 /.nova
 /.vscode
 /.zed
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
