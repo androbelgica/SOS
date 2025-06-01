@@ -1,2 +1,0 @@
-Please add a placeholder.jpg image in this directory for recipe placeholders.
-The application is looking for a file named placeholder.jpg in this directory.

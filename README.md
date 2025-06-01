@@ -1,61 +1,279 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# SeaBasket Mobile App
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A modern React Native/Expo mobile application for the SeaBasket Online Seafood Store, providing a seamless shopping experience for iOS and Android devices.
 
-## About Laravel
+## 📱 Overview
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+This is the dedicated mobile application for SeaBasket, built with React Native and Expo. It provides a native mobile experience for browsing seafood products, managing orders, and accessing recipes on both iOS and Android platforms.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🚀 Features
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 🛒 **E-commerce Functionality**
+- **Product Catalog** with search, filtering, and categories
+- **Shopping Cart** with real-time updates and persistence
+- **Secure Checkout** process with multiple payment options
+- **Order Management** and real-time tracking
+- **QR Code Scanner** for order verification
+- **Push Notifications** for order updates
 
-## Learning Laravel
+### 🍽️ **Recipe Platform**
+- **Recipe Collection** with detailed instructions and videos
+- **Recipe Reviews** and ratings system
+- **Favorite Recipes** management
+- **Recipe Search** and categorization
+- **Cooking Timer** and step-by-step guidance
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 👤 **User Experience**
+- **Native Navigation** with smooth transitions
+- **Biometric Authentication** (Face ID/Touch ID)
+- **Google OAuth** integration
+- **Offline Mode** for browsing cached content
+- **Dark/Light Mode** with system preference detection
+- **Multi-language Support** (English/Filipino)
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### 📍 **Location Services**
+- **Store Locator** with GPS integration
+- **Delivery Tracking** with real-time updates
+- **Location-based Recommendations**
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## 🛠 Tech Stack
 
-## Laravel Sponsors
+- **Framework**: React Native 0.74.5
+- **Platform**: Expo SDK 51
+- **Navigation**: React Navigation 6
+- **UI Library**: React Native Paper 5
+- **State Management**: React Context + Hooks
+- **HTTP Client**: Axios
+- **Storage**: AsyncStorage + Expo SecureStore
+- **Authentication**: Expo AuthSession
+- **Camera**: Expo Camera (QR Scanner)
+- **Notifications**: Expo Notifications
+- **Maps**: Expo Location
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 🚀 Quick Start
 
-### Premium Partners
+### Prerequisites
+- Node.js 18+ and npm
+- Expo CLI (`npm install -g @expo/cli`)
+- iOS Simulator (macOS) or Android Studio
+- Running SeaBasket Backend API
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### Installation
 
-## Contributing
+1. **Clone and setup**
+```bash
+git clone <repository-url>
+cd seabasket-mobile-app
+git checkout seabasket-mobile-app
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+2. **Install dependencies**
+```bash
+npm install
+```
 
-## Code of Conduct
+3. **Start development server**
+```bash
+npm start
+# or
+expo start
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+4. **Run on device/simulator**
+```bash
+# iOS Simulator
+npm run ios
 
-## Security Vulnerabilities
+# Android Emulator
+npm run android
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# Physical device (scan QR code with Expo Go app)
+npm run start
+```
 
-## License
+## 📱 Development Workflow
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### **Development Server**
+```bash
+expo start              # Start Metro bundler
+expo start --tunnel     # Start with tunnel (for physical devices)
+expo start --dev-client # Start with development build
+```
+
+### **Platform-Specific Development**
+```bash
+expo start --ios       # iOS only
+expo start --android   # Android only
+expo start --web       # Web version
+```
+
+### **Building & Deployment**
+```bash
+# Build for app stores
+eas build --platform ios
+eas build --platform android
+eas build --platform all
+
+# Submit to app stores
+eas submit --platform ios
+eas submit --platform android
+```
+
+## 🔧 Configuration
+
+### Environment Setup
+
+The app automatically detects the environment:
+- **Development**: Uses `localhost:8000` for API
+- **Production**: Uses production API URL
+
+### API Configuration
+
+Edit `src/config/api.js` to configure:
+```javascript
+const API_CONFIG = {
+  development: {
+    baseURL: 'http://localhost:8000/api/v1',
+    timeout: 10000,
+  },
+  production: {
+    baseURL: 'https://api.seabasket.com/api/v1',
+    timeout: 15000,
+  }
+};
+```
+
+### Google OAuth Setup
+
+Update `src/config/api.js` with your Google OAuth credentials:
+```javascript
+export const APP_CONFIG = {
+  GOOGLE_CLIENT_ID: 'your_google_client_id',
+  // ... other config
+};
+```
+
+## 📁 Project Structure
+
+```
+seabasket-mobile-app/
+├── src/
+│   ├── components/           # Reusable UI components
+│   ├── screens/             # Application screens
+│   │   ├── auth/           # Authentication screens
+│   │   ├── products/       # Product-related screens
+│   │   ├── recipes/        # Recipe-related screens
+│   │   └── orders/         # Order management screens
+│   ├── navigation/          # Navigation configuration
+│   ├── contexts/           # React contexts (Auth, Cart, Theme)
+│   ├── services/           # API services and utilities
+│   ├── config/             # App configuration
+│   ├── utils/              # Helper functions
+│   ├── hooks/              # Custom React hooks
+│   └── theme/              # Theme and styling
+├── assets/                 # Images, fonts, and static assets
+├── app.json               # Expo configuration
+├── App.js                 # Main application entry point
+├── package.json           # Dependencies and scripts
+└── README.md              # This file
+```
+
+## 🎯 Key Features Implementation
+
+### **Authentication Flow**
+- JWT token-based authentication
+- Secure token storage with Expo SecureStore
+- Automatic token refresh
+- Biometric authentication support
+
+### **Shopping Cart**
+- Persistent cart across app sessions
+- Real-time cart updates
+- Optimistic UI updates
+- Offline cart management
+
+### **QR Code Scanner**
+- Order verification via QR codes
+- Product information scanning
+- Camera permission handling
+- Barcode format support
+
+### **Push Notifications**
+- Order status updates
+- Promotional notifications
+- Local notifications for reminders
+- Background notification handling
+
+## 🔐 Security Features
+
+- **Secure Storage**: Sensitive data stored with encryption
+- **API Security**: Bearer token authentication
+- **Biometric Auth**: Face ID/Touch ID support
+- **Certificate Pinning**: SSL certificate validation
+- **Data Validation**: Input sanitization and validation
+
+## 📱 Platform-Specific Features
+
+### **iOS**
+- Face ID/Touch ID authentication
+- iOS-specific UI components
+- App Store compliance
+- iOS push notification certificates
+
+### **Android**
+- Fingerprint authentication
+- Android-specific UI components
+- Google Play Store compliance
+- Firebase Cloud Messaging
+
+## 🧪 Testing
+
+```bash
+# Run tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Generate coverage report
+npm run test:coverage
+```
+
+## 🚀 Deployment
+
+### **Development Build**
+```bash
+eas build --profile development --platform ios
+eas build --profile development --platform android
+```
+
+### **Production Build**
+```bash
+eas build --profile production --platform all
+```
+
+### **App Store Submission**
+```bash
+eas submit --platform ios
+eas submit --platform android
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test on both iOS and Android
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+**Branch**: `seabasket-mobile-app`
+**Purpose**: React Native/Expo mobile app for SeaBasket
+**Backend**: Consumes `laravel-backend-api`
+**Platforms**: iOS, Android
+**Status**: ✅ Ready for development
