@@ -14,7 +14,7 @@ export default defineConfig({
         host: '0.0.0.0', // Allow external connections
         port: 5173,
         hmr: {
-            host: '192.168.12.109', // Your network IP
+            host: '192.168.218.109', // Your network IP
         },
     },
 });

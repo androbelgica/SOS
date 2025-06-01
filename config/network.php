@@ -16,11 +16,11 @@ return [
         'allowed_origins' => [
             'http://localhost:8081',
             'http://127.0.0.1:8081',
-            'http://192.168.12.109:8081',
-            'exp://192.168.12.109:8081',
+            'http://192.168.218.109:8081',
+            'exp://192.168.218.109:8081',
             'exp://localhost:8081',
         ],
-        
+
         'allowed_headers' => [
             'Accept',
             'Authorization',
@@ -28,7 +28,7 @@ return [
             'X-Requested-With',
             'X-CSRF-TOKEN',
         ],
-        
+
         'allowed_methods' => [
             'GET',
             'POST',
