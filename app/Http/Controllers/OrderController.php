@@ -6,6 +6,8 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use App\Notifications\OrderStatusChanged;
 use App\Notifications\OrderPaymentStatusChanged;
@@ -22,7 +24,7 @@ class OrderController extends Controller
     public function index()
     {
         $orders = Order::with(['items.product'])
-            ->where('user_id', auth()->id())
+            ->where('user_id', Auth::id())
             ->latest()
             ->get();
 
@@ -33,7 +35,7 @@ class OrderController extends Controller
 
     public function show(Order $order)
     {
-        if ($order->user_id !== auth()->id()) {
+        if ($order->user_id !== Auth::id()) {
             abort(403);
         }
 
@@ -75,7 +77,7 @@ class OrderController extends Controller
 
             // Save address to user profile if requested
             if ($request->input('save_address', false)) {
-                $user = User::find(auth()->id());
+                $user = User::find(Auth::id());
                 $user->update([
                     'address' => $request->shipping_address,
                     'city' => $request->shipping_city,
@@ -87,7 +89,7 @@ class OrderController extends Controller
             }
 
             // Use a database transaction to ensure all operations succeed or fail together
-            $order = \DB::transaction(function () use ($cart, $shippingAddress, $billingAddress) {
+            $order = DB::transaction(function () use ($cart, $shippingAddress, $billingAddress) {
                 $total = 0;
                 $items = [];
                 $products = Product::whereIn('id', array_keys($cart))->lockForUpdate()->get();
@@ -157,7 +159,7 @@ class OrderController extends Controller
 
                 // Create the order
                 $order = Order::create([
-                    'user_id' => auth()->id(),
+                    'user_id' => Auth::id(),
                     'order_number' => $orderNumber,
                     'total_amount' => $total,
                     'status' => 'pending',
@@ -260,7 +262,7 @@ class OrderController extends Controller
     public function cancel(Order $order)
     {
         // Check if the order belongs to the authenticated user
-        if ($order->user_id !== auth()->id()) {
+        if ($order->user_id !== Auth::id()) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -270,7 +272,7 @@ class OrderController extends Controller
         }
 
         // Use a database transaction to ensure all operations succeed or fail together
-        \DB::transaction(function () use ($order) {
+        DB::transaction(function () use ($order) {
             // Restore product stock quantities
             foreach ($order->items as $item) {
                 $product = $item->product;
