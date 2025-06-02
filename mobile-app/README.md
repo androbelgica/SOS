@@ -1,279 +1,132 @@
-# SeaBasket Mobile App
+# Seafood Store Mobile App
 
-A modern React Native/Expo mobile application for the SeaBasket Online Seafood Store, providing a seamless shopping experience for iOS and Android devices.
+A React Native mobile application for a seafood online store that connects to a Laravel 12 backend API.
 
-## 📱 Overview
+## Features
 
-This is the dedicated mobile application for SeaBasket, built with React Native and Expo. It provides a native mobile experience for browsing seafood products, managing orders, and accessing recipes on both iOS and Android platforms.
+- User authentication (login, register, forgot password)
+- Product browsing and search
+- Shopping cart functionality
+- Order management
+- Recipe browsing and interaction
+- Offline support
+- Push notifications (coming soon)
 
-## 🚀 Features
+## Tech Stack
 
-### 🛒 **E-commerce Functionality**
-- **Product Catalog** with search, filtering, and categories
-- **Shopping Cart** with real-time updates and persistence
-- **Secure Checkout** process with multiple payment options
-- **Order Management** and real-time tracking
-- **QR Code Scanner** for order verification
-- **Push Notifications** for order updates
+- **React Native**: Cross-platform mobile framework
+- **Redux Toolkit**: State management
+- **React Navigation**: Navigation library
+- **Axios**: API requests
+- **React Native Paper**: UI components
+- **AsyncStorage**: Local storage
+- **React Hook Form**: Form handling
+- **React Native Fast Image**: Optimized image loading
 
-### 🍽️ **Recipe Platform**
-- **Recipe Collection** with detailed instructions and videos
-- **Recipe Reviews** and ratings system
-- **Favorite Recipes** management
-- **Recipe Search** and categorization
-- **Cooking Timer** and step-by-step guidance
+## Project Structure
 
-### 👤 **User Experience**
-- **Native Navigation** with smooth transitions
-- **Biometric Authentication** (Face ID/Touch ID)
-- **Google OAuth** integration
-- **Offline Mode** for browsing cached content
-- **Dark/Light Mode** with system preference detection
-- **Multi-language Support** (English/Filipino)
+```
+src/
+├── api/                  # API service layer
+│   ├── apiClient.js      # Axios instance with interceptors
+│   ├── authService.js    # Authentication API calls
+│   ├── productService.js # Product-related API calls
+│   └── ...
+├── assets/               # Images, fonts, etc.
+├── components/           # Reusable UI components
+│   ├── common/           # Buttons, inputs, loaders, etc.
+│   ├── products/         # Product-specific components
+│   └── ...
+├── navigation/           # Navigation configuration
+│   ├── AppNavigator.js   # Main navigation container
+├── screens/              # App screens
+│   ├── auth/             # Login, Register, etc.
+│   ├── products/         # Product listing, details
+│   ├── cart/             # Cart and checkout
+│   └── ...
+├── store/                # Redux store
+│   ├── slices/           # Redux slices
+│   └── index.js          # Store configuration
+├── utils/                # Helper functions
+└── App.js                # Root component
+```
 
-### 📍 **Location Services**
-- **Store Locator** with GPS integration
-- **Delivery Tracking** with real-time updates
-- **Location-based Recommendations**
-
-## 🛠 Tech Stack
-
-- **Framework**: React Native 0.74.5
-- **Platform**: Expo SDK 51
-- **Navigation**: React Navigation 6
-- **UI Library**: React Native Paper 5
-- **State Management**: React Context + Hooks
-- **HTTP Client**: Axios
-- **Storage**: AsyncStorage + Expo SecureStore
-- **Authentication**: Expo AuthSession
-- **Camera**: Expo Camera (QR Scanner)
-- **Notifications**: Expo Notifications
-- **Maps**: Expo Location
-
-## 🚀 Quick Start
+## Getting Started
 
 ### Prerequisites
-- Node.js 18+ and npm
-- Expo CLI (`npm install -g @expo/cli`)
-- iOS Simulator (macOS) or Android Studio
-- Running SeaBasket Backend API
+
+- Node.js (v14 or newer)
+- npm or yarn
+- React Native CLI
+- Android Studio (for Android development)
+- Xcode (for iOS development, macOS only)
 
 ### Installation
 
-1. **Clone and setup**
-```bash
-git clone <repository-url>
-cd seabasket-mobile-app
-git checkout seabasket-mobile-app
+1. Clone the repository
+2. Navigate to the mobile directory:
+   ```
+   cd mobile
+   ```
+3. Install dependencies:
+   ```
+   npm install
+   # or
+   yarn install
+   ```
+4. Update the API URL in `src/api/apiClient.js` to point to your Laravel backend
+
+### Running the App
+
+#### Android
+
 ```
-
-2. **Install dependencies**
-```bash
-npm install
-```
-
-3. **Start development server**
-```bash
-npm start
-# or
-expo start
-```
-
-4. **Run on device/simulator**
-```bash
-# iOS Simulator
-npm run ios
-
-# Android Emulator
 npm run android
-
-# Physical device (scan QR code with Expo Go app)
-npm run start
+# or
+yarn android
 ```
 
-## 📱 Development Workflow
-
-### **Development Server**
-```bash
-expo start              # Start Metro bundler
-expo start --tunnel     # Start with tunnel (for physical devices)
-expo start --dev-client # Start with development build
-```
-
-### **Platform-Specific Development**
-```bash
-expo start --ios       # iOS only
-expo start --android   # Android only
-expo start --web       # Web version
-```
-
-### **Building & Deployment**
-```bash
-# Build for app stores
-eas build --platform ios
-eas build --platform android
-eas build --platform all
-
-# Submit to app stores
-eas submit --platform ios
-eas submit --platform android
-```
-
-## 🔧 Configuration
-
-### Environment Setup
-
-The app automatically detects the environment:
-- **Development**: Uses `localhost:8000` for API
-- **Production**: Uses production API URL
-
-### API Configuration
-
-Edit `src/config/api.js` to configure:
-```javascript
-const API_CONFIG = {
-  development: {
-    baseURL: 'http://localhost:8000/api/v1',
-    timeout: 10000,
-  },
-  production: {
-    baseURL: 'https://api.seabasket.com/api/v1',
-    timeout: 15000,
-  }
-};
-```
-
-### Google OAuth Setup
-
-Update `src/config/api.js` with your Google OAuth credentials:
-```javascript
-export const APP_CONFIG = {
-  GOOGLE_CLIENT_ID: 'your_google_client_id',
-  // ... other config
-};
-```
-
-## 📁 Project Structure
+#### iOS
 
 ```
-seabasket-mobile-app/
-├── src/
-│   ├── components/           # Reusable UI components
-│   ├── screens/             # Application screens
-│   │   ├── auth/           # Authentication screens
-│   │   ├── products/       # Product-related screens
-│   │   ├── recipes/        # Recipe-related screens
-│   │   └── orders/         # Order management screens
-│   ├── navigation/          # Navigation configuration
-│   ├── contexts/           # React contexts (Auth, Cart, Theme)
-│   ├── services/           # API services and utilities
-│   ├── config/             # App configuration
-│   ├── utils/              # Helper functions
-│   ├── hooks/              # Custom React hooks
-│   └── theme/              # Theme and styling
-├── assets/                 # Images, fonts, and static assets
-├── app.json               # Expo configuration
-├── App.js                 # Main application entry point
-├── package.json           # Dependencies and scripts
-└── README.md              # This file
+npm run ios
+# or
+yarn ios
 ```
 
-## 🎯 Key Features Implementation
+## API Integration
 
-### **Authentication Flow**
-- JWT token-based authentication
-- Secure token storage with Expo SecureStore
-- Automatic token refresh
-- Biometric authentication support
+The app connects to a Laravel 12 backend API using Sanctum for authentication. The API services are organized in the `src/api` directory:
 
-### **Shopping Cart**
-- Persistent cart across app sessions
-- Real-time cart updates
-- Optimistic UI updates
+- `apiClient.js`: Base Axios configuration with interceptors
+- `authService.js`: Authentication-related API calls
+- `productService.js`: Product-related API calls
+- `cartService.js`: Shopping cart API calls
+- `recipeService.js`: Recipe-related API calls
+- `orderService.js`: Order management API calls
+
+## State Management
+
+Redux Toolkit is used for state management. The store is organized into slices:
+
+- `authSlice.js`: Authentication state
+- `productSlice.js`: Products state
+- `cartSlice.js`: Shopping cart state
+- `recipeSlice.js`: Recipes state
+- `orderSlice.js`: Orders state
+
+## Offline Support
+
+The app includes offline support through:
+
+- Local caching of products and recipes
 - Offline cart management
+- Automatic synchronization when back online
 
-### **QR Code Scanner**
-- Order verification via QR codes
-- Product information scanning
-- Camera permission handling
-- Barcode format support
-
-### **Push Notifications**
-- Order status updates
-- Promotional notifications
-- Local notifications for reminders
-- Background notification handling
-
-## 🔐 Security Features
-
-- **Secure Storage**: Sensitive data stored with encryption
-- **API Security**: Bearer token authentication
-- **Biometric Auth**: Face ID/Touch ID support
-- **Certificate Pinning**: SSL certificate validation
-- **Data Validation**: Input sanitization and validation
-
-## 📱 Platform-Specific Features
-
-### **iOS**
-- Face ID/Touch ID authentication
-- iOS-specific UI components
-- App Store compliance
-- iOS push notification certificates
-
-### **Android**
-- Fingerprint authentication
-- Android-specific UI components
-- Google Play Store compliance
-- Firebase Cloud Messaging
-
-## 🧪 Testing
-
-```bash
-# Run tests
-npm test
-
-# Run tests in watch mode
-npm run test:watch
-
-# Generate coverage report
-npm run test:coverage
-```
-
-## 🚀 Deployment
-
-### **Development Build**
-```bash
-eas build --profile development --platform ios
-eas build --profile development --platform android
-```
-
-### **Production Build**
-```bash
-eas build --profile production --platform all
-```
-
-### **App Store Submission**
-```bash
-eas submit --platform ios
-eas submit --platform android
-```
-
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test on both iOS and Android
-5. Submit a pull request
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
----
-
-**Branch**: `seabasket-mobile-app`
-**Purpose**: React Native/Expo mobile app for SeaBasket
-**Backend**: Consumes `laravel-backend-api`
-**Platforms**: iOS, Android
-**Status**: ✅ Ready for development
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
