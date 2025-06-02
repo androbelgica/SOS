@@ -50,6 +50,11 @@ class FileUploadService
         $storageDirectory = "public/{$folder}";
         $files = Storage::files($storageDirectory);
 
+        // Strip 'public/' from the stored paths when searching
+        $files = array_map(function ($file) {
+            return str_replace('public/', '', $file);
+        }, $files);
+
         // Log the search attempt
         Log::info('Searching for existing image', [
             'original_name' => $originalName,
@@ -152,11 +157,10 @@ class FileUploadService
 
         // Log the URL for debugging
         Log::info('Generated image URL', [
-            'storage_url' => Storage::url($path),
+            'original_path' => $path,
             'final_url' => $url,
-            'path' => $path,
             'absolute_path' => storage_path('app/' . $path),
-            'public_path' => public_path('storage/' . str_replace('public/', '', $path))
+            'public_path' => public_path('storage/' . $url)
         ]);
 
         // Verify the file was actually stored
@@ -166,13 +170,13 @@ class FileUploadService
                 'stored_path' => $path,
                 'url' => $url,
                 'absolute_path' => storage_path('app/' . $path),
-                'public_path' => public_path('storage/' . str_replace('public/', '', $path))
+                'public_path' => public_path('storage/' . $url)
             ]);
             throw new \Exception("Failed to store file at path: {$path}");
         }
 
         // Check if the file is accessible via the public URL
-        $publicPath = public_path('storage/' . str_replace('public/', '', $path));
+        $publicPath = public_path('storage/' . $url);
         $fileIsAccessible = file_exists($publicPath);
 
         // Log the file path for debugging
