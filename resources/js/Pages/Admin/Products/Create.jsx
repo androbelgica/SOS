@@ -7,6 +7,7 @@ import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
 import ImageBrowser from "@/Components/ImageBrowser";
 import CameraCapture from "@/Components/CameraCapture";
+import ProductRecognition from "@/Components/ProductRecognition";
 import { getImageProps, getImageUrl, getFallbackImage } from "@/Utils/imageHelpers";
 
 export default function Create({ auth, recipes }) {
@@ -20,6 +21,7 @@ export default function Create({ auth, recipes }) {
     const [generationError, setGenerationError] = useState(null);
     const [imageBrowserOpen, setImageBrowserOpen] = useState(false);
     const [cameraOpen, setCameraOpen] = useState(false);
+    const [recognitionOpen, setRecognitionOpen] = useState(false);
 
     // For debugging image loading
     useEffect(() => {
@@ -115,6 +117,47 @@ export default function Create({ auth, recipes }) {
         }
     };
 
+    // Handle product recognition completion
+    const handleRecognitionComplete = (recognitionData) => {
+        const analysis = recognitionData.analysis;
+
+        // Auto-fill form fields based on recognition results
+        if (analysis.suggested_products && analysis.suggested_products.length > 0) {
+            const topSuggestion = analysis.suggested_products[0];
+
+            // Only fill empty fields to avoid overwriting user input
+            if (!data.name && topSuggestion.name) {
+                setData(prev => ({ ...prev, name: topSuggestion.name }));
+            }
+            if (!data.description && topSuggestion.description) {
+                setData(prev => ({ ...prev, description: topSuggestion.description }));
+            }
+            if (!data.price && topSuggestion.price) {
+                setData(prev => ({ ...prev, price: topSuggestion.price.toString() }));
+            }
+        }
+
+        // Set category based on detected seafood type
+        if (analysis.seafood_detected && analysis.labels && analysis.labels.length > 0) {
+            const topLabel = analysis.labels[0].description.toLowerCase();
+            let suggestedCategory = '';
+
+            if (topLabel.includes('fish') || topLabel.includes('salmon') || topLabel.includes('tuna')) {
+                suggestedCategory = 'fish';
+            } else if (topLabel.includes('shrimp') || topLabel.includes('crab') || topLabel.includes('lobster')) {
+                suggestedCategory = 'crustaceans';
+            } else if (topLabel.includes('oyster') || topLabel.includes('mussel') || topLabel.includes('clam')) {
+                suggestedCategory = 'shellfish';
+            }
+
+            if (suggestedCategory && !data.category) {
+                setData(prev => ({ ...prev, category: suggestedCategory }));
+            }
+        }
+
+        setRecognitionOpen(false);
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
 
@@ -143,7 +186,16 @@ export default function Create({ auth, recipes }) {
 
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 <div>
-                                    <InputLabel htmlFor="name" value="Name" />
+                                    <div className="flex justify-between items-center">
+                                        <InputLabel htmlFor="name" value="Name" />
+                                        <button
+                                            type="button"
+                                            onClick={() => setRecognitionOpen(true)}
+                                            className="px-3 py-1 text-xs bg-purple-600 dark:bg-purple-500 text-white rounded-md hover:bg-purple-700 dark:hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 dark:focus:ring-purple-400 dark:focus:ring-offset-gray-800"
+                                        >
+                                            🔍 Scan Product
+                                        </button>
+                                    </div>
                                     <TextInput
                                         id="name"
                                         type="text"
@@ -506,6 +558,13 @@ export default function Create({ auth, recipes }) {
                 onClose={() => setCameraOpen(false)}
                 onCapture={handleCameraCapture}
                 title="Take Product Photo"
+            />
+
+            {/* Product Recognition Modal */}
+            <ProductRecognition
+                isOpen={recognitionOpen}
+                onClose={() => setRecognitionOpen(false)}
+                onRecognitionComplete={handleRecognitionComplete}
             />
         </MainLayout>
     );
