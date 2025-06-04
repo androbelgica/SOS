@@ -6,6 +6,7 @@ import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
 import ImageBrowser from "@/Components/ImageBrowser";
+import CameraCapture from "@/Components/CameraCapture";
 import { getImageProps, getImageUrl, getFallbackImage } from "@/Utils/imageHelpers";
 
 export default function Create({ auth, recipes }) {
@@ -18,6 +19,7 @@ export default function Create({ auth, recipes }) {
     const [isGenerating, setIsGenerating] = useState(false);
     const [generationError, setGenerationError] = useState(null);
     const [imageBrowserOpen, setImageBrowserOpen] = useState(false);
+    const [cameraOpen, setCameraOpen] = useState(false);
 
     // For debugging image loading
     useEffect(() => {
@@ -92,6 +94,25 @@ export default function Create({ auth, recipes }) {
 
         // Set the preview to the selected image
         setImagePreview(image.url);
+    };
+
+    // Handle camera capture
+    const handleCameraCapture = (file, previewUrl) => {
+        setData("image", file);
+        setImagePreview(previewUrl);
+        setCameraOpen(false);
+    };
+
+    // Handle clearing the image selection
+    const handleClearImage = () => {
+        setData("image", null);
+        setData("image_url", null);
+        setImagePreview(null);
+        // Reset the file input
+        const fileInput = document.getElementById('image');
+        if (fileInput) {
+            fileInput.value = '';
+        }
     };
 
     const handleSubmit = (e) => {
@@ -328,16 +349,34 @@ export default function Create({ auth, recipes }) {
                                             className="block w-full text-gray-700 dark:text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-50 dark:file:bg-gray-700 file:text-gray-700 dark:file:text-gray-300 hover:file:bg-gray-100 dark:hover:file:bg-gray-600"
                                             accept="image/*"
                                         />
-                                        <button
-                                            type="button"
-                                            onClick={() => setImageBrowserOpen(true)}
-                                            className="px-4 py-2 bg-indigo-600 dark:bg-indigo-500 text-white rounded-md hover:bg-indigo-700 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 dark:focus:ring-offset-gray-800 whitespace-nowrap"
-                                        >
-                                            Browse Existing Images
-                                        </button>
+                                        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => setCameraOpen(true)}
+                                                className="px-4 py-2 bg-green-600 dark:bg-green-500 text-white rounded-md hover:bg-green-700 dark:hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-green-400 dark:focus:ring-offset-gray-800 whitespace-nowrap"
+                                            >
+                                                📷 Take Photo
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setImageBrowserOpen(true)}
+                                                className="px-4 py-2 bg-indigo-600 dark:bg-indigo-500 text-white rounded-md hover:bg-indigo-700 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 dark:focus:ring-offset-gray-800 whitespace-nowrap"
+                                            >
+                                                Browse Existing Images
+                                            </button>
+                                            {imagePreview && (
+                                                <button
+                                                    type="button"
+                                                    onClick={handleClearImage}
+                                                    className="px-4 py-2 bg-red-600 dark:bg-red-500 text-white rounded-md hover:bg-red-700 dark:hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-red-400 dark:focus:ring-offset-gray-800 whitespace-nowrap"
+                                                >
+                                                    🗑️ Clear
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
                                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                        Upload a new image or select an existing one from the products folder.
+                                        Upload a new image, take a photo with your camera, or select an existing one from the products folder.
                                     </p>
                                     {progress && (
                                         <div className="mt-2">
@@ -459,6 +498,14 @@ export default function Create({ auth, recipes }) {
                 onSelect={handleExistingImageSelect}
                 type="products"
                 title="Select Product Image"
+            />
+
+            {/* Camera Capture Modal */}
+            <CameraCapture
+                isOpen={cameraOpen}
+                onClose={() => setCameraOpen(false)}
+                onCapture={handleCameraCapture}
+                title="Take Product Photo"
             />
         </MainLayout>
     );

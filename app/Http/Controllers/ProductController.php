@@ -97,15 +97,17 @@ class ProductController extends Controller
                         $product->image_url = '/storage/' . $product->image_url;
                     }
 
-                    // Remove any existing timestamp parameters
-                    $product->image_url = preg_replace('/[?&]t=\d+/', '', $product->image_url);
+                    // Remove any existing timestamp parameters (including multiple ones)
+                    $product->image_url = preg_replace('/(\?|&)t=\d+(&|$)/', '$1', $product->image_url);
+                    $product->image_url = rtrim($product->image_url, '?&');
 
                     // Add a new timestamp parameter
                     $product->image_url .= (strpos($product->image_url, '?') !== false ? '&' : '?') . 't=' . $timestamp;
                 } else {
                     // For external URLs, just add the timestamp
-                    // Remove any existing timestamp parameters first
-                    $product->image_url = preg_replace('/[?&]t=\d+/', '', $product->image_url);
+                    // Remove any existing timestamp parameters first (including multiple ones)
+                    $product->image_url = preg_replace('/(\?|&)t=\d+(&|$)/', '$1', $product->image_url);
+                    $product->image_url = rtrim($product->image_url, '?&');
 
                     // Add a new timestamp parameter
                     $product->image_url .= (strpos($product->image_url, '?') !== false ? '&' : '?') . 't=' . $timestamp;
@@ -156,15 +158,17 @@ class ProductController extends Controller
                     $product->image_url = '/storage/' . $product->image_url;
                 }
 
-                // Remove any existing timestamp parameters
-                $product->image_url = preg_replace('/[?&]t=\d+/', '', $product->image_url);
+                // Remove any existing timestamp parameters (including multiple ones)
+                $product->image_url = preg_replace('/(\?|&)t=\d+(&|$)/', '$1', $product->image_url);
+                $product->image_url = rtrim($product->image_url, '?&');
 
                 // Add a new timestamp parameter
                 $product->image_url .= (strpos($product->image_url, '?') !== false ? '&' : '?') . 't=' . $timestamp;
             } else {
                 // For external URLs, just add the timestamp
-                // Remove any existing timestamp parameters first
-                $product->image_url = preg_replace('/[?&]t=\d+/', '', $product->image_url);
+                // Remove any existing timestamp parameters first (including multiple ones)
+                $product->image_url = preg_replace('/(\?|&)t=\d+(&|$)/', '$1', $product->image_url);
+                $product->image_url = rtrim($product->image_url, '?&');
 
                 // Add a new timestamp parameter
                 $product->image_url .= (strpos($product->image_url, '?') !== false ? '&' : '?') . 't=' . $timestamp;
@@ -214,15 +218,17 @@ class ProductController extends Controller
                     $product->image_url = '/storage/' . $product->image_url;
                 }
 
-                // Remove any existing timestamp parameters
-                $product->image_url = preg_replace('/[?&]t=\d+/', '', $product->image_url);
+                // Remove any existing timestamp parameters (including multiple ones)
+                $product->image_url = preg_replace('/(\?|&)t=\d+(&|$)/', '$1', $product->image_url);
+                $product->image_url = rtrim($product->image_url, '?&');
 
                 // Add a new timestamp parameter
                 $product->image_url .= (strpos($product->image_url, '?') !== false ? '&' : '?') . 't=' . $timestamp;
             } else {
                 // For external URLs, just add the timestamp
-                // Remove any existing timestamp parameters first
-                $product->image_url = preg_replace('/[?&]t=\d+/', '', $product->image_url);
+                // Remove any existing timestamp parameters first (including multiple ones)
+                $product->image_url = preg_replace('/(\?|&)t=\d+(&|$)/', '$1', $product->image_url);
+                $product->image_url = rtrim($product->image_url, '?&');
 
                 // Add a new timestamp parameter
                 $product->image_url .= (strpos($product->image_url, '?') !== false ? '&' : '?') . 't=' . $timestamp;

@@ -344,7 +344,7 @@ export default function AdminProducts({
                                                     <div className="flex-shrink-0 h-12 w-12 relative">
                                                         {(() => {
                                                             // For external URLs (like Unsplash), use them directly
-                                                            if (product.image_url && product.image_url.startsWith('http')) {
+                                                            if (product.image_url) {
                                                                 return (
                                                                     <>
                                                                         <img
@@ -352,30 +352,6 @@ export default function AdminProducts({
                                                                             src={product.image_url.includes('?') ?
                                                                                 `${product.image_url}&t=${cacheTimestamp}` :
                                                                                 `${product.image_url}?t=${cacheTimestamp}`}
-                                                                            alt={product.name}
-                                                                            className="h-12 w-12 rounded-lg object-cover border border-gray-200 dark:border-gray-600 shadow-sm"
-                                                                            onError={(e) => {
-                                                                                // Replace with a div on error
-                                                                                const parent = e.target.parentNode;
-                                                                                if (parent) {
-                                                                                    const div = document.createElement('div');
-                                                                                    div.className = "h-12 w-12 rounded-lg flex items-center justify-center bg-indigo-100 dark:bg-indigo-900 border border-gray-200 dark:border-gray-600 shadow-sm";
-                                                                                    div.innerHTML = `<span class="text-indigo-700 dark:text-indigo-300 font-bold text-lg">${product.name.charAt(0).toUpperCase()}</span>`;
-                                                                                    parent.replaceChild(div, e.target);
-                                                                                }
-                                                                            }}
-                                                                        />
-                                                                    </>
-                                                                );
-                                                            }
-
-                                                            // For local storage or missing images, use a div with the first letter
-                                                            if (product.image_url) {
-                                                                return (
-                                                                    <>
-                                                                        <img
-                                                                            key={`product-image-${product.id}-${cacheTimestamp}`}
-                                                                            src={product.image_url}
                                                                             alt={product.name}
                                                                             className="h-12 w-12 rounded-lg object-cover border border-gray-200 dark:border-gray-600 shadow-sm"
                                                                             onError={(e) => {

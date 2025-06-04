@@ -5,6 +5,7 @@ import MainLayout from "@/Layouts/MainLayout";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
+import CameraCapture from "@/Components/CameraCapture";
 import { getImageProps, getImageUrl } from "@/Utils/imageHelpers";
 
 export default function Edit({ auth, product, recipes, timestamp }) {
@@ -13,12 +14,11 @@ export default function Edit({ auth, product, recipes, timestamp }) {
     const [clientTimestamp, setClientTimestamp] = useState(Date.now());
     const cacheTimestamp = timestamp || clientTimestamp;
 
-    // Initialize image preview with the product's image URL
-    const [imagePreview, setImagePreview] = useState(
-        getImageUrl(product.image_url, cacheTimestamp)
-    );
+    // Initialize image preview as null - we'll show the product image separately
+    const [imagePreview, setImagePreview] = useState(null);
     const [isGenerating, setIsGenerating] = useState(false);
     const [generationError, setGenerationError] = useState(null);
+    const [cameraOpen, setCameraOpen] = useState(false);
 
     // Log the image URL for debugging
     useEffect(() => {
@@ -94,15 +94,34 @@ export default function Edit({ auth, product, recipes, timestamp }) {
         }
     };
 
+    // Handle camera capture
+    const handleCameraCapture = (file, previewUrl) => {
+        setData("image", file);
+        setImagePreview(previewUrl);
+        setCameraOpen(false);
+    };
+
+    // Handle clearing the image selection
+    const handleClearImage = () => {
+        setData("image", null);
+        setImagePreview(null);
+        // Reset the file input
+        const fileInput = document.getElementById('image');
+        if (fileInput) {
+            fileInput.value = '';
+        }
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
 
         // Use post instead of put for file uploads
         post(route("admin.products.update", product.id), {
             forceFormData: true,
-            onSuccess: (page) => {
-                // Reset the image field after successful upload
+            onSuccess: () => {
+                // Reset the image field and preview after successful upload
                 setData("image", null);
+                setImagePreview(null);
 
                 // The controller will redirect to the admin products index page
                 // No need to do anything else here
@@ -322,13 +341,36 @@ export default function Edit({ auth, product, recipes, timestamp }) {
                                         htmlFor="image"
                                         value="Product Image"
                                     />
-                                    <input
-                                        type="file"
-                                        id="image"
-                                        onChange={handleImageChange}
-                                        className="mt-1 block w-full text-gray-700 dark:text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-50 dark:file:bg-gray-700 file:text-gray-700 dark:file:text-gray-300 hover:file:bg-gray-100 dark:hover:file:bg-gray-600"
-                                        accept="image/*"
-                                    />
+                                    <div className="flex flex-col sm:flex-row sm:items-center mt-1 space-y-2 sm:space-y-0 sm:space-x-2">
+                                        <input
+                                            type="file"
+                                            id="image"
+                                            onChange={handleImageChange}
+                                            className="block w-full text-gray-700 dark:text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-50 dark:file:bg-gray-700 file:text-gray-700 dark:file:text-gray-300 hover:file:bg-gray-100 dark:hover:file:bg-gray-600"
+                                            accept="image/*"
+                                        />
+                                        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => setCameraOpen(true)}
+                                                className="px-4 py-2 bg-green-600 dark:bg-green-500 text-white rounded-md hover:bg-green-700 dark:hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-green-400 dark:focus:ring-offset-gray-800 whitespace-nowrap"
+                                            >
+                                                📷 Take Photo
+                                            </button>
+                                            {imagePreview && (
+                                                <button
+                                                    type="button"
+                                                    onClick={handleClearImage}
+                                                    className="px-4 py-2 bg-red-600 dark:bg-red-500 text-white rounded-md hover:bg-red-700 dark:hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-red-400 dark:focus:ring-offset-gray-800 whitespace-nowrap"
+                                                >
+                                                    🗑️ Clear
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                        Upload a new image or take a photo with your camera to replace the current image.
+                                    </p>
                                     {progress && (
                                         <div className="mt-2">
                                             <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full">
@@ -355,7 +397,7 @@ export default function Edit({ auth, product, recipes, timestamp }) {
 
                                         {/* Show either the new image preview or the existing product image */}
                                         {imagePreview ? (
-                                            // New image preview from file input
+                                            // New image preview from file input or camera
                                             <div className="relative">
                                                 <img
                                                     src={imagePreview}
@@ -364,8 +406,8 @@ export default function Edit({ auth, product, recipes, timestamp }) {
                                                 />
                                                 <div className="absolute top-0 right-0 bg-green-500 text-white text-xs px-1 rounded-bl">New</div>
                                             </div>
-                                        ) : product.image_url && product.image_url.startsWith('http') ? (
-                                            // External URL image (like Unsplash)
+                                        ) : product.image_url ? (
+                                            // Existing product image (both external URLs and local storage)
                                             <div className="relative">
                                                 <img
                                                     key={`product-image-${product.id}-${cacheTimestamp}`}
@@ -385,17 +427,17 @@ export default function Edit({ auth, product, recipes, timestamp }) {
                                                         }
                                                     }}
                                                 />
-                                                <div className="absolute top-0 right-0 bg-blue-500 text-white text-xs px-1 rounded-bl">Current</div>
+                                                <div className="absolute top-0 right-0 bg-blue-500 text-white text-xs px-1 rounded-bl">
+                                                    {product.image_url.startsWith('http') ? 'External' : 'Current'}
+                                                </div>
                                             </div>
                                         ) : (
-                                            // No image or local storage image that's not working - show a div with first letter
+                                            // No image - show placeholder
                                             <div className="relative">
                                                 <div className="h-32 w-32 flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-700">
                                                     <span className="text-gray-700 dark:text-gray-300 font-bold text-2xl">{data.name.charAt(0).toUpperCase()}</span>
                                                 </div>
-                                                {product.image_url && (
-                                                    <div className="absolute top-0 right-0 bg-yellow-500 text-white text-xs px-1 rounded-bl">Image Error</div>
-                                                )}
+                                                <div className="absolute top-0 right-0 bg-gray-500 text-white text-xs px-1 rounded-bl">No Image</div>
                                             </div>
                                         )}
                                     </div>
@@ -468,6 +510,14 @@ export default function Edit({ auth, product, recipes, timestamp }) {
                     </div>
                 </div>
             </div>
+
+            {/* Camera Capture Modal */}
+            <CameraCapture
+                isOpen={cameraOpen}
+                onClose={() => setCameraOpen(false)}
+                onCapture={handleCameraCapture}
+                title="Take Product Photo"
+            />
         </MainLayout>
     );
 }

@@ -47,13 +47,8 @@ class FileUploadService
         $extension = pathinfo($originalName, PATHINFO_EXTENSION);
 
         // Search in the storage directory for files with similar names
-        $storageDirectory = "public/{$folder}";
+        $storageDirectory = $folder;
         $files = Storage::files($storageDirectory);
-
-        // Strip 'public/' from the stored paths when searching
-        $files = array_map(function ($file) {
-            return str_replace('public/', '', $file);
-        }, $files);
 
         // Log the search attempt
         Log::info('Searching for existing image', [
@@ -137,8 +132,8 @@ class FileUploadService
             $filename = Str::uuid() . '_' . time() . '.' . $file->getClientOriginalExtension();
         }
 
-        // Ensure the directory exists
-        $storageDirectory = "public/{$folder}";
+        // Ensure the directory exists (don't add 'public/' prefix as Laravel's public disk already handles this)
+        $storageDirectory = $folder;
         if (!Storage::exists($storageDirectory)) {
             Storage::makeDirectory($storageDirectory);
         }
@@ -273,7 +268,7 @@ class FileUploadService
         }
 
         // Ensure the directory exists
-        $storageDirectory = "public/{$folder}";
+        $storageDirectory = $folder;
         if (!Storage::exists($storageDirectory)) {
             Storage::makeDirectory($storageDirectory);
         }

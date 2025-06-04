@@ -65,15 +65,8 @@ export const getImageUrl = (imagePath, timestamp, type = 'product') => {
         ? imagePath
         : `/storage/${imagePath}`;
 
-    // Fix common path issues for recipes
-    if (type === 'recipe' && path.includes('/recipes/')) {
-        // Try to fix the path for recipes
-        // Check if the path needs to be adjusted for the double public issue
-        if (!path.includes('/public/recipes/') && !path.includes('/public/public/recipes/')) {
-            // Add the public directory to the path
-            path = path.replace('/storage/recipes/', '/storage/public/recipes/');
-        }
-    }
+    // No need to fix paths anymore since we've corrected the storage structure
+    // All images should now be stored correctly in /storage/products/ or /storage/recipes/
 
     // Remove any existing timestamp parameters to prevent duplicates
     const cleanPath = path.split('?')[0];
