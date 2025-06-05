@@ -312,12 +312,25 @@ export default function OrdersIndex({ auth, orders }) {
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                <Link
-                                                    href={route("orders.show", order.id)}
-                                                    className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300"
-                                                >
-                                                    View Details
-                                                </Link>
+                                                <div className="flex space-x-2">
+                                                    <Link
+                                                        href={route("orders.show", order.id)}
+                                                        className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300"
+                                                    >
+                                                        View Details
+                                                    </Link>
+                                                    {order.status === 'delivered' && (
+                                                        <Link
+                                                            href={route("orders.scanner", order.id)}
+                                                            className="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 ml-2"
+                                                            title="Verify Products"
+                                                        >
+                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                                                            </svg>
+                                                        </Link>
+                                                    )}
+                                                </div>
                                             </td>
                                         </tr>
                                         ))

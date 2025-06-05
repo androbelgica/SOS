@@ -250,6 +250,58 @@ export default function CustomerDashboard({ auth, orders, recentRecipes }) {
                             </div>
                         </div>
                     </Link>
+
+                    {/* QR Scanner Quick Action - Only show if user has delivered orders */}
+                    {orders && orders.some(order => order.status === 'delivered') && (
+                        <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-md rounded-lg transition-all duration-300 hover:shadow-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/30 border border-gray-200 dark:border-gray-700">
+                            <div className="p-5">
+                                <div className="flex items-center">
+                                    <div className="flex-shrink-0 bg-orange-100 dark:bg-orange-900 rounded-full p-3">
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            className="h-6 w-6 text-orange-600 dark:text-orange-300"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
+                                            />
+                                        </svg>
+                                    </div>
+                                    <div className="ml-4">
+                                        <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                                            Verify Products
+                                        </h3>
+                                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                            Scan QR codes to verify delivered items
+                                        </p>
+                                        <div className="mt-2">
+                                            <select
+                                                onChange={(e) => {
+                                                    if (e.target.value) {
+                                                        window.location.href = route("orders.scanner", e.target.value);
+                                                    }
+                                                }}
+                                                className="text-sm border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-indigo-500 focus:ring-indigo-500"
+                                                defaultValue=""
+                                            >
+                                                <option value="">Select delivered order...</option>
+                                                {orders.filter(order => order.status === 'delivered').map(order => (
+                                                    <option key={order.id} value={order.id}>
+                                                        Order #{order.id} - {new Date(order.created_at).toLocaleDateString()}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 

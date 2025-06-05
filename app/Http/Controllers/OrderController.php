@@ -46,6 +46,25 @@ class OrderController extends Controller
         ]);
     }
 
+    public function scanner(Order $order)
+    {
+        if ($order->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        // Only allow scanning for delivered orders
+        if ($order->status !== 'delivered') {
+            return redirect()->route('orders.show', $order)
+                ->with('error', 'QR scanning is only available for delivered orders.');
+        }
+
+        $order->load(['items.product']);
+
+        return Inertia::render('Orders/Scanner', [
+            'order' => $order
+        ]);
+    }
+
     public function store(Request $request)
     {
         $cart = session()->get('cart', []);
