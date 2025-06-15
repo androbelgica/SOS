@@ -376,4 +376,38 @@ class FileUploadService
         Log::info('Video deletion result', ['success' => $success]);
         return $success;
     }
+
+    /**
+     * Delete a file from storage
+     *
+     * @param string $filePath The file path to delete
+     * @return bool
+     */
+    public function deleteFile(string $filePath): bool
+    {
+        try {
+            // Remove leading slash if present
+            $filePath = ltrim($filePath, '/');
+
+            // Remove storage prefix if present
+            if (str_starts_with($filePath, 'storage/')) {
+                $filePath = substr($filePath, 8);
+            }
+
+            if (Storage::exists($filePath)) {
+                Storage::delete($filePath);
+                Log::info('File deleted successfully', ['path' => $filePath]);
+                return true;
+            }
+
+            Log::warning('File not found for deletion', ['path' => $filePath]);
+            return false;
+        } catch (\Exception $e) {
+            Log::error('Failed to delete file', [
+                'path' => $filePath,
+                'error' => $e->getMessage()
+            ]);
+            return false;
+        }
+    }
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductLabelController;
+use App\Http\Controllers\ProductRecognitionController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -216,7 +217,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/recipes/{recipe}/edit', [RecipeController::class, 'edit'])->name('recipes.edit');
         Route::put('/recipes/{recipe}', [RecipeController::class, 'update'])->name('recipes.update');
         Route::delete('/recipes/{recipe}', [RecipeController::class, 'destroy'])->name('recipes.destroy');
+
+        // Product Recognition Management (Admin)
+        Route::get('/product-recognition', [ProductRecognitionController::class, 'index'])->name('product-recognition.index');
+        Route::get('/product-recognition/{recognition}', [ProductRecognitionController::class, 'show'])->name('product-recognition.show');
+        Route::delete('/product-recognition/{recognition}', [ProductRecognitionController::class, 'destroy'])->name('product-recognition.destroy');
     });
+});
+
+// Product Recognition Routes (Authenticated Users)
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/recognize-product', [ProductRecognitionController::class, 'create'])->name('product-recognition.create');
+    Route::post('/recognize-product', [ProductRecognitionController::class, 'recognize'])->name('product-recognition.recognize');
+    Route::get('/my-recognitions', [ProductRecognitionController::class, 'index'])->name('my-recognitions.index');
 });
 
 // Test route for Google OAuth configuration
