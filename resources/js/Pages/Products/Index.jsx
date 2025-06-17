@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Head, Link, router } from "@inertiajs/react";
 import MainLayout from "@/Layouts/MainLayout";
 import { getImageProps } from "@/Utils/imageHelpers";
+import CategoryFilter from "@/Components/CategoryFilter";
+import CategoryBadge from "@/Components/CategoryBadge";
 
 export default function Index({ auth, products, filters, categories }) {
     const [searchQuery, setSearchQuery] = useState(filters.search || "");
@@ -22,8 +24,32 @@ export default function Index({ auth, products, filters, categories }) {
     };
 
     return (
-        <MainLayout auth={auth} title="Fresh Seafood Products">
-            <Head title="Products - Seafood Online Store" />
+        <MainLayout auth={auth} title="Fresh Grocery Products">
+            <Head title="Products - Online Grocery Store" />
+
+            {/* Header */}
+            <div className="mb-8">
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                    Fresh Grocery Products
+                </h1>
+                <p className="text-gray-600 dark:text-gray-400 text-lg">
+                    Discover our premium selection of fresh groceries, from seafood and meat to vegetables and fruits.
+                </p>
+            </div>
+
+            {/* Category Filter Pills */}
+            {categories && categories.length > 0 && (
+                <div className="mb-6">
+                    <CategoryFilter
+                        categories={categories}
+                        currentCategory={filters.category || ''}
+                        routeName="products.index"
+                        filters={filters}
+                        layout="pills"
+                        showIcons={true}
+                    />
+                </div>
+            )}
 
             {/* Search and filters */}
             <div className="mb-6 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
@@ -51,31 +77,14 @@ export default function Index({ auth, products, filters, categories }) {
                     </div>
 
                     {categories && categories.length > 0 && (
-                        <div className="w-full md:w-64">
-                            <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Category
-                            </label>
-                            <select
-                                id="category"
-                                name="category"
-                                value={filters.category || ""}
-                                onChange={(e) => {
-                                    router.get(
-                                        route("products.index"),
-                                        { ...filters, category: e.target.value || null },
-                                        { preserveState: true }
-                                    );
-                                }}
-                                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                            >
-                                <option value="">All Categories</option>
-                                {categories.map((category) => (
-                                    <option key={category} value={category}>
-                                        {category}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
+                        <CategoryFilter
+                            categories={categories}
+                            currentCategory={filters.category || ''}
+                            routeName="products.index"
+                            filters={filters}
+                            layout="dropdown"
+                            showIcons={true}
+                        />
                     )}
                 </div>
             </div>
@@ -117,9 +126,20 @@ export default function Index({ auth, products, filters, categories }) {
                                 </div>
                             </div>
                             <div className="p-4">
-                                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                                    {product.name}
-                                </h2>
+                                <div className="flex justify-between items-start mb-2">
+                                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex-1">
+                                        {product.name}
+                                    </h2>
+                                    {product.category && (
+                                        <CategoryBadge
+                                            category={product.category_display_name || product.category}
+                                            icon={product.category_icon}
+                                            color={product.category_color}
+                                            size="xs"
+                                            className="ml-2 flex-shrink-0"
+                                        />
+                                    )}
+                                </div>
                                 <p className="text-gray-600 dark:text-gray-300 mt-2 text-sm line-clamp-2">
                                     {product.description}
                                 </p>

@@ -10,7 +10,7 @@ import CameraCapture from "@/Components/CameraCapture";
 import ProductRecognition from "@/Components/ProductRecognition";
 import { getImageProps, getImageUrl, getFallbackImage } from "@/Utils/imageHelpers";
 
-export default function Create({ auth, recipes }) {
+export default function Create({ auth, recipes, categories }) {
     const { asset } = usePage().props;
 
     const [clientTimestamp, setClientTimestamp] = useState(Date.now());
@@ -346,14 +346,11 @@ export default function Create({ auth, recipes }) {
                                             <option value="">
                                                 Select a category
                                             </option>
-                                            <option value="fish">Fish</option>
-                                            <option value="shellfish">
-                                                Shellfish
-                                            </option>
-                                            <option value="crustaceans">
-                                                Crustaceans
-                                            </option>
-                                            <option value="other">Other</option>
+                                            {categories && categories.map((category) => (
+                                                <option key={category.value} value={category.value}>
+                                                    {category.icon} {category.label}
+                                                </option>
+                                            ))}
                                         </select>
                                         <InputError
                                             message={errors.category}

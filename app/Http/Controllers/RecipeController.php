@@ -60,7 +60,7 @@ class RecipeController extends Controller
         return Inertia::render('Recipes/Index', [
             'recipes' => $recipes,
             'filters' => request()->only(['search', 'category', 'difficulty', 'sort']),
-            'categories' => $this->getSeafoodCategories()
+            'categories' => $this->getEnhancedCategories()
         ]);
     }
 
@@ -559,7 +559,39 @@ class RecipeController extends Controller
     }
 
     /**
-     * Get available seafood categories
+     * Get enhanced categories including both recipe and product categories
+     */
+    private function getEnhancedCategories(): array
+    {
+        // Get recipe categories from database
+        $recipeCategories = Recipe::approved()
+            ->distinct()
+            ->pluck('category')
+            ->filter()
+            ->mapWithKeys(function ($category) {
+                return [$category => ucfirst($category)];
+            })
+            ->toArray();
+
+        // Get product categories used in recipes
+        $productCategories = Product::whereHas('recipes', function ($query) {
+            $query->where('status', 'approved');
+        })
+            ->distinct()
+            ->pluck('category')
+            ->filter()
+            ->mapWithKeys(function ($category) {
+                $categoryEnum = \App\Enums\ProductCategory::tryFrom($category);
+                return [$category => $categoryEnum ? $categoryEnum->getDisplayName() : ucfirst($category)];
+            })
+            ->toArray();
+
+        // Merge categories with recipe categories taking precedence
+        return array_merge($productCategories, $recipeCategories);
+    }
+
+    /**
+     * Get available seafood categories (legacy method for backward compatibility)
      */
     private function getSeafoodCategories(): array
     {

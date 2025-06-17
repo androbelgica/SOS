@@ -8,7 +8,7 @@ import InputError from "@/Components/InputError";
 import CameraCapture from "@/Components/CameraCapture";
 import { getImageProps, getImageUrl } from "@/Utils/imageHelpers";
 
-export default function Edit({ auth, product, recipes, timestamp }) {
+export default function Edit({ auth, product, recipes, categories, timestamp }) {
     const { asset } = usePage().props;
 
     const [clientTimestamp, setClientTimestamp] = useState(Date.now());
@@ -294,14 +294,11 @@ export default function Edit({ auth, product, recipes, timestamp }) {
                                             <option value="">
                                                 Select a category
                                             </option>
-                                            <option value="fish">Fish</option>
-                                            <option value="shellfish">
-                                                Shellfish
-                                            </option>
-                                            <option value="crustaceans">
-                                                Crustaceans
-                                            </option>
-                                            <option value="other">Other</option>
+                                            {categories && categories.map((category) => (
+                                                <option key={category.value} value={category.value}>
+                                                    {category.icon} {category.label}
+                                                </option>
+                                            ))}
                                         </select>
                                         <InputError
                                             message={errors.category}

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Recipe;
 use App\Models\User;
+use App\Enums\ProductCategory;
 use App\Notifications\LowStockAlert;
 use App\Services\FileUploadService;
 use Illuminate\Http\Request;
@@ -58,10 +59,38 @@ class ProductController extends Controller
 
         $products = $query->paginate(12)->withQueryString();
 
+        // Get enhanced category information
+        $categories = collect(ProductCategory::cases())->map(function ($category) {
+            return [
+                'value' => $category->value,
+                'label' => $category->getDisplayName(),
+                'icon' => $category->getIcon(),
+                'color' => $category->getColor()
+            ];
+        });
+
+        // Add database categories that might not be in enum
+        $dbCategories = Product::distinct()
+            ->pluck('category')
+            ->filter()
+            ->reject(function ($category) use ($categories) {
+                return $categories->pluck('value')->contains($category);
+            })
+            ->map(function ($category) {
+                return [
+                    'value' => $category,
+                    'label' => ucfirst($category),
+                    'icon' => '📦',
+                    'color' => 'gray'
+                ];
+            });
+
+        $allCategories = $categories->merge($dbCategories)->values();
+
         return Inertia::render('Products/Index', [
             'products' => $products,
             'filters' => $request->only(['search', 'category', 'available', 'min_price', 'max_price', 'sort', 'direction']),
-            'categories' => Product::distinct()->pluck('category')
+            'categories' => $allCategories
         ]);
     }
 
@@ -121,6 +150,21 @@ class ProductController extends Controller
             return $product;
         });
 
+        // Get category statistics
+        $categoryStats = Product::selectRaw('category, COUNT(*) as count')
+            ->groupBy('category')
+            ->get()
+            ->map(function ($item) {
+                $categoryEnum = ProductCategory::tryFrom($item->category);
+                return [
+                    'category' => $item->category,
+                    'label' => $categoryEnum ? $categoryEnum->getDisplayName() : ucfirst($item->category),
+                    'icon' => $categoryEnum ? $categoryEnum->getIcon() : '📦',
+                    'color' => $categoryEnum ? $categoryEnum->getColor() : 'gray',
+                    'count' => $item->count,
+                ];
+            });
+
         return Inertia::render('Admin/Products/Index', [
             'products' => $products,
             'filters' => request()->only(['search', 'sort', 'direction']),
@@ -129,6 +173,7 @@ class ProductController extends Controller
                 'lowStock' => Product::where('stock_quantity', '<=', 10)->count(),
                 'outOfStock' => Product::where('stock_quantity', 0)->count(),
             ],
+            'categoryStats' => $categoryStats,
             'timestamp' => $timestamp, // Pass timestamp to the view for cache busting
         ]);
     }
@@ -136,7 +181,15 @@ class ProductController extends Controller
     public function create()
     {
         return Inertia::render('Admin/Products/Create', [
-            'recipes' => Recipe::all()
+            'recipes' => Recipe::all(),
+            'categories' => collect(ProductCategory::cases())->map(function ($category) {
+                return [
+                    'value' => $category->value,
+                    'label' => $category->getDisplayName(),
+                    'icon' => $category->getIcon(),
+                    'color' => $category->getColor()
+                ];
+            })
         ]);
     }
 
@@ -245,6 +298,14 @@ class ProductController extends Controller
         return Inertia::render('Admin/Products/Edit', [
             'product' => $product,
             'recipes' => Recipe::all(),
+            'categories' => collect(ProductCategory::cases())->map(function ($category) {
+                return [
+                    'value' => $category->value,
+                    'label' => $category->getDisplayName(),
+                    'icon' => $category->getIcon(),
+                    'color' => $category->getColor()
+                ];
+            }),
             'timestamp' => $timestamp // Pass timestamp to the view for cache busting
         ]);
     }
@@ -263,7 +324,7 @@ class ProductController extends Controller
             'nutritional_facts' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'stock_quantity' => 'required|integer|min:0',
-            'category' => 'required|string|max:255',
+            'category' => 'required|string|in:' . implode(',', ProductCategory::values()),
             'unit_type' => 'required|string|in:kg,piece',
             'image' => 'nullable|image|max:2048',
             'image_url' => 'nullable|string' // For existing images selected from browser
@@ -344,7 +405,7 @@ class ProductController extends Controller
             'nutritional_facts' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'stock_quantity' => 'required|integer|min:0',
-            'category' => 'required|string|max:255',
+            'category' => 'required|string|in:' . implode(',', ProductCategory::values()),
             'unit_type' => 'required|string|in:kg,piece',
             'image' => 'nullable|image|max:2048',
             'image_url' => 'nullable|string' // For existing images selected from browser

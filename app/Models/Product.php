@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ProductCategory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -47,6 +48,56 @@ class Product extends Model
     public function recipes(): BelongsToMany
     {
         return $this->belongsToMany(Recipe::class);
+    }
+
+    // Category Scopes
+    public function scopeSeafood($query)
+    {
+        return $query->whereIn('category', [ProductCategory::Seafood->value, ProductCategory::Fish->value, ProductCategory::Shellfish->value]);
+    }
+
+    public function scopeMeat($query)
+    {
+        return $query->where('category', ProductCategory::Meat->value);
+    }
+
+    public function scopeVegetable($query)
+    {
+        return $query->where('category', ProductCategory::Vegetable->value);
+    }
+
+    public function scopeFruit($query)
+    {
+        return $query->where('category', ProductCategory::Fruit->value);
+    }
+
+    public function scopeByCategory($query, string $category)
+    {
+        return $query->where('category', $category);
+    }
+
+    // Helper methods
+    public function getCategoryEnum(): ?ProductCategory
+    {
+        return ProductCategory::tryFrom($this->category);
+    }
+
+    public function getCategoryDisplayName(): string
+    {
+        $categoryEnum = $this->getCategoryEnum();
+        return $categoryEnum ? $categoryEnum->getDisplayName() : ucfirst($this->category);
+    }
+
+    public function getCategoryIcon(): string
+    {
+        $categoryEnum = $this->getCategoryEnum();
+        return $categoryEnum ? $categoryEnum->getIcon() : '📦';
+    }
+
+    public function getCategoryColor(): string
+    {
+        $categoryEnum = $this->getCategoryEnum();
+        return $categoryEnum ? $categoryEnum->getColor() : 'gray';
     }
 
     public function orders(): BelongsToMany
