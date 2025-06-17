@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\RecipeReview;
 use App\Services\FileUploadService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
@@ -31,11 +32,23 @@ class RecipeController extends Controller
 
     public function show(Recipe $recipe)
     {
-        $recipe->load(['reviews.user', 'products']);
+        $recipe->load(['reviews.user', 'products', 'reactions']);
         $recipe->loadAvg('reviews', 'rating');
 
+        // Get reaction counts and user's reaction if authenticated
+        $reactionCounts = $recipe->reaction_counts;
+        $userReaction = null;
+
+        if (Auth::check()) {
+            $userReactionModel = $recipe->getUserReaction(Auth::id());
+            $userReaction = $userReactionModel ? $userReactionModel->reaction_type : null;
+        }
+
         return Inertia::render('Recipes/Show', [
-            'recipe' => $recipe,
+            'recipe' => array_merge($recipe->toArray(), [
+                'reaction_counts' => $reactionCounts,
+                'user_reaction' => $userReaction
+            ]),
             'relatedRecipes' => Recipe::where('id', '!=', $recipe->id)
                 ->withAvg('reviews', 'rating')
                 ->inRandomOrder()

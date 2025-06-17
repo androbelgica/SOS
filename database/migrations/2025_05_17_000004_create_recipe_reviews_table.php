@@ -15,7 +15,7 @@ return new class extends Migration
             $table->integer('rating')->unsigned();
             $table->text('comment')->nullable();
             $table->timestamps();
-            
+
             // One review per recipe per user
             $table->unique(['user_id', 'recipe_id']);
         });

@@ -4,6 +4,8 @@ import { StarIcon } from "@heroicons/react/24/solid";
 import { StarIcon as StarOutlineIcon } from "@heroicons/react/24/outline";
 import MainLayout from "@/Layouts/MainLayout";
 import { getImageProps } from "@/Utils/imageHelpers";
+import CommentSection from "@/Components/CommentSection";
+import ReactionButton from "@/Components/ReactionButton";
 
 // Function to convert YouTube URL to embed URL
 const getYouTubeEmbedUrl = (url) => {
@@ -30,6 +32,8 @@ const getYouTubeEmbedUrl = (url) => {
 export default function RecipeShow({ auth, recipe, relatedRecipes }) {
     const [cacheTimestamp, setCacheTimestamp] = useState(Date.now());
     const [showReviewForm, setShowReviewForm] = useState(false);
+    const [reactionCounts, setReactionCounts] = useState(recipe.reaction_counts || {});
+    const [userReaction, setUserReaction] = useState(recipe.user_reaction || null);
     const { data, setData, post, processing, reset } = useForm({
         rating: 5,
         comment: "",
@@ -43,6 +47,30 @@ export default function RecipeShow({ auth, recipe, relatedRecipes }) {
                 setShowReviewForm(false);
             },
         });
+    };
+
+    const handleReactionToggle = async (reactionType) => {
+        try {
+            const response = await fetch(`/api/recipes/${recipe.id}/reactions`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                },
+                body: JSON.stringify({ reaction_type: reactionType })
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                setReactionCounts(result.reaction_counts);
+                setUserReaction(result.user_reaction);
+            } else {
+                console.error('Failed to toggle reaction:', result.message);
+            }
+        } catch (error) {
+            console.error('Failed to toggle reaction:', error);
+        }
     };
 
     return (
@@ -144,6 +172,18 @@ export default function RecipeShow({ auth, recipe, relatedRecipes }) {
                                 ({recipe.reviews?.length || 0} reviews)
                             </span>
                         </div>
+
+                        {/* Reactions */}
+                        {auth.user && (
+                            <div className="mt-4">
+                                <ReactionButton
+                                    reactionCounts={reactionCounts}
+                                    userReaction={userReaction}
+                                    onReactionToggle={handleReactionToggle}
+                                    size="lg"
+                                />
+                            </div>
+                        )}
 
                         {/* Description */}
                         <p className="mt-4 text-gray-600 dark:text-gray-300">
@@ -304,6 +344,18 @@ export default function RecipeShow({ auth, recipe, relatedRecipes }) {
                             </div>
                         )}
                     </div>
+                </div>
+
+                {/* Comments Section */}
+                <div className="px-8 py-6 border-t border-gray-200 dark:border-gray-700">
+                    <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6">
+                        Comments & Discussion
+                    </h2>
+                    <CommentSection
+                        recipe={recipe}
+                        auth={auth}
+                        className="max-w-4xl"
+                    />
                 </div>
 
                 {/* Related Recipes */}

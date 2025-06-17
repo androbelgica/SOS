@@ -3,6 +3,8 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RecipeController;
+use App\Http\Controllers\RecipeCommentController;
+use App\Http\Controllers\RecipeReactionController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductLabelController;
@@ -68,6 +70,21 @@ Route::get('/recipes', [RecipeController::class, 'index'])->name('recipes.index'
 Route::get('/recipes/{recipe}', [RecipeController::class, 'show'])->name('recipes.show');
 Route::post('/recipes', [RecipeController::class, 'store'])->middleware(['auth', 'can:create,App\\Models\\Recipe'])->name('recipes.store');
 Route::post('/recipes/{recipe}/reviews', [RecipeController::class, 'addReview'])->middleware(['auth'])->name('recipes.reviews.store');
+
+// Recipe Comments & Reactions API routes (authenticated users only)
+Route::middleware(['auth'])->group(function () {
+    // Recipe Comments
+    Route::get('/api/recipes/{recipe}/comments', [RecipeCommentController::class, 'index'])->name('api.recipes.comments.index');
+    Route::post('/api/recipes/{recipe}/comments', [RecipeCommentController::class, 'store'])->name('api.recipes.comments.store');
+    Route::put('/api/comments/{comment}', [RecipeCommentController::class, 'update'])->name('api.comments.update');
+    Route::delete('/api/comments/{comment}', [RecipeCommentController::class, 'destroy'])->name('api.comments.destroy');
+    Route::get('/api/comments/{comment}/replies', [RecipeCommentController::class, 'replies'])->name('api.comments.replies');
+
+    // Recipe Reactions
+    Route::post('/api/recipes/{recipe}/reactions', [RecipeReactionController::class, 'toggleRecipeReaction'])->name('api.recipes.reactions.toggle');
+    Route::get('/api/recipes/{recipe}/reactions', [RecipeReactionController::class, 'getRecipeReactions'])->name('api.recipes.reactions.get');
+    Route::post('/api/comments/{comment}/reactions', [RecipeReactionController::class, 'toggleCommentReaction'])->name('api.comments.reactions.toggle');
+});
 
 // Order verification route (accessible without authentication)
 Route::get('/orders/{order}/verify/{product}', [ProductLabelController::class, 'verify'])->name('orders.verify');
