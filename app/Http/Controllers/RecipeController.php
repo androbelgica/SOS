@@ -5,14 +5,19 @@ namespace App\Http\Controllers;
 use App\Models\Recipe;
 use App\Models\Product;
 use App\Models\RecipeReview;
+use App\Models\Notification;
+use App\Models\User;
 use App\Services\FileUploadService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Inertia\Inertia;
 
 class RecipeController extends Controller
 {
+    use AuthorizesRequests;
+
     protected $fileUploadService;
 
     public function __construct(FileUploadService $fileUploadService)
@@ -21,18 +26,53 @@ class RecipeController extends Controller
     }
     public function index()
     {
-        $recipes = Recipe::with(['reviews.user', 'products'])
+        $recipes = Recipe::approved()
+            ->with(['reviews.user', 'products', 'creator'])
             ->withAvg('reviews', 'rating')
-            ->paginate(9);
+            ->when(request('search'), function ($query, $search) {
+                $query->where('title', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            })
+            ->when(request('category'), function ($query, $category) {
+                $query->where('category', $category);
+            })
+            ->when(request('difficulty'), function ($query, $difficulty) {
+                $query->where('difficulty_level', $difficulty);
+            })
+            ->when(request('sort'), function ($query, $sort) {
+                switch ($sort) {
+                    case 'rating':
+                        $query->orderByDesc('reviews_avg_rating');
+                        break;
+                    case 'newest':
+                        $query->orderByDesc('created_at');
+                        break;
+                    case 'oldest':
+                        $query->orderBy('created_at');
+                        break;
+                    default:
+                        $query->orderByDesc('created_at');
+                }
+            })
+            ->paginate(9)
+            ->withQueryString();
 
         return Inertia::render('Recipes/Index', [
-            'recipes' => $recipes
+            'recipes' => $recipes,
+            'filters' => request()->only(['search', 'category', 'difficulty', 'sort']),
+            'categories' => $this->getSeafoodCategories()
         ]);
     }
 
     public function show(Recipe $recipe)
     {
-        $recipe->load(['reviews.user', 'products', 'reactions']);
+        // Only show approved recipes to public, unless user is the creator or admin
+        if (!$recipe->isApproved() &&
+            (!Auth::check() || (Auth::id() !== $recipe->created_by && !Auth::user()->isAdmin()))) {
+            abort(404);
+        }
+
+        $recipe->load(['reviews.user', 'products', 'reactions', 'creator']);
         $recipe->loadAvg('reviews', 'rating');
 
         // Get reaction counts and user's reaction if authenticated
@@ -49,7 +89,8 @@ class RecipeController extends Controller
                 'reaction_counts' => $reactionCounts,
                 'user_reaction' => $userReaction
             ]),
-            'relatedRecipes' => Recipe::where('id', '!=', $recipe->id)
+            'relatedRecipes' => Recipe::approved()
+                ->where('id', '!=', $recipe->id)
                 ->withAvg('reviews', 'rating')
                 ->inRandomOrder()
                 ->limit(3)
@@ -84,15 +125,24 @@ class RecipeController extends Controller
         // Add a timestamp to force fresh data
         $timestamp = time();
 
+        $status = request('status', 'all');
+
         // Get recipes with a query
         $recipesQuery = Recipe::query()
-            ->with('products')
+            ->with(['products', 'creator', 'approver'])
             ->withCount('reviews')
             ->withAvg('reviews', 'rating')
-            ->select('id', 'title', 'description', 'cooking_time', 'difficulty_level', 'image_url', 'created_at', 'updated_at')
+            ->select('id', 'title', 'description', 'cooking_time', 'difficulty_level', 'image_url', 'created_at', 'updated_at', 'status', 'created_by', 'approved_by', 'approved_at', 'category')
             ->when(request('search'), function ($query, $search) {
                 $query->where('title', 'like', "%{$search}%")
                     ->orWhere('description', 'like', "%{$search}%");
+            })
+            ->when($status !== 'all', function ($query) use ($status) {
+                if ($status === 'pending') {
+                    $query->whereIn('status', ['submitted', 'under_review']);
+                } else {
+                    $query->where('status', $status);
+                }
             })
             ->when(request('sort'), function ($query, $sort) {
                 $query->orderBy($sort, request('direction', 'asc'));
@@ -116,10 +166,14 @@ class RecipeController extends Controller
 
         return Inertia::render('Admin/Recipes/Index', [
             'recipes' => $recipes,
-            'filters' => request()->only(['search', 'sort', 'direction']),
+            'filters' => request()->only(['search', 'sort', 'direction', 'status']),
             'stats' => [
                 'total' => Recipe::count(),
-                'highRated' => Recipe::whereHas('reviews', function ($query) {
+                'approved' => Recipe::where('status', 'approved')->count(),
+                'pending' => Recipe::whereIn('status', ['submitted', 'under_review'])->count(),
+                'rejected' => Recipe::where('status', 'rejected')->count(),
+                'drafts' => Recipe::where('status', 'draft')->count(),
+                'highRated' => Recipe::approved()->whereHas('reviews', function ($query) {
                     $query->select('recipe_id')
                         ->groupBy('recipe_id')
                         ->havingRaw('AVG(rating) >= ?', [4]);
@@ -180,6 +234,12 @@ class RecipeController extends Controller
         unset($validated['product_ids']);
 
         $recipe = new Recipe($validated);
+
+        // Set admin-created recipes as approved by default
+        $recipe->created_by = Auth::id();
+        $recipe->status = 'approved';
+        $recipe->approved_by = Auth::id();
+        $recipe->approved_at = now();
 
         // Handle image upload or reuse existing image
         if ($request->hasFile('image')) {
@@ -422,5 +482,95 @@ class RecipeController extends Controller
         $recipe->delete();
 
         return redirect()->route('admin.recipes.index')->with('success', 'Recipe deleted successfully. (Note: Recipe image has been preserved for future reuse)');
+    }
+
+    /**
+     * Approve a recipe
+     */
+    public function approve(Recipe $recipe)
+    {
+        $this->authorize('approve', $recipe);
+
+        $recipe->approve(Auth::user());
+
+        // Send notification to recipe creator
+        try {
+            Notification::createRecipeApproved(
+                $recipe->created_by,
+                $recipe->id,
+                $recipe->title
+            );
+        } catch (\Exception $e) {
+            \Log::error('Failed to create approval notification: ' . $e->getMessage());
+        }
+
+        return back()->with('success', 'Recipe approved successfully!');
+    }
+
+    /**
+     * Reject a recipe
+     */
+    public function reject(Request $request, Recipe $recipe)
+    {
+        $this->authorize('reject', $recipe);
+
+        $validated = $request->validate([
+            'rejection_reason' => 'required|string|max:1000'
+        ]);
+
+        $recipe->reject(Auth::user(), $validated['rejection_reason']);
+
+        // Send notification to recipe creator
+        try {
+            Notification::createRecipeRejected(
+                $recipe->created_by,
+                $recipe->id,
+                $recipe->title,
+                $validated['rejection_reason']
+            );
+        } catch (\Exception $e) {
+            \Log::error('Failed to create rejection notification: ' . $e->getMessage());
+        }
+
+        return back()->with('success', 'Recipe rejected successfully!');
+    }
+
+    /**
+     * Set recipe status to under review
+     */
+    public function setUnderReview(Recipe $recipe)
+    {
+        $this->authorize('approve', $recipe);
+
+        $recipe->update(['status' => 'under_review']);
+
+        // Send notification to recipe creator
+        try {
+            Notification::createRecipeUnderReview(
+                $recipe->created_by,
+                $recipe->id,
+                $recipe->title
+            );
+        } catch (\Exception $e) {
+            \Log::error('Failed to create under review notification: ' . $e->getMessage());
+        }
+
+        return back()->with('success', 'Recipe marked as under review!');
+    }
+
+    /**
+     * Get available seafood categories
+     */
+    private function getSeafoodCategories(): array
+    {
+        return [
+            'fish' => 'Fish',
+            'shellfish' => 'Shellfish',
+            'crustaceans' => 'Crustaceans',
+            'mollusks' => 'Mollusks',
+            'cephalopods' => 'Cephalopods',
+            'mixed_seafood' => 'Mixed Seafood',
+            'other' => 'Other'
+        ];
     }
 }

@@ -3,6 +3,7 @@ import { Link, usePage } from "@inertiajs/react";
 import { Transition } from "@headlessui/react";
 import FlashMessage from "@/Components/FlashMessage";
 import DarkModeToggle from "@/Components/DarkModeToggle";
+import NotificationDropdown from "@/Components/NotificationDropdown";
 import { useDarkMode } from "@/Contexts/DarkModeContext";
 
 export default function AdminLayout({ children, title = "Admin Dashboard" }) {
@@ -59,7 +60,10 @@ export default function AdminLayout({ children, title = "Admin Dashboard" }) {
                         </div>
                         
                         {/* User dropdown */}
-                        <div className="flex items-center">
+                        <div className="flex items-center space-x-4">
+                            {/* Notification Dropdown */}
+                            <NotificationDropdown auth={auth} />
+
                             <div className="ml-3 relative">
                                 <div>
                                     <button

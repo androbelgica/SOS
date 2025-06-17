@@ -19,15 +19,25 @@ class RecipePolicy
 
     public function create(User $user): bool
     {
-        return $user->role === 'admin';
+        return true; // All authenticated users can create recipes
     }
 
     public function update(User $user, Recipe $recipe): bool
     {
-        return $user->role === 'admin';
+        return $recipe->canBeEditedBy($user);
     }
 
     public function delete(User $user, Recipe $recipe): bool
+    {
+        return $recipe->canBeDeletedBy($user);
+    }
+
+    public function approve(User $user, Recipe $recipe): bool
+    {
+        return $user->role === 'admin';
+    }
+
+    public function reject(User $user, Recipe $recipe): bool
     {
         return $user->role === 'admin';
     }

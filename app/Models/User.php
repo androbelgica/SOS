@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -58,5 +59,41 @@ class User extends Authenticatable
     public function isAdmin()
     {
         return $this->role === 'admin';
+    }
+
+    // Recipe relationships
+    public function recipes(): HasMany
+    {
+        return $this->hasMany(Recipe::class, 'created_by');
+    }
+
+    public function approvedRecipes(): HasMany
+    {
+        return $this->hasMany(Recipe::class, 'approved_by');
+    }
+
+    public function recipeComments(): HasMany
+    {
+        return $this->hasMany(RecipeComment::class);
+    }
+
+    public function recipeReactions(): HasMany
+    {
+        return $this->hasMany(RecipeReaction::class);
+    }
+
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(Notification::class);
+    }
+
+    public function unreadNotifications(): HasMany
+    {
+        return $this->hasMany(Notification::class)->whereNull('read_at');
+    }
+
+    public function getUnreadNotificationsCountAttribute(): int
+    {
+        return $this->unreadNotifications()->count();
     }
 }

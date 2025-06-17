@@ -14,6 +14,8 @@ export default function AdminRecipes({
     const [searchQuery, setSearchQuery] = useState(filters.search || "");
     const [deleteConfirmation, setDeleteConfirmation] = useState(null);
     const [clientTimestamp, setClientTimestamp] = useState(Date.now());
+    const [rejectModal, setRejectModal] = useState(null);
+    const [rejectionReason, setRejectionReason] = useState("");
 
     // Use server timestamp if available, otherwise use client timestamp
     const cacheTimestamp = timestamp || clientTimestamp;
@@ -76,6 +78,66 @@ export default function AdminRecipes({
         }
     };
 
+    // Handle status filter
+    const handleStatusFilter = (status) => {
+        router.get(
+            route("admin.recipes.index"),
+            { ...filters, status: status },
+            { preserveState: true }
+        );
+    };
+
+    // Handle recipe approval
+    const approveRecipe = (recipeId) => {
+        router.post(route("admin.recipes.approve", recipeId));
+    };
+
+    // Handle recipe rejection
+    const openRejectModal = (recipeId) => {
+        setRejectModal(recipeId);
+        setRejectionReason("");
+    };
+
+    const rejectRecipe = () => {
+        if (rejectModal && rejectionReason.trim()) {
+            router.post(route("admin.recipes.reject", rejectModal), {
+                rejection_reason: rejectionReason
+            });
+            setRejectModal(null);
+            setRejectionReason("");
+        }
+    };
+
+    // Set recipe under review
+    const setUnderReview = (recipeId) => {
+        router.post(route("admin.recipes.under-review", recipeId));
+    };
+
+    // Get status badge
+    const getStatusBadge = (status) => {
+        const badges = {
+            draft: 'bg-gray-100 text-gray-800',
+            submitted: 'bg-blue-100 text-blue-800',
+            under_review: 'bg-yellow-100 text-yellow-800',
+            approved: 'bg-green-100 text-green-800',
+            rejected: 'bg-red-100 text-red-800'
+        };
+
+        const labels = {
+            draft: 'Draft',
+            submitted: 'Submitted',
+            under_review: 'Under Review',
+            approved: 'Approved',
+            rejected: 'Rejected'
+        };
+
+        return (
+            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${badges[status]}`}>
+                {labels[status]}
+            </span>
+        );
+    };
+
     // Get sort icon
     const getSortIcon = (column) => {
         if (filters.sort !== column) {
@@ -102,18 +164,18 @@ export default function AdminRecipes({
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 mb-8">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-5 mb-8">
                 <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-md rounded-lg border border-gray-200 dark:border-gray-700 transition-all duration-200 hover:shadow-lg">
                     <div className="px-4 py-5 sm:p-6">
                         <div className="flex items-center">
-                            <div className="flex-shrink-0 bg-green-100 dark:bg-green-900 rounded-full p-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-green-600 dark:text-green-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <div className="flex-shrink-0 bg-blue-100 dark:bg-blue-900 rounded-full p-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600 dark:text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                                 </svg>
                             </div>
                             <div className="ml-5">
                                 <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                    Total Recipes
+                                    Total
                                 </dt>
                                 <dd className="mt-1 text-3xl font-semibold text-gray-900 dark:text-white">
                                     {stats.total}
@@ -125,17 +187,17 @@ export default function AdminRecipes({
                 <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-md rounded-lg border border-gray-200 dark:border-gray-700 transition-all duration-200 hover:shadow-lg">
                     <div className="px-4 py-5 sm:p-6">
                         <div className="flex items-center">
-                            <div className="flex-shrink-0 bg-yellow-100 dark:bg-yellow-900 rounded-full p-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-yellow-600 dark:text-yellow-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                            <div className="flex-shrink-0 bg-green-100 dark:bg-green-900 rounded-full p-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-green-600 dark:text-green-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                 </svg>
                             </div>
                             <div className="ml-5">
                                 <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                    Highly Rated (4+ stars)
+                                    Approved
                                 </dt>
                                 <dd className="mt-1 text-3xl font-semibold text-gray-900 dark:text-white">
-                                    {stats.highRated}
+                                    {stats.approved}
                                 </dd>
                             </div>
                         </div>
@@ -144,17 +206,55 @@ export default function AdminRecipes({
                 <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-md rounded-lg border border-gray-200 dark:border-gray-700 transition-all duration-200 hover:shadow-lg">
                     <div className="px-4 py-5 sm:p-6">
                         <div className="flex items-center">
-                            <div className="flex-shrink-0 bg-indigo-100 dark:bg-indigo-900 rounded-full p-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-indigo-600 dark:text-indigo-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <div className="flex-shrink-0 bg-yellow-100 dark:bg-yellow-900 rounded-full p-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-yellow-600 dark:text-yellow-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                             </div>
                             <div className="ml-5">
                                 <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                    Avg. Cooking Time
+                                    Pending
                                 </dt>
                                 <dd className="mt-1 text-3xl font-semibold text-gray-900 dark:text-white">
-                                    {stats.avgCookingTime || "N/A"}
+                                    {stats.pending}
+                                </dd>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-md rounded-lg border border-gray-200 dark:border-gray-700 transition-all duration-200 hover:shadow-lg">
+                    <div className="px-4 py-5 sm:p-6">
+                        <div className="flex items-center">
+                            <div className="flex-shrink-0 bg-red-100 dark:bg-red-900 rounded-full p-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-red-600 dark:text-red-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </div>
+                            <div className="ml-5">
+                                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    Rejected
+                                </dt>
+                                <dd className="mt-1 text-3xl font-semibold text-gray-900 dark:text-white">
+                                    {stats.rejected}
+                                </dd>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-md rounded-lg border border-gray-200 dark:border-gray-700 transition-all duration-200 hover:shadow-lg">
+                    <div className="px-4 py-5 sm:p-6">
+                        <div className="flex items-center">
+                            <div className="flex-shrink-0 bg-gray-100 dark:bg-gray-900 rounded-full p-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </div>
+                            <div className="ml-5">
+                                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    Drafts
+                                </dt>
+                                <dd className="mt-1 text-3xl font-semibold text-gray-900 dark:text-white">
+                                    {stats.drafts}
                                 </dd>
                             </div>
                         </div>
@@ -162,38 +262,68 @@ export default function AdminRecipes({
                 </div>
             </div>
 
-            {/* Search */}
-            <div className="mb-6 bg-white dark:bg-gray-800 shadow-md rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-                <form onSubmit={handleSearch}>
-                    <label htmlFor="search" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Search Recipes
-                    </label>
-                    <div className="flex rounded-md shadow-sm">
-                        <div className="relative flex-grow focus-within:z-10">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg className="h-5 w-5 text-gray-400 dark:text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
-                                </svg>
+            {/* Status Filter Tabs */}
+            <div className="mb-6 bg-white dark:bg-gray-800 shadow-md rounded-lg border border-gray-200 dark:border-gray-700">
+                <div className="border-b border-gray-200 dark:border-gray-700">
+                    <nav className="-mb-px flex space-x-8 px-6" aria-label="Tabs">
+                        {[
+                            { key: 'all', label: 'All Recipes', count: stats.total },
+                            { key: 'pending', label: 'Pending Review', count: stats.pending },
+                            { key: 'approved', label: 'Approved', count: stats.approved },
+                            { key: 'rejected', label: 'Rejected', count: stats.rejected },
+                            { key: 'draft', label: 'Drafts', count: stats.drafts }
+                        ].map((tab) => (
+                            <button
+                                key={tab.key}
+                                onClick={() => handleStatusFilter(tab.key)}
+                                className={`${
+                                    (filters.status || 'all') === tab.key
+                                        ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400'
+                                        : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
+                                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-150`}
+                            >
+                                {tab.label}
+                                <span className="ml-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-300 py-0.5 px-2.5 rounded-full text-xs">
+                                    {tab.count}
+                                </span>
+                            </button>
+                        ))}
+                    </nav>
+                </div>
+
+                {/* Search */}
+                <div className="p-4">
+                    <form onSubmit={handleSearch}>
+                        <label htmlFor="search" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Search Recipes
+                        </label>
+                        <div className="flex rounded-md shadow-sm">
+                            <div className="relative flex-grow focus-within:z-10">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg className="h-5 w-5 text-gray-400 dark:text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+                                    </svg>
+                                </div>
+                                <input
+                                    type="text"
+                                    name="search"
+                                    id="search"
+                                    className="pl-10 focus:ring-indigo-500 focus:border-indigo-500 block w-full rounded-l-md sm:text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                                    placeholder="Search by title, ingredients, or difficulty..."
+                                    value={searchQuery}
+                                    onChange={handleSearchChange}
+                                    onBlur={() => debouncedSearch(searchQuery)}
+                                />
                             </div>
-                            <input
-                                type="text"
-                                name="search"
-                                id="search"
-                                className="pl-10 focus:ring-indigo-500 focus:border-indigo-500 block w-full rounded-l-md sm:text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                                placeholder="Search by title, ingredients, or difficulty..."
-                                value={searchQuery}
-                                onChange={handleSearchChange}
-                                onBlur={() => debouncedSearch(searchQuery)}
-                            />
+                            <button
+                                type="submit"
+                                className="-ml-px relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-r-md text-gray-700 dark:text-gray-200 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150"
+                            >
+                                Search
+                            </button>
                         </div>
-                        <button
-                            type="submit"
-                            className="-ml-px relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-r-md text-gray-700 dark:text-gray-200 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150"
-                        >
-                            Search
-                        </button>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
 
             {/* Recipes Table */}
@@ -269,6 +399,18 @@ export default function AdminRecipes({
                                                     </svg>
                                                 )}
                                             </div>
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                                        >
+                                            Status
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                                        >
+                                            Creator
                                         </th>
                                         <th
                                             scope="col"
@@ -363,6 +505,12 @@ export default function AdminRecipes({
                                                     {recipe.difficulty_level}
                                                 </span>
                                             </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                {getStatusBadge(recipe.status)}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                                {recipe.creator ? recipe.creator.name : 'Unknown'}
+                                            </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                                 <div className="flex items-center">
                                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-yellow-500 mr-1" fill="currentColor" viewBox="0 0 24 24" stroke="none">
@@ -380,24 +528,83 @@ export default function AdminRecipes({
                                                 {new Date(recipe.created_at).toLocaleDateString()}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                <Link
-                                                    href={route("admin.recipes.edit", recipe.id)}
-                                                    className="inline-flex items-center px-3 py-1 border border-transparent text-xs leading-4 font-medium rounded-md text-indigo-700 dark:text-indigo-300 bg-indigo-100 dark:bg-indigo-900 hover:bg-indigo-200 dark:hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-150 mr-2"
-                                                >
-                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                    </svg>
-                                                    Edit
-                                                </Link>
-                                                <button
-                                                    onClick={() => confirmDelete(recipe.id)}
-                                                    className="inline-flex items-center px-3 py-1 border border-transparent text-xs leading-4 font-medium rounded-md text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-900 hover:bg-red-200 dark:hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-150"
-                                                >
-                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                    </svg>
-                                                    Delete
-                                                </button>
+                                                <div className="flex justify-end space-x-2">
+                                                    {/* Approval Actions */}
+                                                    {recipe.status === 'submitted' && (
+                                                        <>
+                                                            <button
+                                                                onClick={() => approveRecipe(recipe.id)}
+                                                                className="inline-flex items-center px-3 py-1 border border-transparent text-xs leading-4 font-medium rounded-md text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900 hover:bg-green-200 dark:hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-150"
+                                                            >
+                                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                                </svg>
+                                                                Approve
+                                                            </button>
+                                                            <button
+                                                                onClick={() => openRejectModal(recipe.id)}
+                                                                className="inline-flex items-center px-3 py-1 border border-transparent text-xs leading-4 font-medium rounded-md text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-900 hover:bg-red-200 dark:hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-150"
+                                                            >
+                                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                                </svg>
+                                                                Reject
+                                                            </button>
+                                                            <button
+                                                                onClick={() => setUnderReview(recipe.id)}
+                                                                className="inline-flex items-center px-3 py-1 border border-transparent text-xs leading-4 font-medium rounded-md text-yellow-700 dark:text-yellow-300 bg-yellow-100 dark:bg-yellow-900 hover:bg-yellow-200 dark:hover:bg-yellow-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors duration-150"
+                                                            >
+                                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                </svg>
+                                                                Review
+                                                            </button>
+                                                        </>
+                                                    )}
+
+                                                    {recipe.status === 'under_review' && (
+                                                        <>
+                                                            <button
+                                                                onClick={() => approveRecipe(recipe.id)}
+                                                                className="inline-flex items-center px-3 py-1 border border-transparent text-xs leading-4 font-medium rounded-md text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900 hover:bg-green-200 dark:hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-150"
+                                                            >
+                                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                                </svg>
+                                                                Approve
+                                                            </button>
+                                                            <button
+                                                                onClick={() => openRejectModal(recipe.id)}
+                                                                className="inline-flex items-center px-3 py-1 border border-transparent text-xs leading-4 font-medium rounded-md text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-900 hover:bg-red-200 dark:hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-150"
+                                                            >
+                                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                                </svg>
+                                                                Reject
+                                                            </button>
+                                                        </>
+                                                    )}
+
+                                                    {/* Standard Actions */}
+                                                    <Link
+                                                        href={route("admin.recipes.edit", recipe.id)}
+                                                        className="inline-flex items-center px-3 py-1 border border-transparent text-xs leading-4 font-medium rounded-md text-indigo-700 dark:text-indigo-300 bg-indigo-100 dark:bg-indigo-900 hover:bg-indigo-200 dark:hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-150"
+                                                    >
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                        </svg>
+                                                        Edit
+                                                    </Link>
+                                                    <button
+                                                        onClick={() => confirmDelete(recipe.id)}
+                                                        className="inline-flex items-center px-3 py-1 border border-transparent text-xs leading-4 font-medium rounded-md text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-900 hover:bg-red-200 dark:hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-150"
+                                                    >
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                        </svg>
+                                                        Delete
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     ))}
@@ -507,6 +714,79 @@ export default function AdminRecipes({
                                     type="button"
                                     className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition-colors duration-150"
                                     onClick={() => setDeleteConfirmation(null)}
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Rejection Modal */}
+            {rejectModal && (
+                <div className="fixed z-50 inset-0 overflow-y-auto">
+                    <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center">
+                        <div
+                            className="fixed inset-0 bg-gray-500 dark:bg-gray-900 bg-opacity-75 dark:bg-opacity-75 transition-opacity"
+                            aria-hidden="true"
+                            onClick={() => setRejectModal(null)}
+                        ></div>
+
+                        <div className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                            <div className="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                <div className="sm:flex sm:items-start">
+                                    <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900 sm:mx-0 sm:h-10 sm:w-10">
+                                        <svg
+                                            className="h-6 w-6 text-red-600 dark:text-red-300"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth="2"
+                                                d="M6 18L18 6M6 6l12 12"
+                                            />
+                                        </svg>
+                                    </div>
+                                    <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                                        <h3
+                                            className="text-lg leading-6 font-medium text-gray-900 dark:text-white"
+                                            id="modal-title"
+                                        >
+                                            Reject Recipe
+                                        </h3>
+                                        <div className="mt-2">
+                                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                                                Please provide a reason for rejecting this recipe. This will help the user understand what needs to be improved.
+                                            </p>
+                                            <textarea
+                                                value={rejectionReason}
+                                                onChange={(e) => setRejectionReason(e.target.value)}
+                                                className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white"
+                                                rows={4}
+                                                placeholder="Enter rejection reason..."
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                <button
+                                    type="button"
+                                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm transition-colors duration-150 disabled:opacity-50"
+                                    onClick={rejectRecipe}
+                                    disabled={!rejectionReason.trim()}
+                                >
+                                    Reject Recipe
+                                </button>
+                                <button
+                                    type="button"
+                                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition-colors duration-150"
+                                    onClick={() => setRejectModal(null)}
                                 >
                                     Cancel
                                 </button>

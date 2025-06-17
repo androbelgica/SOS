@@ -17,7 +17,22 @@ return new class extends Migration
             $table->integer('cooking_time');
             $table->string('difficulty_level');
             $table->string('image_url')->nullable();
+            $table->string('video_url')->nullable();
+
+            // User-generated content fields
+            $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
+            $table->enum('status', ['draft', 'submitted', 'under_review', 'approved', 'rejected'])->default('draft');
+            $table->string('category')->nullable(); // seafood type category
+            $table->foreignId('approved_by')->nullable()->constrained('users')->onDelete('set null');
+            $table->timestamp('approved_at')->nullable();
+            $table->text('rejection_reason')->nullable();
+
             $table->timestamps();
+
+            // Add indexes for better performance
+            $table->index(['status', 'created_at']);
+            $table->index(['created_by', 'status']);
+            $table->index('category');
         });
 
         Schema::create('product_recipe', function (Blueprint $table) {

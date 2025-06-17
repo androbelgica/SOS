@@ -235,6 +235,44 @@ export default function RecipeShow({ auth, recipe, relatedRecipes }) {
                     </div>
                 </div>
 
+                {/* User Recipe CTA */}
+                {auth.user && (
+                    <div className="px-8 py-6 border-t border-gray-200 dark:border-gray-700">
+                        <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-lg p-6 border border-green-200 dark:border-green-800">
+                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                <div>
+                                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                                        Inspired by this recipe?
+                                    </h3>
+                                    <p className="text-gray-600 dark:text-gray-300">
+                                        Share your own seafood recipe with our community! Whether it's a family secret or your own creation, we'd love to see it.
+                                    </p>
+                                </div>
+                                <div className="flex gap-3">
+                                    <Link
+                                        href={route('user.recipes.index')}
+                                        className="inline-flex items-center px-4 py-2 border border-green-300 dark:border-green-600 rounded-md shadow-sm text-sm font-medium text-green-700 dark:text-green-300 bg-white dark:bg-gray-800 hover:bg-green-50 dark:hover:bg-green-900/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                        </svg>
+                                        My Recipes
+                                    </Link>
+                                    <Link
+                                        href={route('user.recipes.create')}
+                                        className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 dark:bg-green-500 hover:bg-green-700 dark:hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                        </svg>
+                                        Share Recipe
+                                    </Link>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {/* Comments Section */}
                 <div className="px-8 py-6 border-t border-gray-200 dark:border-gray-700">
                     <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6">

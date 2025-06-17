@@ -3,11 +3,13 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RecipeController;
+use App\Http\Controllers\UserRecipeController;
 use App\Http\Controllers\RecipeCommentController;
 use App\Http\Controllers\RecipeReactionController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductLabelController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProductRecognitionController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
@@ -68,8 +70,30 @@ Route::middleware(['auth'])->group(function () {
 // Recipe routes
 Route::get('/recipes', [RecipeController::class, 'index'])->name('recipes.index');
 Route::get('/recipes/{recipe}', [RecipeController::class, 'show'])->name('recipes.show');
-Route::post('/recipes', [RecipeController::class, 'store'])->middleware(['auth', 'can:create,App\\Models\\Recipe'])->name('recipes.store');
 Route::post('/recipes/{recipe}/reviews', [RecipeController::class, 'addReview'])->middleware(['auth'])->name('recipes.reviews.store');
+
+// User Recipe Management Routes (Authenticated Users)
+Route::middleware(['auth', 'verified'])->prefix('my')->name('user.')->group(function () {
+    Route::get('/recipes', [UserRecipeController::class, 'index'])->name('recipes.index');
+    Route::get('/recipes/create', [UserRecipeController::class, 'create'])->name('recipes.create');
+    Route::post('/recipes', [UserRecipeController::class, 'store'])->name('recipes.store');
+    Route::get('/recipes/{recipe}', [UserRecipeController::class, 'show'])->name('recipes.show');
+    Route::get('/recipes/{recipe}/edit', [UserRecipeController::class, 'edit'])->name('recipes.edit');
+    Route::put('/recipes/{recipe}', [UserRecipeController::class, 'update'])->name('recipes.update');
+    Route::delete('/recipes/{recipe}', [UserRecipeController::class, 'destroy'])->name('recipes.destroy');
+    Route::post('/recipes/{recipe}/submit', [UserRecipeController::class, 'submitForReview'])->name('recipes.submit');
+});
+
+// Notification Routes (Authenticated Users)
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/notifications/recent', [NotificationController::class, 'getRecent'])->name('notifications.recent');
+    Route::get('/notifications/unread-count', [NotificationController::class, 'getUnreadCount'])->name('notifications.unread-count');
+    Route::post('/notifications/{notification}/mark-read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+    Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
+    Route::post('/notifications/clear-read', [NotificationController::class, 'clearRead'])->name('notifications.clear-read');
+});
 
 
 
@@ -223,6 +247,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/recipes/{recipe}/edit', [RecipeController::class, 'edit'])->name('recipes.edit');
         Route::put('/recipes/{recipe}', [RecipeController::class, 'update'])->name('recipes.update');
         Route::delete('/recipes/{recipe}', [RecipeController::class, 'destroy'])->name('recipes.destroy');
+
+        // Recipe Approval Routes
+        Route::post('/recipes/{recipe}/approve', [RecipeController::class, 'approve'])->name('recipes.approve');
+        Route::post('/recipes/{recipe}/reject', [RecipeController::class, 'reject'])->name('recipes.reject');
+        Route::post('/recipes/{recipe}/under-review', [RecipeController::class, 'setUnderReview'])->name('recipes.under-review');
 
         // Product Recognition Management (Admin)
         Route::get('/product-recognition', [ProductRecognitionController::class, 'index'])->name('product-recognition.index');

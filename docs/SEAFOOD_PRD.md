@@ -1,13 +1,12 @@
-
-# 📄 Project Document Requirement: Seafood Online Store Web App
+# 📄 Project Document Requirement: Online Grocery Store Web App
 
 ## 1. Project Overview
-A mobile-friendly web application built with **Laravel 12** and **React Kit** (integrated via Inertia.js) using **SQLite** as the database. The platform is designed to manage seafood product listings, handle inventory, process orders, and include a unique section where the admin/owner can post seafood recipes tied to specific products.
+A mobile-friendly web application built with **Laravel 12** and **React Kit** (integrated via Inertia.js) using **SQLite** as the database. The platform is designed to manage product listings (including seafood, meat, vegetables, and fruits), handle inventory, process orders, and include a unique section where the admin/owner can post recipes tied to specific products.
 
 ## 2. Project Objectives
-- Provide an intuitive platform for customers to browse and purchase seafood products.
-- Allow the admin to manage product inventory efficiently.
-- Integrate a unique recipe feature to enhance product value and customer engagement.
+- Provide an intuitive platform for customers to browse and purchase products (seafood, meat, vegetables, fruits).
+- Allow the admin to manage product inventory efficiently across multiple categories.
+- Integrate a unique recipe feature to enhance product value and customer engagement for all product types.
 - Ensure the application is responsive and mobile-friendly for optimal usability.
 
 ## 3. Technology Stack
@@ -24,16 +23,20 @@ A mobile-friendly web application built with **Laravel 12** and **React Kit** (i
 
 ### 1. Admin/Owner
 - Login/logout
-- Manage seafood products (CRUD)
+- Manage products (CRUD) across all categories (seafood, meat, vegetables, fruits)
 - Manage inventory (stock levels)
 - View and manage customer orders
-- Add/edit/delete recipes per product
+- **Moderate user-generated recipes** (approve/reject/edit/delete)
+- **Review and approve pending recipes** before publication
 - View recipe usage reports (optional future feature)
+- **Full recipe management privileges** (can edit any recipe)
 
-### 2. Customer
-- View seafood product listings
+### 2. Customer/Registered User
+- View product listings by category (seafood, meat, vegetables, fruits)
 - Search/filter products
-- View seafood recipes (public access)
+- View recipes (public access)
+- **Create and submit recipes for admin approval**
+- **Edit/delete their own recipes** (before approval)
 - **Comment on recipes** (authenticated users only)
 - **React to recipes** with emojis/likes (authenticated users only)
 - **View recipe comments and reactions** from other users
@@ -43,7 +46,7 @@ A mobile-friendly web application built with **Laravel 12** and **React Kit** (i
 ## 5. Core Features
 
 ### 📦 Product & Inventory Management
-- Product name, description, price, image, stock quantity
+- Product name, description, price, image, stock quantity, category (seafood, meat, vegetables, fruits)
 - Product availability toggle
 - Inventory alerts (optional)
 
@@ -53,9 +56,19 @@ A mobile-friendly web application built with **Laravel 12** and **React Kit** (i
 - Order status (Pending, Processing, Delivered, Canceled)
 
 ### 🍽️ Recipes Module (Unique Feature)
-- Admin can assign recipes to one or more seafood products
+- **All authenticated users can create and submit recipes for admin approval**
 - Recipe includes: title, image, ingredients list, preparation steps, and optional video link
-- Public-facing recipe listing with filters by seafood type
+- Public-facing recipe listing with filters by product category (seafood, meat, vegetables, fruits)
+- **Recipe Creation and Approval Workflow:**
+  - **User-Generated Content**: Any authenticated user can create and submit recipes
+  - **Recipe Status**: Draft/Submitted/Under Review/Approved/Rejected
+  - **Admin Review Process**: All recipes require admin approval before publication
+  - **Recipe Drafts**: Save recipes as drafts before submission
+  - **Recipe Categories**: Tag recipes with relevant product types (seafood, meat, vegetables, fruits)
+  - **Image Upload**: Support for multiple recipe images
+  - **Video Integration**: Optional video links for cooking demonstrations
+  - **Recipe Analytics**: View engagement metrics for own recipes
+  - **Notification System**: Users are notified of recipe approval/rejection
 - **Interactive Recipe Engagement System:**
   - **Comments System**: Users can leave detailed comments on recipes
   - **Reaction System**: Users can react with emojis (👍, ❤️, 😋, 🔥, 👏)
@@ -65,7 +78,7 @@ A mobile-friendly web application built with **Laravel 12** and **React Kit** (i
   - **User Interaction History**: Track user's comments and reactions
 
 ### 🔍 Search & Filter
-- Search by name, type (e.g., shrimp, crab)
+- Search by name, category (seafood, meat, vegetables, fruits)
 - Filter by availability, price range
 
 ### 📱 Mobile-Friendly UI
@@ -106,22 +119,22 @@ A mobile-friendly web application built with **Laravel 12** and **React Kit** (i
 
 ## 6. Database Tables (Schema Outline)
 - **users**: id, name, email, password, role (admin/customer)
-- **products**: id, name, description, price, stock, image, available (bool)
+- **products**: id, name, description, price, stock, image, available (bool), category
 - **orders**: id, user_id, status, total_price, created_at
 - **order_items**: id, order_id, product_id, quantity, price
 - **recipes**: id, title, description, image, video_url, created_by
-- **recipe_product**: id, recipe_id, product_id (pivot table for many-to-many)
+- **recipe_product**: id, recipe_id, product_id (pivot table for many-to-many, supports all categories)
 - **recipe_comments**: id, recipe_id, user_id, comment, parent_id (for threading), created_at, updated_at
 - **recipe_reactions**: id, recipe_id, user_id, reaction_type (like, love, yum, fire, clap), created_at
 - **comment_reactions**: id, comment_id, user_id, reaction_type, created_at (reactions on comments)
 
 ## 7. Wireframe Suggestions
 You can sketch or prototype the following views:
-- Home page (product listings)
+- Home page (product listings by category)
 - Product details
 - Cart and checkout
 - Admin dashboard
-- Recipe creation and listing page
+- Recipe creation and listing page (with category filter)
 - Recipe details view
 - **Recipe comments section** (below recipe details)
 - **Comment thread view** (nested replies)
@@ -132,4 +145,3 @@ You can sketch or prototype the following views:
 - **Security**: Basic auth (Laravel Breeze or Jetstream), input validation
 - **Scalability**: Code modularity and clean architecture
 - **Accessibility**: Color contrast and text size for mobile users
-``
