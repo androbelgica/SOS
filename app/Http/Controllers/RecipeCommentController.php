@@ -10,23 +10,59 @@ use Illuminate\Validation\ValidationException;
 
 class RecipeCommentController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
+    // Middleware is now handled at the route level in routes/api.php
 
     /**
      * Get comments for a recipe
      */
     public function index(Recipe $recipe)
     {
-        $comments = $recipe->comments()
-            ->with(['user', 'replies.user', 'reactions'])
-            ->paginate(10);
+        try {
+            $comments = $recipe->comments()
+                ->where('is_hidden', false)
+                ->whereNull('parent_id')
+                ->with(['user', 'replies' => function($query) {
+                    $query->where('is_hidden', false)->with('user');
+                }, 'reactions'])
+                ->orderBy('created_at', 'desc')
+                ->paginate(10);
+
+            // Add user reaction information if user is authenticated
+            if (Auth::check()) {
+                $userId = Auth::id();
+                $comments->getCollection()->transform(function ($comment) use ($userId) {
+                    $comment->user_reaction = $comment->reactions()
+                        ->where('user_id', $userId)
+                        ->first()?->reaction_type;
+
+                    // Also add user reactions for replies
+                    if ($comment->replies) {
+                        $comment->replies->transform(function ($reply) use ($userId) {
+                            $reply->user_reaction = $reply->reactions()
+                                ->where('user_id', $userId)
+                                ->first()?->reaction_type;
+                            return $reply;
+                        });
+                    }
+
+                    return $comment;
+                });
+            }
+
+        } catch (\Exception $e) {
+            \Log::error('Error loading comments for recipe ' . $recipe->id . ': ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load comments: ' . $e->getMessage()], 500);
+        }
 
         return response()->json([
-            'comments' => $comments,
-            'total_count' => $recipe->comments_count
+            'comments' => [
+                'data' => $comments->items(),
+                'current_page' => $comments->currentPage(),
+                'last_page' => $comments->lastPage(),
+                'per_page' => $comments->perPage(),
+                'total' => $comments->total()
+            ],
+            'total_count' => $comments->total()
         ]);
     }
 
@@ -120,6 +156,17 @@ class RecipeCommentController extends Controller
         $replies = $comment->replies()
             ->with(['user', 'reactions'])
             ->paginate(5);
+
+        // Add user reaction information if user is authenticated
+        if (Auth::check()) {
+            $userId = Auth::id();
+            $replies->getCollection()->transform(function ($reply) use ($userId) {
+                $reply->user_reaction = $reply->reactions()
+                    ->where('user_id', $userId)
+                    ->first()?->reaction_type;
+                return $reply;
+            });
+        }
 
         return response()->json([
             'replies' => $replies

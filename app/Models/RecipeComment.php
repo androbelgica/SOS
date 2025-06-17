@@ -30,7 +30,7 @@ class RecipeComment extends Model
         'updated_at' => 'datetime'
     ];
 
-    protected $with = ['user', 'reactions'];
+    // Removed automatic eager loading to prevent conflicts
 
     /**
      * Get the recipe that owns the comment

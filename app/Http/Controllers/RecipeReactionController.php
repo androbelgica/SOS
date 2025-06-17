@@ -11,10 +11,7 @@ use Illuminate\Support\Facades\Auth;
 
 class RecipeReactionController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
+    // Middleware is now handled at the route level in routes/api.php
 
     /**
      * Toggle reaction on a recipe

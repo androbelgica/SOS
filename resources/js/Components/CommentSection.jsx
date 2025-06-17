@@ -3,6 +3,7 @@ import { useForm } from '@inertiajs/react';
 import { ChatBubbleLeftIcon, HeartIcon, HandThumbUpIcon } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartIconSolid, HandThumbUpIcon as HandThumbUpIconSolid } from '@heroicons/react/24/solid';
 import ReactionButton from './ReactionButton';
+import CommentItem from './CommentItem';
 import toast from 'react-hot-toast';
 
 export default function CommentSection({ recipe, auth, className = '' }) {
@@ -28,6 +29,11 @@ export default function CommentSection({ recipe, auth, className = '' }) {
     const loadComments = async () => {
         try {
             const response = await fetch(`/api/recipes/${recipe.id}/comments`);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
             const result = await response.json();
             setComments(result.comments.data || []);
         } catch (error) {
