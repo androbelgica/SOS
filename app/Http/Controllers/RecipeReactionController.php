@@ -47,6 +47,16 @@ class RecipeReactionController extends Controller
                 'reaction_type' => $reactionType
             ]);
             $action = 'added';
+            // Notify recipe author if not self
+            if ($recipe->created_by !== $userId) {
+                \App\Models\Notification::createRecipeReacted(
+                    $recipe->created_by,
+                    $recipe->id,
+                    $recipe->title,
+                    Auth::user()->name,
+                    $reactionType
+                );
+            }
         }
 
         // Get updated reaction counts
@@ -96,6 +106,18 @@ class RecipeReactionController extends Controller
                 'reaction_type' => $reactionType
             ]);
             $action = 'added';
+            // Notify comment author if not self
+            if ($comment->user_id !== $userId) {
+                $recipe = $comment->recipe;
+                \App\Models\Notification::createCommentReacted(
+                    $comment->user_id,
+                    $recipe->id,
+                    $recipe->title,
+                    Auth::user()->name,
+                    $reactionType,
+                    $comment->id
+                );
+            }
         }
 
         // Get updated reaction counts

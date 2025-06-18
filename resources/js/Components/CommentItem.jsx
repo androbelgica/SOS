@@ -35,7 +35,7 @@ export default function CommentItem({
     );
 
     return (
-        <div className={`${isReply ? 'ml-12' : ''}`}>
+        <div id={`comment-${comment.id}`} className={`${isReply ? 'ml-12' : ''} scroll-mt-20`}>
             <div className="flex space-x-3">
                 {/* Avatar */}
                 <img

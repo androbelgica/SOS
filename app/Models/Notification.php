@@ -108,4 +108,69 @@ class Notification extends Model
             'data' => ['recipe_id' => $recipeId, 'recipe_title' => $recipeTitle]
         ]);
     }
+
+    public static function createRecipeCommented($recipeAuthorId, $recipeId, $recipeTitle, $commenterName, $commentId)
+    {
+        return self::create([
+            'user_id' => $recipeAuthorId,
+            'type' => 'recipe_commented',
+            'title' => 'New Comment on Your Recipe',
+            'message' => "{$commenterName} commented on your recipe '{$recipeTitle}'.",
+            'data' => [
+                'recipe_id' => $recipeId,
+                'recipe_title' => $recipeTitle,
+                'commenter_name' => $commenterName,
+                'comment_id' => $commentId
+            ]
+        ]);
+    }
+
+    public static function createCommentReplied($commentAuthorId, $recipeId, $recipeTitle, $replierName, $commentId)
+    {
+        return self::create([
+            'user_id' => $commentAuthorId,
+            'type' => 'comment_replied',
+            'title' => 'New Reply to Your Comment',
+            'message' => "{$replierName} replied to your comment on recipe '{$recipeTitle}'.",
+            'data' => [
+                'recipe_id' => $recipeId,
+                'recipe_title' => $recipeTitle,
+                'replier_name' => $replierName,
+                'comment_id' => $commentId
+            ]
+        ]);
+    }
+
+    public static function createRecipeReacted($recipeAuthorId, $recipeId, $recipeTitle, $reactorName, $reactionType)
+    {
+        return self::create([
+            'user_id' => $recipeAuthorId,
+            'type' => 'recipe_reacted',
+            'title' => 'New Reaction on Your Recipe',
+            'message' => "{$reactorName} reacted to your recipe '{$recipeTitle}' with {$reactionType}.",
+            'data' => [
+                'recipe_id' => $recipeId,
+                'recipe_title' => $recipeTitle,
+                'reactor_name' => $reactorName,
+                'reaction_type' => $reactionType
+            ]
+        ]);
+    }
+
+    public static function createCommentReacted($commentAuthorId, $recipeId, $recipeTitle, $reactorName, $reactionType, $commentId)
+    {
+        return self::create([
+            'user_id' => $commentAuthorId,
+            'type' => 'comment_reacted',
+            'title' => 'New Reaction on Your Comment',
+            'message' => "{$reactorName} reacted to your comment on recipe '{$recipeTitle}' with {$reactionType}.",
+            'data' => [
+                'recipe_id' => $recipeId,
+                'recipe_title' => $recipeTitle,
+                'reactor_name' => $reactorName,
+                'reaction_type' => $reactionType,
+                'comment_id' => $commentId
+            ]
+        ]);
+    }
 }

@@ -26,6 +26,29 @@ export default function CommentSection({ recipe, auth, className = '' }) {
         loadComments();
     }, []);
 
+    // Handle scrolling to comment from URL hash
+    useEffect(() => {
+        const hash = window.location.hash;
+        if (hash && hash.startsWith('#comment-')) {
+            const commentId = hash.replace('#comment-', '');
+            // Wait for comments to load and DOM to update
+            setTimeout(() => {
+                const element = document.getElementById(`comment-${commentId}`);
+                if (element) {
+                    element.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                    // Add a highlight effect
+                    element.classList.add('bg-blue-50', 'dark:bg-blue-900/20', 'rounded-lg', 'transition-colors', 'duration-1000');
+                    setTimeout(() => {
+                        element.classList.remove('bg-blue-50', 'dark:bg-blue-900/20');
+                    }, 3000);
+                }
+            }, 500);
+        }
+    }, [comments]);
+
     const loadComments = async () => {
         try {
             const response = await fetch(`/api/recipes/${recipe.id}/comments`);

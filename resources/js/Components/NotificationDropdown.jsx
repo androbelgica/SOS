@@ -61,8 +61,17 @@ export default function NotificationDropdown({ auth }) {
 
     const markAsRead = async (notificationId) => {
         try {
-            await axios.post(`/notifications/${notificationId}/mark-read`);
-            setNotifications(notifications.map(n => 
+            // Get CSRF token
+            const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+            await axios.post(`/notifications/${notificationId}/mark-read`, {}, {
+                headers: {
+                    'X-CSRF-TOKEN': token,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            });
+            setNotifications(notifications.map(n =>
                 n.id === notificationId ? { ...n, read_at: new Date().toISOString() } : n
             ));
             setUnreadCount(Math.max(0, unreadCount - 1));
@@ -73,7 +82,16 @@ export default function NotificationDropdown({ auth }) {
 
     const markAllAsRead = async () => {
         try {
-            await axios.post('/notifications/mark-all-read');
+            // Get CSRF token
+            const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+            await axios.post('/notifications/mark-all-read', {}, {
+                headers: {
+                    'X-CSRF-TOKEN': token,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            });
             setNotifications(notifications.map(n => ({ ...n, read_at: new Date().toISOString() })));
             setUnreadCount(0);
         } catch (error) {
@@ -91,6 +109,17 @@ export default function NotificationDropdown({ auth }) {
             router.visit(`/my/recipes/${notification.data.recipe_id}`);
         } else if (notification.type === 'recipe_submitted' && auth.user.role === 'admin') {
             router.visit(`/admin/recipes`);
+        } else if (notification.type === 'recipe_commented' || notification.type === 'comment_replied' || notification.type === 'recipe_reacted' || notification.type === 'comment_reacted') {
+            // Navigate to the recipe page for comment-related notifications
+            const recipeId = notification.data.recipe_id;
+            const commentId = notification.data.comment_id;
+
+            // Navigate to recipe page with comment anchor if available
+            if (commentId) {
+                router.visit(`/recipes/${recipeId}#comment-${commentId}`);
+            } else {
+                router.visit(`/recipes/${recipeId}`);
+            }
         }
 
         setIsOpen(false);
@@ -128,6 +157,31 @@ export default function NotificationDropdown({ auth }) {
                         <svg className="w-4 h-4 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                    </div>
+                );
+            case 'recipe_commented':
+                return (
+                    <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center">
+                        <svg className="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                        </svg>
+                    </div>
+                );
+            case 'comment_replied':
+                return (
+                    <div className="w-8 h-8 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center">
+                        <svg className="w-4 h-4 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                        </svg>
+                    </div>
+                );
+            case 'recipe_reacted':
+            case 'comment_reacted':
+                return (
+                    <div className="w-8 h-8 bg-pink-100 dark:bg-pink-900/30 rounded-full flex items-center justify-center">
+                        <svg className="w-4 h-4 text-pink-600 dark:text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                         </svg>
                     </div>
                 );

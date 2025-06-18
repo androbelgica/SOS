@@ -8,8 +8,17 @@ export default function NotificationsIndex({ auth, notifications }) {
 
     const markAsRead = async (notificationId) => {
         try {
-            await axios.post(`/notifications/${notificationId}/mark-read`);
-            setNotificationList(notificationList.map(n => 
+            // Get CSRF token
+            const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+            await axios.post(`/notifications/${notificationId}/mark-read`, {}, {
+                headers: {
+                    'X-CSRF-TOKEN': token,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            });
+            setNotificationList(notificationList.map(n =>
                 n.id === notificationId ? { ...n, read_at: new Date().toISOString() } : n
             ));
         } catch (error) {
@@ -19,7 +28,16 @@ export default function NotificationsIndex({ auth, notifications }) {
 
     const markAllAsRead = async () => {
         try {
-            await axios.post('/notifications/mark-all-read');
+            // Get CSRF token
+            const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+            await axios.post('/notifications/mark-all-read', {}, {
+                headers: {
+                    'X-CSRF-TOKEN': token,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            });
             setNotificationList(notificationList.map(n => ({ ...n, read_at: new Date().toISOString() })));
         } catch (error) {
             console.error('Error marking all notifications as read:', error);
@@ -29,7 +47,16 @@ export default function NotificationsIndex({ auth, notifications }) {
     const deleteNotification = async (notificationId) => {
         if (confirm('Are you sure you want to delete this notification?')) {
             try {
-                await axios.delete(`/notifications/${notificationId}`);
+                // Get CSRF token
+                const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+                await axios.delete(`/notifications/${notificationId}`, {
+                    headers: {
+                        'X-CSRF-TOKEN': token,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
                 setNotificationList(notificationList.filter(n => n.id !== notificationId));
             } catch (error) {
                 console.error('Error deleting notification:', error);
@@ -40,7 +67,16 @@ export default function NotificationsIndex({ auth, notifications }) {
     const clearReadNotifications = async () => {
         if (confirm('Are you sure you want to clear all read notifications?')) {
             try {
-                await axios.post('/notifications/clear-read');
+                // Get CSRF token
+                const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+                await axios.post('/notifications/clear-read', {}, {
+                    headers: {
+                        'X-CSRF-TOKEN': token,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
                 setNotificationList(notificationList.filter(n => !n.read_at));
             } catch (error) {
                 console.error('Error clearing read notifications:', error);

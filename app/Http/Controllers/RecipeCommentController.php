@@ -94,6 +94,30 @@ class RecipeCommentController extends Controller
 
         $comment->load(['user', 'reactions']);
 
+        // Notify recipe author if someone comments (not self)
+        if ($recipe->created_by !== Auth::id()) {
+            \App\Models\Notification::createRecipeCommented(
+                $recipe->created_by,
+                $recipe->id,
+                $recipe->title,
+                Auth::user()->name,
+                $comment->id
+            );
+        }
+        // Notify parent comment author if this is a reply (not self or recipe author)
+        if (!empty($validated['parent_id'])) {
+            $parentComment = \App\Models\RecipeComment::find($validated['parent_id']);
+            if ($parentComment && $parentComment->user_id !== Auth::id() && $parentComment->user_id !== $recipe->created_by) {
+                \App\Models\Notification::createCommentReplied(
+                    $parentComment->user_id,
+                    $recipe->id,
+                    $recipe->title,
+                    Auth::user()->name,
+                    $comment->id
+                );
+            }
+        }
+
         return response()->json([
             'comment' => $comment,
             'message' => 'Comment added successfully!'
