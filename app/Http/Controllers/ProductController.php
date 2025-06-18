@@ -59,6 +59,14 @@ class ProductController extends Controller
 
         $products = $query->paginate(12)->withQueryString();
 
+        // Transform products to include category metadata
+        $products->getCollection()->transform(function ($product) {
+            $product->category_display_name = $product->getCategoryDisplayName();
+            $product->category_icon = $product->getCategoryIcon();
+            $product->category_color = $product->getCategoryColor();
+            return $product;
+        });
+
         // Get enhanced category information
         $categories = collect(ProductCategory::cases())->map(function ($category) {
             return [

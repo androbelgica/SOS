@@ -1,7 +1,7 @@
-# 📄 Project Document Requirement: Online Grocery Store Web App
+# 📄 Project Document Requirement: Cart & Cook Web App
 
 ## 1. Project Overview
-A mobile-friendly web application built with **Laravel 12** and **React Kit** (integrated via Inertia.js) using **SQLite** as the database. The platform is designed to manage product listings (including seafood, meat, vegetables, and fruits), handle inventory, process orders, and include a unique section where the admin/owner can post recipes tied to specific products.
+A mobile-friendly web application built with **Laravel 12** and **React Kit** (integrated via Inertia.js) using **SQLite** as the database. The platform is designed to manage product listings (including seafood, meat, vegetables, and fruits), handle inventory, process orders, and include a unique section where the admin/owner and users can post and discover recipes tied to specific products.
 
 ## 2. Project Objectives
 - Provide an intuitive platform for customers to browse and purchase products (seafood, meat, vegetables, fruits).

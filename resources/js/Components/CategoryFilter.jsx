@@ -1,5 +1,6 @@
 import React from 'react';
 import { router } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 
 const CategoryFilter = ({ 
     categories = [], 

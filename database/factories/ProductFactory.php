@@ -20,7 +20,7 @@ class ProductFactory extends Factory
             'price' => $this->faker->randomFloat(2, 10, 100),
             'stock_quantity' => $this->faker->numberBetween(0, 100),
             'is_available' => $this->faker->boolean(80),
-            'image_url' => $this->faker->imageUrl(640, 480, 'food'),
+            'image_url' => null, // Will use fallback images in frontend
             'category' => $category,
             'unit_type' => $this->getUnitTypeForCategory($category),
             'created_at' => now(),

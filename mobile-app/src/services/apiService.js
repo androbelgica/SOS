@@ -1,5 +1,5 @@
 /**
- * API Service for SeaBasket Mobile App
+ * API Service for Cart & Cook Mobile App
  * 
  * This service handles all HTTP requests to the Laravel backend API
  */

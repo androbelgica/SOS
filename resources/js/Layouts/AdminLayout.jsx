@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, usePage } from "@inertiajs/react";
+import { Link, usePage, router } from "@inertiajs/react";
 import { Transition } from "@headlessui/react";
 import FlashMessage from "@/Components/FlashMessage";
 import DarkModeToggle from "@/Components/DarkModeToggle";
@@ -11,6 +11,16 @@ export default function AdminLayout({ children, title = "Admin Dashboard" }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const { darkMode } = useDarkMode();
+
+    // Safe route helper that handles errors
+    const safeRoute = (routeName, params = {}) => {
+        try {
+            return route(routeName, params);
+        } catch (error) {
+            console.error(`Route error for ${routeName}:`, error);
+            return '#';
+        }
+    };
 
     // Close sidebar on mobile when route changes
     useEffect(() => {
@@ -42,18 +52,18 @@ export default function AdminLayout({ children, title = "Admin Dashboard" }) {
                                 {/* Logo */}
                                 <Link href="/" className="flex items-center ml-3 lg:ml-0">
                                     <img
-                                        src="/storage/brand/seabasket.png"
-                                        alt="SeaBasket"
+                                        src="/storage/brand/C&C_image.png"
+                                        alt="Cart & Cook"
                                         className="h-10 w-auto"
                                         onError={(e) => {
-                                            e.target.src = "/brand/seabasket.png";
+                                            e.target.src = "/brand/C&C_image.png";
                                             e.target.onerror = () => {
                                                 e.target.style.display = "none";
                                             };
                                         }}
                                     />
                                     <span className="ml-2 text-xl font-semibold text-gray-900 dark:text-white">
-                                        Admin
+                                        Cart & Cook
                                     </span>
                                 </Link>
                             </div>
@@ -96,7 +106,7 @@ export default function AdminLayout({ children, title = "Admin Dashboard" }) {
                                 >
                                     <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-50">
                                         <Link
-                                            href={route("profile.edit")}
+                                            href={safeRoute("profile.edit")}
                                             className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                                         >
                                             Your Profile
@@ -108,14 +118,20 @@ export default function AdminLayout({ children, title = "Admin Dashboard" }) {
                                             View Store
                                         </Link>
                                         <DarkModeToggle />
-                                        <Link
-                                            href={route("logout")}
-                                            method="post"
-                                            as="button"
+                                        <button
+                                            onClick={() => {
+                                                try {
+                                                    router.post(route("logout"));
+                                                } catch (error) {
+                                                    console.error('Logout error:', error);
+                                                    // Fallback to window location
+                                                    window.location.href = '/logout';
+                                                }
+                                            }}
                                             className="w-full text-left block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                                         >
                                             Sign out
-                                        </Link>
+                                        </button>
                                     </div>
                                 </Transition>
                             </div>
@@ -139,7 +155,7 @@ export default function AdminLayout({ children, title = "Admin Dashboard" }) {
                     <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
                         <nav className="mt-5 flex-1 px-2 space-y-1">
                             <Link
-                                href={route("admin.dashboard")}
+                                href={safeRoute("admin.dashboard")}
                                 className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
                                     route().current("admin.dashboard")
                                         ? "bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-200"
@@ -157,7 +173,7 @@ export default function AdminLayout({ children, title = "Admin Dashboard" }) {
                             </Link>
 
                             <Link
-                                href={route("admin.products.index")}
+                                href={safeRoute("admin.products.index")}
                                 className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
                                     route().current("admin.products.*")
                                         ? "bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-200"
@@ -175,7 +191,7 @@ export default function AdminLayout({ children, title = "Admin Dashboard" }) {
                             </Link>
 
                             <Link
-                                href={route("admin.recipes.index")}
+                                href={safeRoute("admin.recipes.index")}
                                 className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
                                     route().current("admin.recipes.*")
                                         ? "bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-200"
@@ -193,7 +209,7 @@ export default function AdminLayout({ children, title = "Admin Dashboard" }) {
                             </Link>
 
                             <Link
-                                href={route("admin.orders.index")}
+                                href={safeRoute("admin.orders.index")}
                                 className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
                                     route().current("admin.orders.*")
                                         ? "bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-200"
@@ -211,7 +227,7 @@ export default function AdminLayout({ children, title = "Admin Dashboard" }) {
                             </Link>
 
                             <Link
-                                href={route("admin.product-recognition.index")}
+                                href={safeRoute("admin.product-recognition.index")}
                                 className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
                                     route().current("admin.product-recognition.*")
                                         ? "bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-200"

@@ -11,17 +11,23 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Drop the existing notifications table if it exists
+        Schema::dropIfExists('notifications');
+
+        // Create the notifications table with the correct structure
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('type'); // recipe_approved, recipe_rejected, recipe_submitted, etc.
+            $table->string('type');
             $table->string('title');
             $table->text('message');
-            $table->json('data')->nullable(); // Additional data like recipe_id, etc.
+            $table->json('data')->nullable();
             $table->timestamp('read_at')->nullable();
             $table->timestamps();
 
+            // Add indexes for better performance
             $table->index(['user_id', 'read_at']);
+            $table->index(['user_id', 'created_at']);
         });
     }
 

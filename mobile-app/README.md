@@ -1,14 +1,14 @@
-# Seafood Store Mobile App
+# Cart & Cook Mobile App
 
-A React Native mobile application for a seafood online store that connects to a Laravel 12 backend API.
+A React Native mobile application for Cart & Cook, your all-in-one grocery and recipe platform. Shop for seafood, meat, vegetables, and fruits, and discover or share recipes—all from your mobile device.
 
 ## Features
 
 - User authentication (login, register, forgot password)
-- Product browsing and search
+- Product browsing and search (all categories)
 - Shopping cart functionality
 - Order management
-- Recipe browsing and interaction
+- Recipe browsing, creation, and interaction
 - Offline support
 - Push notifications (coming soon)
 

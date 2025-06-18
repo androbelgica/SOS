@@ -147,6 +147,8 @@ export default function Login({ status, canResetPassword }) {
                     Sign up now
                 </Link>
             </div>
+
+          
         </GuestLayout>
     );
 }

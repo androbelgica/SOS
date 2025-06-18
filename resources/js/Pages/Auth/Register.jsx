@@ -48,6 +48,7 @@ export default function Register() {
                 </div>
             </div>
 
+          
             <form onSubmit={submit}>
                 <div>
                     <InputLabel htmlFor="name" value="Name" />

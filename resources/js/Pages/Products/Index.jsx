@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Head, Link, router } from "@inertiajs/react";
+import { route } from "ziggy-js";
 import MainLayout from "@/Layouts/MainLayout";
 import { getImageProps } from "@/Utils/imageHelpers";
 import CategoryFilter from "@/Components/CategoryFilter";
@@ -8,6 +9,24 @@ import CategoryBadge from "@/Components/CategoryBadge";
 export default function Index({ auth, products, filters, categories }) {
     const [searchQuery, setSearchQuery] = useState(filters.search || "");
 
+    // Debug logging
+    React.useEffect(() => {
+        console.log('Products Index Debug:', {
+            products: products,
+            productsData: products?.data,
+            categories: categories,
+            filters: filters
+        });
+
+        // Check for any products with missing IDs
+        if (products?.data) {
+            const invalidProducts = products.data.filter(p => !p || !p.id);
+            if (invalidProducts.length > 0) {
+                console.warn('Found products with missing IDs:', invalidProducts);
+            }
+        }
+    }, [products, categories, filters]);
+
     // Handle search input change
     const handleSearch = (e) => {
         const query = e.target.value;
@@ -15,11 +34,15 @@ export default function Index({ auth, products, filters, categories }) {
 
         // Debounced search - could use a proper debounce function in production
         setTimeout(() => {
-            router.get(
-                route("products.index"),
-                { ...filters, search: query },
-                { preserveState: true }
-            );
+            try {
+                router.get(
+                    route("products.index"),
+                    { ...filters, search: query },
+                    { preserveState: true }
+                );
+            } catch (error) {
+                console.error('Search error:', error);
+            }
         }, 300);
     };
 
@@ -91,13 +114,13 @@ export default function Index({ auth, products, filters, categories }) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {products.data &&
-                    products.data.map((product) => (
+                    products.data.filter(product => product && product.id).map((product) => (
                         <div
                             key={product.id}
                             className="bg-white dark:bg-gray-800 overflow-hidden shadow-md rounded-lg transition-all duration-300 hover:shadow-lg border border-gray-200 dark:border-gray-700"
                         >
                             <div className="relative">
-                                {product.image_url && (
+                                {product.image_url ? (
                                     <img
                                         {...getImageProps({
                                             src: product.image_url,
@@ -105,7 +128,29 @@ export default function Index({ auth, products, filters, categories }) {
                                             className: "w-full h-48 object-cover",
                                             type: "product"
                                         })}
+                                        onError={(e) => {
+                                            // Replace with placeholder on error
+                                            const parent = e.target.parentNode;
+                                            if (parent) {
+                                                const div = document.createElement('div');
+                                                div.className = "w-full h-48 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800";
+                                                div.innerHTML = `
+                                                    <div class="text-center">
+                                                        <div class="text-4xl mb-2">${product.category_icon || '📦'}</div>
+                                                        <div class="text-sm text-gray-600 dark:text-gray-400">${product.name}</div>
+                                                    </div>
+                                                `;
+                                                parent.replaceChild(div, e.target);
+                                            }
+                                        }}
                                     />
+                                ) : (
+                                    <div className="w-full h-48 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800">
+                                        <div className="text-center">
+                                            <div className="text-4xl mb-2">{product.category_icon || '📦'}</div>
+                                            <div className="text-sm text-gray-600 dark:text-gray-400">{product.name}</div>
+                                        </div>
+                                    </div>
                                 )}
                                 <div className="absolute top-2 right-2">
                                     <span
@@ -154,30 +199,55 @@ export default function Index({ auth, products, filters, categories }) {
                                     </span>
                                 </div>
                                 <div className="mt-4 flex justify-between items-center">
-                                    <Link
-                                        href={route("products.show", product.id)}
-                                        className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 flex items-center"
-                                    >
-                                        <span>View Details</span>
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                        </svg>
-                                    </Link>
-                                    {product.stock_quantity > 0 && (
+                                    {product.id ? (
                                         <Link
-                                            href={route("cart.add", product.id)}
-                                            method="post"
-                                            data={{
-                                                quantity: product.unit_type === 'kg' ? 250 : 1,
+                                            href={(() => {
+                                                try {
+                                                    return route("products.show", product.id);
+                                                } catch (error) {
+                                                    console.error('Route generation error for product:', product.id, error);
+                                                    return '#';
+                                                }
+                                            })()}
+                                            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 flex items-center"
+                                        >
+                                            <span>View Details</span>
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </Link>
+                                    ) : (
+                                        <span className="text-gray-400 dark:text-gray-500 flex items-center">
+                                            <span>View Details</span>
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </span>
+                                    )}
+                                    {product.stock_quantity > 0 && product.id && (
+                                        <button
+                                            onClick={() => {
+                                                try {
+                                                    const cartRoute = route("cart.add", product.id);
+                                                    router.post(cartRoute, {
+                                                        quantity: product.unit_type === 'kg' ? 250 : 1,
+                                                    }, {
+                                                        preserveScroll: true,
+                                                        onError: (error) => {
+                                                            console.error('Cart add error:', error);
+                                                        }
+                                                    });
+                                                } catch (error) {
+                                                    console.error('Cart route error for product:', product.id, error);
+                                                }
                                             }}
                                             className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 dark:bg-indigo-500 hover:bg-indigo-700 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200"
-                                            preserveScroll
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                                             </svg>
                                             Add to Cart
-                                        </Link>
+                                        </button>
                                     )}
                                 </div>
                             </div>
@@ -190,22 +260,28 @@ export default function Index({ auth, products, filters, categories }) {
                 <div className="mt-6">
                     <div className="flex items-center justify-center gap-1">
                         {products.links.map((link, i) => (
-                            <Link
-                                key={i}
-                                href={link.url}
-                                className={`px-4 py-2 text-sm rounded-md ${
-                                    link.active
-                                        ? "bg-indigo-600 dark:bg-indigo-500 text-white"
-                                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                                } ${
-                                    !link.url
-                                        ? "opacity-50 cursor-not-allowed"
-                                        : ""
-                                }`}
-                                dangerouslySetInnerHTML={{
-                                    __html: link.label,
-                                }}
-                            />
+                            link.url ? (
+                                <Link
+                                    key={i}
+                                    href={link.url}
+                                    className={`px-4 py-2 text-sm rounded-md ${
+                                        link.active
+                                            ? "bg-indigo-600 dark:bg-indigo-500 text-white"
+                                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                    }`}
+                                    dangerouslySetInnerHTML={{
+                                        __html: link.label,
+                                    }}
+                                />
+                            ) : (
+                                <span
+                                    key={i}
+                                    className="px-4 py-2 text-sm rounded-md opacity-50 cursor-not-allowed text-gray-400 dark:text-gray-600"
+                                    dangerouslySetInnerHTML={{
+                                        __html: link.label,
+                                    }}
+                                />
+                            )
                         ))}
                     </div>
                 </div>

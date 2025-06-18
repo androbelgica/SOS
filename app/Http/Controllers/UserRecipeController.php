@@ -51,7 +51,7 @@ class UserRecipeController extends Controller
         $this->authorize('create', Recipe::class);
         
         return Inertia::render('User/Recipes/Create', [
-            'products' => Product::where('available', true)->get(),
+            'products' => Product::where('is_available', true)->get(),
             'categories' => $this->getSeafoodCategories()
         ]);
     }
@@ -172,7 +172,7 @@ class UserRecipeController extends Controller
 
         return Inertia::render('User/Recipes/Edit', [
             'recipe' => $recipe,
-            'products' => Product::where('available', true)->get(),
+            'products' => Product::where('is_available', true)->get(),
             'categories' => $this->getSeafoodCategories()
         ]);
     }

@@ -3,7 +3,7 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>SeaBasket - Product Label - {{ $product->name }}</title>
+    <title>Cart & Cook - Product Label - {{ $product->name }}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -84,7 +84,7 @@
 <body>
     <div class="label-container">
         <div class="header">
-            <div class="logo">SeaBasket Online Seafood Store</div>
+            <div class="logo">Cart & Cook</div>
             <div>Order #{{ $order->order_number }}</div>
             <div class="contact-info">
                 <small>Contact: 0917-123-4567 | 123 Ocean Drive, Manila</small>
@@ -123,7 +123,7 @@
         </div>
 
         <div class="footer">
-            Thank you for shopping with SeaBasket Online Seafood Store!
+            Thank you for shopping with Cart & Cook!
         </div>
     </div>
 </body>

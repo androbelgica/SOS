@@ -36,8 +36,13 @@ class NotificationController extends Controller
      */
     public function getUnreadCount()
     {
-        $count = Auth::user()->unreadNotifications()->count();
-        return response()->json(['count' => $count]);
+        try {
+            $count = Auth::user()->unreadNotifications()->count();
+            return response()->json(['count' => $count]);
+        } catch (\Exception $e) {
+            // Return 0 if table doesn't exist or other database error
+            return response()->json(['count' => 0]);
+        }
     }
 
     /**
@@ -45,18 +50,26 @@ class NotificationController extends Controller
      */
     public function getRecent()
     {
-        $notifications = Auth::user()
-            ->notifications()
-            ->orderBy('created_at', 'desc')
-            ->limit(10)
-            ->get();
+        try {
+            $notifications = Auth::user()
+                ->notifications()
+                ->orderBy('created_at', 'desc')
+                ->limit(10)
+                ->get();
 
-        $unreadCount = Auth::user()->unreadNotifications()->count();
+            $unreadCount = Auth::user()->unreadNotifications()->count();
 
-        return response()->json([
-            'notifications' => $notifications,
-            'unread_count' => $unreadCount
-        ]);
+            return response()->json([
+                'notifications' => $notifications,
+                'unread_count' => $unreadCount
+            ]);
+        } catch (\Exception $e) {
+            // Return empty notifications if table doesn't exist
+            return response()->json([
+                'notifications' => [],
+                'unread_count' => 0
+            ]);
+        }
     }
 
     /**
@@ -117,4 +130,6 @@ class NotificationController extends Controller
 
         return response()->json(['success' => true]);
     }
+
+
 }

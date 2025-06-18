@@ -1,7 +1,7 @@
-# 🛒 Product Categories Extension Guide
+# 🛒 Cart & Cook: Product Categories Extension Guide
 
 ## Overview
-This guide details how to extend your existing Seafood Online Store web app to support additional product categories: **Meat, Vegetables, and Fruits**. The goal is to transform the platform into a flexible online grocery store supporting multiple product types, each with their own inventory, listings, and recipe associations.
+This guide details how to extend your Cart & Cook web app to support additional product categories: **Meat, Vegetables, and Fruits**. The goal is to transform the platform into a flexible online grocery store supporting multiple product types, each with their own inventory, listings, and recipe associations.
 
 ---
 

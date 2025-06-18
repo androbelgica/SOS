@@ -62,7 +62,10 @@ class ProductCategorySeeder extends Seeder
         ];
 
         foreach ($seafoodProducts as $product) {
-            Product::create($product);
+            Product::create(array_merge($product, [
+                'image_url' => null,
+                'is_available' => true
+            ]));
         }
     }
 
@@ -108,7 +111,10 @@ class ProductCategorySeeder extends Seeder
         ];
 
         foreach ($meatProducts as $product) {
-            Product::create($product);
+            Product::create(array_merge($product, [
+                'image_url' => null,
+                'is_available' => true
+            ]));
         }
     }
 
@@ -154,7 +160,10 @@ class ProductCategorySeeder extends Seeder
         ];
 
         foreach ($vegetableProducts as $product) {
-            Product::create($product);
+            Product::create(array_merge($product, [
+                'image_url' => null,
+                'is_available' => true
+            ]));
         }
     }
 
@@ -200,7 +209,10 @@ class ProductCategorySeeder extends Seeder
         ];
 
         foreach ($fruitProducts as $product) {
-            Product::create($product);
+            Product::create(array_merge($product, [
+                'image_url' => null,
+                'is_available' => true
+            ]));
         }
     }
 }

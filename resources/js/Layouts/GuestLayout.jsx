@@ -9,13 +9,13 @@ export default function GuestLayout({ children }) {
             <div className="mt-8 sm:mt-0">
                 <Link href="/" className="flex flex-col items-center">
                     <img
-                        src="/storage/brand/seabasket.png"
-                        alt="SeaBasket"
+                        src="/storage/brand/C&C_image.png"
+                        alt="Cart & Cook"
                         className="h-20 w-auto"
                         onError={(e) => {
                             console.error("Failed to load logo image");
                             // Try with a different path as fallback
-                            e.target.src = "/brand/seabasket.png";
+                            e.target.src = "/brand/C&C_image.png";
                             // If that fails too, use a text fallback
                             e.target.onerror = () => {
                                 e.target.style.display = "none";
@@ -27,7 +27,7 @@ export default function GuestLayout({ children }) {
                             };
                         }}
                     />
-                    <span className="mt-2 text-xl font-bold text-gray-800 dark:text-white">SeaBasket</span>
+                    <span className="mt-2 text-xl font-bold text-gray-800 dark:text-white">Cart & Cook</span>
                 </Link>
             </div>
 
@@ -36,7 +36,7 @@ export default function GuestLayout({ children }) {
             </div>
 
             <div className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
-                &copy; {new Date().getFullYear()} SeaBasket. All rights reserved.
+                &copy; {new Date().getFullYear()} Cart & Cook. All rights reserved.
             </div>
         </div>
     );
