@@ -95,10 +95,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/notifications/clear-read', [NotificationController::class, 'clearRead'])->name('notifications.clear-read');
 });
 
-
-
-
-
 // Order verification route (accessible without authentication)
 Route::get('/orders/{order}/verify/{product}', [ProductLabelController::class, 'verify'])->name('orders.verify');
 
@@ -284,6 +280,11 @@ Route::get('/test-google-config', function () {
         ],
         'app_url' => config('app.url'),
     ]);
+});
+
+// Route to get a fresh CSRF token
+Route::get('/csrf-token', function () {
+    return response()->json(['token' => csrf_token()]);
 });
 
 require __DIR__ . '/auth.php';
