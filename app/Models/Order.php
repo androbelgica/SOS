@@ -26,6 +26,10 @@ class Order extends Model
         'total_amount' => 'decimal:2'
     ];
 
+    // Constants for order thresholds
+    const HIGH_VALUE_THRESHOLD = 10000; // ₱10,000
+    const LOW_STOCK_THRESHOLD = 5;
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -93,5 +97,113 @@ class Order extends Model
         $sequencePart = str_pad($sequenceNumber, 4, '0', STR_PAD_LEFT);
 
         return "{$prefix}-{$datePart}-{$sequencePart}";
+    }
+
+    protected static function booted()
+    {
+        // Send notification when order is created
+        static::created(function ($order) {
+            // Notify customer
+            $order->user->notify(new \App\Notifications\OrderPlaced($order));
+
+            // Check for high-value orders
+            if ($order->total_amount >= self::HIGH_VALUE_THRESHOLD) {
+                // Notify admin about high-value order
+                \App\Models\User::admins()->each(function ($admin) use ($order) {
+                    $admin->notify(new \App\Notifications\AdminOrderAlert(
+                        $order,
+                        'high_value_order',
+                        "High-value order (₱{$order->total_amount}) received from {$order->user->name}"
+                    ));
+                });
+            }
+
+            // Check for low stock after order
+            foreach ($order->items as $item) {
+                if ($item->product->stock <= self::LOW_STOCK_THRESHOLD) {
+                    // Notify admin about low stock
+                    \App\Models\User::admins()->each(function ($admin) use ($item) {
+                        $admin->notify(new \App\Notifications\LowStockAlert($item->product));
+                    });
+                }
+            }
+        });
+
+        // Send notification when order status changes
+        static::updated(function ($order) {
+            if ($order->isDirty('status')) {
+                $order->user->notify(new \App\Notifications\OrderStatusChanged($order));
+
+                // If status changed to "shipped", send shipping notification
+                if ($order->status === 'shipped' && $order->tracking_number) {
+                    $order->user->notify(new \App\Notifications\OrderShipped(
+                        $order,
+                        $order->tracking_number
+                    ));
+                }
+            }
+
+            if ($order->isDirty('payment_status')) {
+                $order->user->notify(new \App\Notifications\OrderPaymentStatusChanged($order));
+
+                // Check for potential fraud (multiple payment failures)
+                if ($order->payment_failures >= 3) {
+                    \App\Models\User::admins()->each(function ($admin) use ($order) {
+                        $admin->notify(new \App\Notifications\AdminOrderAlert(
+                            $order,
+                            'potential_fraud',
+                            "Multiple payment failures detected for Order #{$order->id}"
+                        ));
+                    });
+                }
+            }
+        });
+    }
+
+    /**
+     * Process a batch of orders
+     *
+     * @param array $orderIds
+     * @param string $processType
+     * @return array
+     */
+    public static function processBatch(array $orderIds, string $processType): array
+    {
+        $summary = [
+            'batch_id' => uniqid('batch_'),
+            'successful' => 0,
+            'failed' => 0,
+            'failed_orders' => [],
+        ];
+
+        $orders = self::whereIn('id', $orderIds)->get();
+
+        foreach ($orders as $order) {
+            try {
+                switch ($processType) {
+                    case 'ship':
+                        $order->ship();
+                        break;
+                    case 'cancel':
+                        $order->cancel();
+                        break;
+                        // Add more process types as needed
+                }
+                $summary['successful']++;
+            } catch (\Exception $e) {
+                $summary['failed']++;
+                $summary['failed_orders'][] = [
+                    'id' => $order->id,
+                    'error' => $e->getMessage()
+                ];
+            }
+        }
+
+        // Notify admins about batch processing
+        \App\Models\User::admins()->each(function ($admin) use ($orders, $processType, $summary) {
+            $admin->notify(new \App\Notifications\BatchOrderProcessed($orders->toArray(), $processType, $summary));
+        });
+
+        return $summary;
     }
 }

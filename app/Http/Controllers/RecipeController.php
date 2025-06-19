@@ -107,7 +107,7 @@ class RecipeController extends Controller
         ]);
 
         $review = new RecipeReview($validated);
-        $review->user_id = auth()->id();
+        $review->user_id = Auth::id();
         $recipe->reviews()->save($review);
 
         return back();
@@ -504,8 +504,23 @@ class RecipeController extends Controller
             $this->fileUploadService->deleteVideo($recipe->video_url);
         }
 
+        // Store recipe information before deletion
+        $recipeOwnerId = $recipe->created_by;
+        $recipeTitle = $recipe->title;
+
         // Delete the recipe
         $recipe->delete();
+
+        // Send notification to recipe owner
+        try {
+            Notification::createRecipeDeleted(
+                $recipeOwnerId,
+                $recipeTitle,
+                Auth::user()->name
+            );
+        } catch (\Exception $e) {
+            Log::error('Failed to create deletion notification: ' . $e->getMessage());
+        }
 
         return redirect()->route('admin.recipes.index')->with('success', 'Recipe deleted successfully. (Note: Recipe image has been preserved for future reuse)');
     }
@@ -527,7 +542,7 @@ class RecipeController extends Controller
                 $recipe->title
             );
         } catch (\Exception $e) {
-            \Log::error('Failed to create approval notification: ' . $e->getMessage());
+            Log::error('Failed to create approval notification: ' . $e->getMessage());
         }
 
         return back()->with('success', 'Recipe approved successfully!');
@@ -555,7 +570,7 @@ class RecipeController extends Controller
                 $validated['rejection_reason']
             );
         } catch (\Exception $e) {
-            \Log::error('Failed to create rejection notification: ' . $e->getMessage());
+            Log::error('Failed to create rejection notification: ' . $e->getMessage());
         }
 
         return back()->with('success', 'Recipe rejected successfully!');
@@ -578,7 +593,7 @@ class RecipeController extends Controller
                 $recipe->title
             );
         } catch (\Exception $e) {
-            \Log::error('Failed to create under review notification: ' . $e->getMessage());
+            Log::error('Failed to create under review notification: ' . $e->getMessage());
         }
 
         return back()->with('success', 'Recipe marked as under review!');

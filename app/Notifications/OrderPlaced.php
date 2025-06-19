@@ -7,7 +7,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\MailMessage;
 
-class OrderStatusChanged extends Notification
+class OrderPlaced extends Notification
 {
     use Queueable;
 
@@ -22,16 +22,30 @@ class OrderStatusChanged extends Notification
     {
         return ['mail', 'database'];
     }
-
+    public function toArray($notifiable): array
+    {
+        $orderIdentifier = $this->order->order_number ?? "#{$this->order->id}";
+        return [
+            'title' => "Order Placed Successfully",
+            'order_id' => $this->order->id,
+            'order_number' => $orderIdentifier,
+            'status' => $this->order->status,
+            'message' => "Your order has been placed successfully!",
+            'action_url' => route('orders.show', $this->order),
+            'total_amount' => $this->order->total_amount,
+            'type' => 'order_placed',
+            'created_at' => now(),
+        ];
+    }
 
     public function toMail($notifiable): MailMessage
     {
         $orderIdentifier = $this->order->order_number ?? "#{$this->order->id}";
 
         $message = (new MailMessage)
-            ->subject("Order {$orderIdentifier} Status Update")
+            ->subject("Order {$orderIdentifier} Placed Successfully")
             ->greeting("Hello {$notifiable->name}")
-            ->line("Your order status has been updated to: " . ucfirst($this->order->status));
+            ->line("Thank you for your order! Your order has been placed successfully.");
 
         // Add order details
         $message->line('Order Details:');
@@ -41,32 +55,18 @@ class OrderStatusChanged extends Notification
 
         $message->line("Total Amount: ₱{$this->order->total_amount}")
             ->action('View Order', route('orders.show', $this->order))
+            ->line('We will notify you once your order status changes.')
             ->line('Thank you for shopping with us!');
 
         return $message;
     }
 
-    public function toArray($notifiable): array
-    {
-        $orderIdentifier = $this->order->order_number ?? "#{$this->order->id}";
-        return [
-            'title' => "Order Status Updated",
-            'order_id' => $this->order->id,
-            'order_number' => $orderIdentifier,
-            'status' => $this->order->status,
-            'message' => "Your order status has been updated to: " . ucfirst($this->order->status),
-            'action_url' => route('orders.show', $this->order),
-            'total_amount' => $this->order->total_amount,
-            'type' => 'order_status_changed',
-            'created_at' => now(),
-        ];
-    }
-
     public function toDatabase($notifiable)
     {
+        $orderIdentifier = $this->order->order_number ?? "#{$this->order->id}";
         $data = $this->toArray($notifiable);
         return [
-            'title' => "Order Status Updated",
+            'title' => "Order Placed Successfully",
             'data' => $data
         ];
     }

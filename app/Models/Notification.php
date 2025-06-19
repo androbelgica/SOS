@@ -173,4 +173,18 @@ class Notification extends Model
             ]
         ]);
     }
+
+    public static function createRecipeDeleted($userId, $recipeTitle, $adminName)
+    {
+        return self::create([
+            'user_id' => $userId,
+            'type' => 'recipe_deleted',
+            'title' => 'Recipe Deleted',
+            'message' => "Your recipe '{$recipeTitle}' has been deleted by administrator {$adminName}.",
+            'data' => [
+                'recipe_title' => $recipeTitle,
+                'admin_name' => $adminName
+            ]
+        ]);
+    }
 }
