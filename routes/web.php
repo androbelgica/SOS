@@ -112,7 +112,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 ->latest()
                 ->take(5)
                 ->get(),
-            'recentRecipes' => \App\Models\Recipe::with('reviews')
+            'recentRecipes' => \App\Models\Recipe::with(['reviews', 'creator'])
                 ->withAvg('reviews', 'rating')
                 ->latest()
                 ->take(3)
@@ -241,6 +241,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/recipes/create', [RecipeController::class, 'create'])->name('recipes.create');
         Route::post('/recipes', [RecipeController::class, 'store'])->name('recipes.store');
         Route::get('/recipes/{recipe}/edit', [RecipeController::class, 'edit'])->name('recipes.edit');
+        Route::get('/recipes/{recipe}', [RecipeController::class, 'adminShow'])->name('recipes.show');
         Route::put('/recipes/{recipe}', [RecipeController::class, 'update'])->name('recipes.update');
         Route::delete('/recipes/{recipe}', [RecipeController::class, 'destroy'])->name('recipes.destroy');
 

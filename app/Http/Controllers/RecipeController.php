@@ -67,8 +67,10 @@ class RecipeController extends Controller
     public function show(Recipe $recipe)
     {
         // Only show approved recipes to public, unless user is the creator or admin
-        if (!$recipe->isApproved() &&
-            (!Auth::check() || (Auth::id() !== $recipe->created_by && !Auth::user()->isAdmin()))) {
+        if (
+            !$recipe->isApproved() &&
+            (!Auth::check() || (Auth::id() !== $recipe->created_by && !Auth::user()->isAdmin()))
+        ) {
             abort(404);
         }
 
@@ -180,6 +182,30 @@ class RecipeController extends Controller
                 })->count(),
             ],
             'timestamp' => $timestamp, // Pass timestamp to the view for cache busting
+        ]);
+    }
+
+    public function adminShow(Recipe $recipe)
+    {
+        $recipe->load(['creator', 'reviews.user', 'products']);
+        $recipe->loadAvg('reviews', 'rating');
+
+        return Inertia::render('Admin/Recipes/Show', [
+            'recipe' => array_merge($recipe->toArray(), [
+                'image_path' => $recipe->image_url,
+                'reviews' => $recipe->reviews->map(function ($review) {
+                    return [
+                        'id' => $review->id,
+                        'rating' => $review->rating,
+                        'comment' => $review->comment,
+                        'created_at' => $review->created_at,
+                        'user' => $review->user ? [
+                            'id' => $review->user->id,
+                            'name' => $review->user->name,
+                        ] : null,
+                    ];
+                }),
+            ]),
         ]);
     }
 

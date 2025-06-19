@@ -434,6 +434,16 @@ export default function CustomerDashboard({ auth, orders, recentRecipes }) {
                                         type: "recipe"
                                     })}
                                 />
+                                {/* Owner Badge - Top Left */}
+                                {auth.user && recipe.creator && recipe.creator.id === auth.user.id && (
+                                    <div className="absolute top-2 left-2 bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 text-white rounded-full px-3 py-1 flex items-center shadow-lg">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                        </svg>
+                                        <span className="text-xs font-semibold">My Recipe</span>
+                                    </div>
+                                )}
+                                {/* Rating Badge - Top Right */}
                                 {recipe.reviews_avg_rating && (
                                     <div className="absolute top-2 right-2 bg-white dark:bg-gray-800 rounded-full px-2 py-1 flex items-center shadow-md">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
@@ -449,6 +459,15 @@ export default function CustomerDashboard({ auth, orders, recentRecipes }) {
                                 <h3 className="font-medium text-gray-900 dark:text-white text-lg">
                                     {recipe.title}
                                 </h3>
+                                {/* Creator Info */}
+                                {recipe.creator && (
+                                    <div className="flex items-center mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                        </svg>
+                                        <span>Created by {recipe.creator.name}</span>
+                                    </div>
+                                )}
                                 <div className="flex items-center mt-2 text-sm text-gray-500 dark:text-gray-400">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
