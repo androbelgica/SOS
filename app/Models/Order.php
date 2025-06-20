@@ -111,21 +111,18 @@ class Order extends Model
                 $order->total_amount
             );
 
-            // Check for high-value orders
-            if ($order->total_amount >= self::HIGH_VALUE_THRESHOLD) {
-                // Notify admin about high-value order
-                \App\Models\User::admins()->each(function ($admin) use ($order) {
-                    \App\Models\Notification::createAdminOrderAlert(
-                        $admin->id,
-                        $order->id,
-                        $order->order_number,
-                        'high_value_order',
-                        "High-value order (₱{$order->total_amount}) received from {$order->user->name}",
-                        $order->total_amount,
-                        'medium'
-                    );
-                });
-            }
+            // Notify admins about order placed
+            \App\Models\User::admins()->each(function ($admin) use ($order) {
+                \App\Models\Notification::createAdminOrderAlert(
+                    $admin->id,
+                    $order->id,
+                    $order->order_number,
+                    'order_placed',
+                    "A new order (₱{$order->total_amount}) was placed by {$order->user->name}",
+                    $order->total_amount,
+                    'normal'
+                );
+            });
 
             // Check for low stock after order
             foreach ($order->items as $item) {

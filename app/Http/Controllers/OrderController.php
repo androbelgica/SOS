@@ -230,6 +230,11 @@ class OrderController extends Controller
             'status' => 'required|in:pending,processing,delivered,cancelled'
         ]);
 
+        // Backend enforcement: Prevent delivered if payment is not paid
+        if ($validated['status'] === 'delivered' && $order->payment_status !== 'paid') {
+            return redirect()->back()->withErrors(['status' => 'Cannot mark as delivered unless payment is paid.']);
+        }
+
         $oldStatus = $order->status;
         $order->update([
             'status' => $validated['status']
@@ -237,7 +242,22 @@ class OrderController extends Controller
 
         // Send notification if status has changed
         if ($oldStatus !== $validated['status']) {
-            $order->user->notify(new OrderStatusChanged($order));
+            // Use custom notification model
+            $items = $order->items->map(function ($item) {
+                return [
+                    'product' => $item->product->name,
+                    'quantity' => $item->quantity,
+                    'price' => $item->price
+                ];
+            })->toArray();
+            \App\Models\Notification::createOrderStatusChanged(
+                $order->user_id,
+                $order->id,
+                $order->order_number,
+                $order->status,
+                $items,
+                $order->total_amount
+            );
 
             // Generate labels if status is changed to processing
             if ($validated['status'] === 'processing') {
@@ -262,7 +282,22 @@ class OrderController extends Controller
 
         // Send notification if payment status has changed
         if ($oldPaymentStatus !== $validated['payment_status']) {
-            $order->user->notify(new OrderPaymentStatusChanged($order));
+            // Use custom notification model
+            $items = $order->items->map(function ($item) {
+                return [
+                    'product' => $item->product->name,
+                    'quantity' => $item->quantity,
+                    'price' => $item->price
+                ];
+            })->toArray();
+            \App\Models\Notification::createOrderPaymentStatusChanged(
+                $order->user_id,
+                $order->id,
+                $order->order_number,
+                $order->payment_status,
+                $items,
+                $order->total_amount
+            );
         }
 
         return redirect()->back()->with('success', 'Payment status updated successfully.');
