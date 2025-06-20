@@ -32,8 +32,9 @@ class DatabaseSeeder extends Seeder
         // Run other seeders
         $this->call([
             ProductCategorySeeder::class, // New comprehensive category seeder
-            ProductSeeder::class,         // Keep existing for additional random products
-            RecipeSeeder::class,
+            // ProductSeeder::class,         // Remove this
+            // RecipeSeeder::class,          // Remove this
+            // Any Order-related seeders should also be removed
         ]);
     }
 }

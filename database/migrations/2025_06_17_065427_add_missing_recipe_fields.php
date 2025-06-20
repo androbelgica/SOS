@@ -67,9 +67,9 @@ return new class extends Migration
         Schema::table('recipes', function (Blueprint $table) {
             // Drop indexes first
             try {
-                $table->dropIndex(['status', 'created_at']);
-                $table->dropIndex(['created_by', 'status']);
-                $table->dropIndex(['category']);
+                $table->dropIndex('recipes_status_created_at_index');
+                $table->dropIndex('recipes_created_by_status_index');
+                $table->dropIndex('recipes_category_index');
             } catch (\Exception $e) {
                 // Indexes might not exist, ignore the error
             }
