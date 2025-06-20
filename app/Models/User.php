@@ -61,6 +61,29 @@ class User extends Authenticatable
         return $this->role === 'admin';
     }
 
+    /**
+     * Scope for admin users
+     */
+    public function scopeAdmins($query)
+    {
+        return $query->where('role', 'admin');
+    }
+
+    /**
+     * Get the user's notification preferences
+     */
+    public function notificationPreferences(): array
+    {
+        return $this->notification_preferences ?? [
+            'order_status' => true,
+            'payment_status' => true,
+            'shipping_updates' => true,
+            'email_notifications' => true,
+            'push_notifications' => true,
+            'order_reminders' => true,
+        ];
+    }
+
     // Recipe relationships
     public function recipes(): HasMany
     {
