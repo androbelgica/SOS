@@ -104,17 +104,26 @@ class Order extends Model
         // Send notification when order is created
         static::created(function ($order) {
             // Notify customer
-            $order->user->notify(new \App\Notifications\OrderPlaced($order));
+            \App\Models\Notification::createOrderPlaced(
+                $order->user_id,
+                $order->id,
+                $order->order_number,
+                $order->total_amount
+            );
 
             // Check for high-value orders
             if ($order->total_amount >= self::HIGH_VALUE_THRESHOLD) {
                 // Notify admin about high-value order
                 \App\Models\User::admins()->each(function ($admin) use ($order) {
-                    $admin->notify(new \App\Notifications\AdminOrderAlert(
-                        $order,
+                    \App\Models\Notification::createAdminOrderAlert(
+                        $admin->id,
+                        $order->id,
+                        $order->order_number,
                         'high_value_order',
-                        "High-value order (₱{$order->total_amount}) received from {$order->user->name}"
-                    ));
+                        "High-value order (₱{$order->total_amount}) received from {$order->user->name}",
+                        $order->total_amount,
+                        'medium'
+                    );
                 });
             }
 
@@ -123,7 +132,13 @@ class Order extends Model
                 if ($item->product->stock <= self::LOW_STOCK_THRESHOLD) {
                     // Notify admin about low stock
                     \App\Models\User::admins()->each(function ($admin) use ($item) {
-                        $admin->notify(new \App\Notifications\LowStockAlert($item->product));
+                        \App\Models\Notification::createLowStockAlert(
+                            $admin->id,
+                            $item->product->id,
+                            $item->product->name,
+                            $item->product->stock,
+                            self::LOW_STOCK_THRESHOLD
+                        );
                     });
                 }
             }
@@ -132,28 +147,63 @@ class Order extends Model
         // Send notification when order status changes
         static::updated(function ($order) {
             if ($order->isDirty('status')) {
-                $order->user->notify(new \App\Notifications\OrderStatusChanged($order));
+                $items = $order->items->map(function ($item) {
+                    return [
+                        'product' => $item->product->name,
+                        'quantity' => $item->quantity,
+                        'price' => $item->price
+                    ];
+                })->toArray();
+                \App\Models\Notification::createOrderStatusChanged(
+                    $order->user_id,
+                    $order->id,
+                    $order->order_number,
+                    $order->status,
+                    $items,
+                    $order->total_amount
+                );
 
                 // If status changed to "shipped", send shipping notification
                 if ($order->status === 'shipped' && $order->tracking_number) {
-                    $order->user->notify(new \App\Notifications\OrderShipped(
-                        $order,
-                        $order->tracking_number
-                    ));
+                    \App\Models\Notification::createOrderShipped(
+                        $order->user_id,
+                        $order->id,
+                        $order->order_number,
+                        $order->tracking_number,
+                        $order->total_amount
+                    );
                 }
             }
 
             if ($order->isDirty('payment_status')) {
-                $order->user->notify(new \App\Notifications\OrderPaymentStatusChanged($order));
+                $items = $order->items->map(function ($item) {
+                    return [
+                        'product' => $item->product->name,
+                        'quantity' => $item->quantity,
+                        'price' => $item->price
+                    ];
+                })->toArray();
+                \App\Models\Notification::createOrderPaymentStatusChanged(
+                    $order->user_id,
+                    $order->id,
+                    $order->order_number,
+                    $order->payment_status,
+                    $items,
+                    $order->total_amount
+                );
 
                 // Check for potential fraud (multiple payment failures)
                 if ($order->payment_failures >= 3) {
                     \App\Models\User::admins()->each(function ($admin) use ($order) {
-                        $admin->notify(new \App\Notifications\AdminOrderAlert(
-                            $order,
+                        \App\Models\Notification::createAdminOrderAlert(
+                            $admin->id,
+                            $order->id,
+                            $order->order_number,
                             'potential_fraud',
-                            "Multiple payment failures detected for Order #{$order->id}"
-                        ));
+                            "Multiple payment failures detected for Order #{$order->id}",
+                            $order->total_amount,
+                            'high'
+                        );
                     });
                 }
             }
@@ -201,7 +251,11 @@ class Order extends Model
 
         // Notify admins about batch processing
         \App\Models\User::admins()->each(function ($admin) use ($orders, $processType, $summary) {
-            $admin->notify(new \App\Notifications\BatchOrderProcessed($orders->toArray(), $processType, $summary));
+            \App\Models\Notification::createBatchOrderProcessed(
+                $admin->id,
+                $processType,
+                $summary
+            );
         });
 
         return $summary;

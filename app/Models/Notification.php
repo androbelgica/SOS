@@ -187,4 +187,117 @@ class Notification extends Model
             ]
         ]);
     }
+
+    // Order notification methods
+    public static function createOrderPlaced($userId, $orderId, $orderNumber, $totalAmount)
+    {
+        return self::create([
+            'user_id' => $userId,
+            'type' => 'order_placed',
+            'title' => 'Order Placed Successfully',
+            'message' => "Your order {$orderNumber} has been placed successfully!",
+            'data' => [
+                'order_id' => $orderId,
+                'order_number' => $orderNumber,
+                'total_amount' => $totalAmount
+            ]
+        ]);
+    }
+
+    public static function createOrderStatusChanged($userId, $orderId, $orderNumber, $status, $items, $totalAmount)
+    {
+        return self::create([
+            'user_id' => $userId,
+            'type' => 'order_status_changed',
+            'title' => 'Order Status Updated',
+            'message' => "Your order status has been updated to: " . ucfirst($status),
+            'data' => [
+                'order_id' => $orderId,
+                'order_number' => $orderNumber,
+                'status' => $status,
+                'items' => $items,
+                'total_amount' => $totalAmount
+            ]
+        ]);
+    }
+
+    public static function createOrderPaymentStatusChanged($userId, $orderId, $orderNumber, $paymentStatus, $items, $totalAmount)
+    {
+        return self::create([
+            'user_id' => $userId,
+            'type' => 'order_payment_status_changed',
+            'title' => 'Payment Status Updated',
+            'message' => "Your order payment status has been updated to: " . ucfirst($paymentStatus),
+            'data' => [
+                'order_id' => $orderId,
+                'order_number' => $orderNumber,
+                'payment_status' => $paymentStatus,
+                'items' => $items,
+                'total_amount' => $totalAmount
+            ]
+        ]);
+    }
+
+    public static function createOrderShipped($userId, $orderId, $orderNumber, $trackingNumber, $totalAmount)
+    {
+        return self::create([
+            'user_id' => $userId,
+            'type' => 'order_shipped',
+            'title' => 'Order Shipped',
+            'message' => "Your order {$orderNumber} has been shipped! Track your package with tracking number: {$trackingNumber}",
+            'data' => [
+                'order_id' => $orderId,
+                'order_number' => $orderNumber,
+                'tracking_number' => $trackingNumber,
+                'total_amount' => $totalAmount
+            ]
+        ]);
+    }
+
+    public static function createAdminOrderAlert($adminUserId, $orderId, $orderNumber, $type, $message, $totalAmount, $priority = 'normal')
+    {
+        return self::create([
+            'user_id' => $adminUserId,
+            'type' => 'admin_order_alert',
+            'title' => "[Admin Alert] {$type}",
+            'message' => $message,
+            'data' => [
+                'order_id' => $orderId,
+                'order_number' => $orderNumber,
+                'alert_type' => $type,
+                'total_amount' => $totalAmount,
+                'priority' => $priority
+            ]
+        ]);
+    }
+
+    public static function createLowStockAlert($adminUserId, $productId, $productName, $currentStock, $threshold)
+    {
+        return self::create([
+            'user_id' => $adminUserId,
+            'type' => 'low_stock_alert',
+            'title' => 'Low Stock Alert',
+            'message' => "The product '{$productName}' is running low on stock.",
+            'data' => [
+                'product_id' => $productId,
+                'product_name' => $productName,
+                'current_stock' => $currentStock,
+                'threshold' => $threshold
+            ]
+        ]);
+    }
+
+    public static function createBatchOrderProcessed($adminUserId, $processType, $summary)
+    {
+        return self::create([
+            'user_id' => $adminUserId,
+            'type' => 'batch_order_processed',
+            'title' => 'Batch Order Processing Report',
+            'message' => "Batch {$processType} completed: {$summary['successful']} successful, {$summary['failed']} failed.",
+            'data' => [
+                'process_type' => $processType,
+                'summary' => $summary
+            ]
+        ]);
+    }
 }
