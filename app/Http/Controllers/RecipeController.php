@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Inertia\Inertia;
+use App\Events\RecipeStatusChanged;
 
 class RecipeController extends Controller
 {
@@ -541,6 +542,8 @@ class RecipeController extends Controller
                 $recipe->id,
                 $recipe->title
             );
+            // Real-time event
+            event(new RecipeStatusChanged($recipe->id, $recipe->created_by, 'approved', 'Your recipe has been approved!'));
         } catch (\Exception $e) {
             Log::error('Failed to create approval notification: ' . $e->getMessage());
         }
@@ -569,6 +572,8 @@ class RecipeController extends Controller
                 $recipe->title,
                 $validated['rejection_reason']
             );
+            // Real-time event
+            event(new RecipeStatusChanged($recipe->id, $recipe->created_by, 'rejected', $validated['rejection_reason']));
         } catch (\Exception $e) {
             Log::error('Failed to create rejection notification: ' . $e->getMessage());
         }

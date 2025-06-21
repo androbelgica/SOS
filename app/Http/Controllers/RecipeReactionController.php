@@ -8,6 +8,7 @@ use App\Models\RecipeComment;
 use App\Models\CommentReaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Events\RecipeReactionUpdated;
 
 class RecipeReactionController extends Controller
 {
@@ -62,6 +63,9 @@ class RecipeReactionController extends Controller
         // Get updated reaction counts
         $reactionCounts = $recipe->fresh()->reaction_counts;
         $userReaction = $recipe->getUserReaction($userId);
+
+        // Real-time event
+        event(new RecipeReactionUpdated($recipe->id, $reactionCounts, $userReaction ? $userReaction->reaction_type : null));
 
         return response()->json([
             'action' => $action,

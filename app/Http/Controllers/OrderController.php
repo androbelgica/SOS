@@ -12,6 +12,7 @@ use Inertia\Inertia;
 use App\Notifications\OrderStatusChanged;
 use App\Notifications\OrderPaymentStatusChanged;
 use App\Services\LabelGenerationService;
+use App\Events\OrderStatusChanged as OrderStatusChangedEvent;
 
 class OrderController extends Controller
 {
@@ -88,6 +89,9 @@ class OrderController extends Controller
                 'billing_postal_code' => 'required|string',
                 'billing_country' => 'required|string',
                 'billing_phone' => 'required|string',
+                'payment_method' => 'required|in:cod', // Only allow COD for now
+            ], [
+                'payment_method.in' => 'Payment option coming soon.'
             ]);
 
             // Format shipping and billing addresses
@@ -108,7 +112,7 @@ class OrderController extends Controller
             }
 
             // Use a database transaction to ensure all operations succeed or fail together
-            $order = DB::transaction(function () use ($cart, $shippingAddress, $billingAddress) {
+            $order = DB::transaction(function () use ($cart, $shippingAddress, $billingAddress, $request) {
                 $total = 0;
                 $items = [];
                 $products = Product::whereIn('id', array_keys($cart))->lockForUpdate()->get();
@@ -184,7 +188,8 @@ class OrderController extends Controller
                     'status' => 'pending',
                     'shipping_address' => $shippingAddress,
                     'billing_address' => $billingAddress,
-                    'payment_status' => 'pending'
+                    'payment_status' => 'pending',
+                    'payment_method' => $request->payment_method,
                 ]);
 
                 // Create order items
@@ -258,7 +263,8 @@ class OrderController extends Controller
                 $items,
                 $order->total_amount
             );
-
+            // Real-time event
+            event(new OrderStatusChangedEvent($order->id, $order->user_id, $order->status, $order->payment_status, 'Order status updated.'));
             // Generate labels if status is changed to processing
             if ($validated['status'] === 'processing') {
                 $this->labelService->generateLabelsForOrder($order);
@@ -298,6 +304,8 @@ class OrderController extends Controller
                 $items,
                 $order->total_amount
             );
+            // Real-time event
+            event(new OrderStatusChangedEvent($order->id, $order->user_id, $order->status, $order->payment_status, 'Order payment status updated.'));
         }
 
         return redirect()->back()->with('success', 'Payment status updated successfully.');

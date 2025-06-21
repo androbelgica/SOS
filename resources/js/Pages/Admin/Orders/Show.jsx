@@ -184,6 +184,17 @@ export default function Show({ auth, order }) {
                                                     )}
                                             </span>
                                         </p>
+                                        <p className="text-sm text-gray-700 dark:text-gray-300">
+                                            <span className="font-medium">
+                                                Payment Method:
+                                            </span>{" "}
+                                            {order.payment_method === "cod" &&
+                                                "Cash on Delivery (COD)"}
+                                            {order.payment_method === "gcash" &&
+                                                "GCash"}
+                                            {order.payment_method === "maya" &&
+                                                "Maya"}
+                                        </p>
                                     </div>
                                 </div>
                                 <div>

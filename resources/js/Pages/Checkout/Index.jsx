@@ -5,13 +5,20 @@ import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 
-export default function CheckoutIndex({ auth, cartItems, total, user, timestamp }) {
+export default function CheckoutIndex({
+    auth,
+    cartItems,
+    total,
+    user,
+    timestamp,
+}) {
     // Log the cart items for debugging
     useEffect(() => {
         console.log("Checkout page loaded with cart items:", cartItems);
         console.log("Timestamp:", timestamp);
     }, [cartItems, timestamp]);
     const [sameAsBilling, setSameAsBilling] = useState(true);
+    const [paymentMethod, setPaymentMethod] = useState("cod");
 
     const { data, setData, post, processing, errors } = useForm({
         shipping_address: user?.address || "",
@@ -29,10 +36,15 @@ export default function CheckoutIndex({ auth, cartItems, total, user, timestamp 
         billing_phone: user?.phone || "",
 
         save_address: true,
+        payment_method: "cod",
     });
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        if (paymentMethod !== "cod") {
+            alert("Only Cash on Delivery is available at this time.");
+            return;
+        }
         post(route("orders.store"));
     };
 
@@ -41,8 +53,8 @@ export default function CheckoutIndex({ auth, cartItems, total, user, timestamp 
         setData(name, value);
 
         // If billing should be same as shipping, update billing fields
-        if (sameAsBilling && name.startsWith('shipping_')) {
-            const billingField = name.replace('shipping_', 'billing_');
+        if (sameAsBilling && name.startsWith("shipping_")) {
+            const billingField = name.replace("shipping_", "billing_");
             setData(billingField, value);
         }
     };
@@ -65,6 +77,16 @@ export default function CheckoutIndex({ auth, cartItems, total, user, timestamp 
         }
     };
 
+    const handlePaymentMethodChange = (e) => {
+        const value = e.target.value;
+        if (value === "cod") {
+            setPaymentMethod("cod");
+            setData("payment_method", "cod");
+        } else {
+            alert("Payment option coming soon.");
+        }
+    };
+
     return (
         <MainLayout auth={auth} title="Checkout">
             <Head title="Checkout - Seafood Online Store" />
@@ -74,11 +96,16 @@ export default function CheckoutIndex({ auth, cartItems, total, user, timestamp 
                 <div className="lg:col-span-2">
                     <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden mb-6">
                         <div className="px-4 py-5 sm:p-6">
-                            <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Shipping Information</h2>
+                            <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+                                Shipping Information
+                            </h2>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                 <div>
-                                    <InputLabel htmlFor="shipping_address" value="Address" />
+                                    <InputLabel
+                                        htmlFor="shipping_address"
+                                        value="Address"
+                                    />
                                     <TextInput
                                         id="shipping_address"
                                         name="shipping_address"
@@ -87,11 +114,17 @@ export default function CheckoutIndex({ auth, cartItems, total, user, timestamp 
                                         onChange={handleInputChange}
                                         required
                                     />
-                                    <InputError message={errors.shipping_address} className="mt-2" />
+                                    <InputError
+                                        message={errors.shipping_address}
+                                        className="mt-2"
+                                    />
                                 </div>
 
                                 <div>
-                                    <InputLabel htmlFor="shipping_phone" value="Phone Number" />
+                                    <InputLabel
+                                        htmlFor="shipping_phone"
+                                        value="Phone Number"
+                                    />
                                     <TextInput
                                         id="shipping_phone"
                                         name="shipping_phone"
@@ -100,13 +133,19 @@ export default function CheckoutIndex({ auth, cartItems, total, user, timestamp 
                                         onChange={handleInputChange}
                                         required
                                     />
-                                    <InputError message={errors.shipping_phone} className="mt-2" />
+                                    <InputError
+                                        message={errors.shipping_phone}
+                                        className="mt-2"
+                                    />
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                                 <div>
-                                    <InputLabel htmlFor="shipping_city" value="City" />
+                                    <InputLabel
+                                        htmlFor="shipping_city"
+                                        value="City"
+                                    />
                                     <TextInput
                                         id="shipping_city"
                                         name="shipping_city"
@@ -115,11 +154,17 @@ export default function CheckoutIndex({ auth, cartItems, total, user, timestamp 
                                         onChange={handleInputChange}
                                         required
                                     />
-                                    <InputError message={errors.shipping_city} className="mt-2" />
+                                    <InputError
+                                        message={errors.shipping_city}
+                                        className="mt-2"
+                                    />
                                 </div>
 
                                 <div>
-                                    <InputLabel htmlFor="shipping_state" value="Province/State" />
+                                    <InputLabel
+                                        htmlFor="shipping_state"
+                                        value="Province/State"
+                                    />
                                     <TextInput
                                         id="shipping_state"
                                         name="shipping_state"
@@ -128,11 +173,17 @@ export default function CheckoutIndex({ auth, cartItems, total, user, timestamp 
                                         onChange={handleInputChange}
                                         required
                                     />
-                                    <InputError message={errors.shipping_state} className="mt-2" />
+                                    <InputError
+                                        message={errors.shipping_state}
+                                        className="mt-2"
+                                    />
                                 </div>
 
                                 <div>
-                                    <InputLabel htmlFor="shipping_postal_code" value="Postal Code" />
+                                    <InputLabel
+                                        htmlFor="shipping_postal_code"
+                                        value="Postal Code"
+                                    />
                                     <TextInput
                                         id="shipping_postal_code"
                                         name="shipping_postal_code"
@@ -141,12 +192,18 @@ export default function CheckoutIndex({ auth, cartItems, total, user, timestamp 
                                         onChange={handleInputChange}
                                         required
                                     />
-                                    <InputError message={errors.shipping_postal_code} className="mt-2" />
+                                    <InputError
+                                        message={errors.shipping_postal_code}
+                                        className="mt-2"
+                                    />
                                 </div>
                             </div>
 
                             <div className="mb-4">
-                                <InputLabel htmlFor="shipping_country" value="Country" />
+                                <InputLabel
+                                    htmlFor="shipping_country"
+                                    value="Country"
+                                />
                                 <TextInput
                                     id="shipping_country"
                                     name="shipping_country"
@@ -155,7 +212,10 @@ export default function CheckoutIndex({ auth, cartItems, total, user, timestamp 
                                     onChange={handleInputChange}
                                     required
                                 />
-                                <InputError message={errors.shipping_country} className="mt-2" />
+                                <InputError
+                                    message={errors.shipping_country}
+                                    className="mt-2"
+                                />
                             </div>
 
                             <div className="flex items-center mb-4">
@@ -164,10 +224,18 @@ export default function CheckoutIndex({ auth, cartItems, total, user, timestamp 
                                     name="save_address"
                                     type="checkbox"
                                     checked={data.save_address}
-                                    onChange={(e) => setData('save_address', e.target.checked)}
+                                    onChange={(e) =>
+                                        setData(
+                                            "save_address",
+                                            e.target.checked
+                                        )
+                                    }
                                     className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                                 />
-                                <label htmlFor="save_address" className="ml-2 block text-sm text-gray-900 dark:text-gray-200">
+                                <label
+                                    htmlFor="save_address"
+                                    className="ml-2 block text-sm text-gray-900 dark:text-gray-200"
+                                >
                                     Save this address to my profile
                                 </label>
                             </div>
@@ -177,7 +245,9 @@ export default function CheckoutIndex({ auth, cartItems, total, user, timestamp 
                     <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
                         <div className="px-4 py-5 sm:p-6">
                             <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-lg font-medium text-gray-900 dark:text-white">Billing Information</h2>
+                                <h2 className="text-lg font-medium text-gray-900 dark:text-white">
+                                    Billing Information
+                                </h2>
 
                                 <div className="flex items-center">
                                     <input
@@ -188,7 +258,10 @@ export default function CheckoutIndex({ auth, cartItems, total, user, timestamp 
                                         onChange={toggleSameAsBilling}
                                         className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                                     />
-                                    <label htmlFor="same_as_shipping" className="ml-2 block text-sm text-gray-900 dark:text-gray-200">
+                                    <label
+                                        htmlFor="same_as_shipping"
+                                        className="ml-2 block text-sm text-gray-900 dark:text-gray-200"
+                                    >
                                         Same as shipping address
                                     </label>
                                 </div>
@@ -198,7 +271,10 @@ export default function CheckoutIndex({ auth, cartItems, total, user, timestamp 
                                 <>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                         <div>
-                                            <InputLabel htmlFor="billing_address" value="Address" />
+                                            <InputLabel
+                                                htmlFor="billing_address"
+                                                value="Address"
+                                            />
                                             <TextInput
                                                 id="billing_address"
                                                 name="billing_address"
@@ -207,11 +283,17 @@ export default function CheckoutIndex({ auth, cartItems, total, user, timestamp 
                                                 onChange={handleInputChange}
                                                 required
                                             />
-                                            <InputError message={errors.billing_address} className="mt-2" />
+                                            <InputError
+                                                message={errors.billing_address}
+                                                className="mt-2"
+                                            />
                                         </div>
 
                                         <div>
-                                            <InputLabel htmlFor="billing_phone" value="Phone Number" />
+                                            <InputLabel
+                                                htmlFor="billing_phone"
+                                                value="Phone Number"
+                                            />
                                             <TextInput
                                                 id="billing_phone"
                                                 name="billing_phone"
@@ -220,13 +302,19 @@ export default function CheckoutIndex({ auth, cartItems, total, user, timestamp 
                                                 onChange={handleInputChange}
                                                 required
                                             />
-                                            <InputError message={errors.billing_phone} className="mt-2" />
+                                            <InputError
+                                                message={errors.billing_phone}
+                                                className="mt-2"
+                                            />
                                         </div>
                                     </div>
 
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                                         <div>
-                                            <InputLabel htmlFor="billing_city" value="City" />
+                                            <InputLabel
+                                                htmlFor="billing_city"
+                                                value="City"
+                                            />
                                             <TextInput
                                                 id="billing_city"
                                                 name="billing_city"
@@ -235,11 +323,17 @@ export default function CheckoutIndex({ auth, cartItems, total, user, timestamp 
                                                 onChange={handleInputChange}
                                                 required
                                             />
-                                            <InputError message={errors.billing_city} className="mt-2" />
+                                            <InputError
+                                                message={errors.billing_city}
+                                                className="mt-2"
+                                            />
                                         </div>
 
                                         <div>
-                                            <InputLabel htmlFor="billing_state" value="Province/State" />
+                                            <InputLabel
+                                                htmlFor="billing_state"
+                                                value="Province/State"
+                                            />
                                             <TextInput
                                                 id="billing_state"
                                                 name="billing_state"
@@ -248,11 +342,17 @@ export default function CheckoutIndex({ auth, cartItems, total, user, timestamp 
                                                 onChange={handleInputChange}
                                                 required
                                             />
-                                            <InputError message={errors.billing_state} className="mt-2" />
+                                            <InputError
+                                                message={errors.billing_state}
+                                                className="mt-2"
+                                            />
                                         </div>
 
                                         <div>
-                                            <InputLabel htmlFor="billing_postal_code" value="Postal Code" />
+                                            <InputLabel
+                                                htmlFor="billing_postal_code"
+                                                value="Postal Code"
+                                            />
                                             <TextInput
                                                 id="billing_postal_code"
                                                 name="billing_postal_code"
@@ -261,12 +361,20 @@ export default function CheckoutIndex({ auth, cartItems, total, user, timestamp 
                                                 onChange={handleInputChange}
                                                 required
                                             />
-                                            <InputError message={errors.billing_postal_code} className="mt-2" />
+                                            <InputError
+                                                message={
+                                                    errors.billing_postal_code
+                                                }
+                                                className="mt-2"
+                                            />
                                         </div>
                                     </div>
 
                                     <div className="mb-4">
-                                        <InputLabel htmlFor="billing_country" value="Country" />
+                                        <InputLabel
+                                            htmlFor="billing_country"
+                                            value="Country"
+                                        />
                                         <TextInput
                                             id="billing_country"
                                             name="billing_country"
@@ -275,10 +383,67 @@ export default function CheckoutIndex({ auth, cartItems, total, user, timestamp 
                                             onChange={handleInputChange}
                                             required
                                         />
-                                        <InputError message={errors.billing_country} className="mt-2" />
+                                        <InputError
+                                            message={errors.billing_country}
+                                            className="mt-2"
+                                        />
                                     </div>
                                 </>
                             )}
+                        </div>
+                    </div>
+
+                    {/* Payment Method Selection */}
+                    <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden mt-6">
+                        <div className="px-4 py-5 sm:p-6">
+                            <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+                                Payment Method
+                            </h2>
+                            <div className="space-y-3">
+                                <label className="flex items-center">
+                                    <input
+                                        type="radio"
+                                        name="payment_method"
+                                        value="cod"
+                                        checked={paymentMethod === "cod"}
+                                        onChange={handlePaymentMethodChange}
+                                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                                    />
+                                    <span className="ml-2 text-gray-900 dark:text-gray-200 font-medium">
+                                        Cash on Delivery (COD)
+                                    </span>
+                                </label>
+                                <label className="flex items-center opacity-50 cursor-not-allowed">
+                                    <input
+                                        type="radio"
+                                        name="payment_method"
+                                        value="gcash"
+                                        disabled
+                                        className="h-4 w-4 text-indigo-600 border-gray-300"
+                                    />
+                                    <span className="ml-2 text-gray-900 dark:text-gray-200">
+                                        GCash{" "}
+                                        <span className="ml-1 text-xs text-gray-500">
+                                            (Coming soon)
+                                        </span>
+                                    </span>
+                                </label>
+                                <label className="flex items-center opacity-50 cursor-not-allowed">
+                                    <input
+                                        type="radio"
+                                        name="payment_method"
+                                        value="maya"
+                                        disabled
+                                        className="h-4 w-4 text-indigo-600 border-gray-300"
+                                    />
+                                    <span className="ml-2 text-gray-900 dark:text-gray-200">
+                                        Maya{" "}
+                                        <span className="ml-1 text-xs text-gray-500">
+                                            (Coming soon)
+                                        </span>
+                                    </span>
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -287,11 +452,16 @@ export default function CheckoutIndex({ auth, cartItems, total, user, timestamp 
                 <div className="lg:col-span-1">
                     <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
                         <div className="px-4 py-5 sm:p-6">
-                            <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Order Summary</h2>
+                            <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+                                Order Summary
+                            </h2>
 
                             <div className="space-y-4 mb-6">
                                 {cartItems.map((item) => (
-                                    <div key={item.id} className="flex items-center space-x-4">
+                                    <div
+                                        key={item.id}
+                                        className="flex items-center space-x-4"
+                                    >
                                         <div className="flex-shrink-0 w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-md overflow-hidden">
                                             {item.image_url && (
                                                 <img
@@ -300,7 +470,8 @@ export default function CheckoutIndex({ auth, cartItems, total, user, timestamp 
                                                     className="w-full h-full object-cover"
                                                     onError={(e) => {
                                                         e.target.onerror = null;
-                                                        e.target.src = "/images/placeholder.jpg";
+                                                        e.target.src =
+                                                            "/images/placeholder.jpg";
                                                     }}
                                                 />
                                             )}
@@ -310,9 +481,13 @@ export default function CheckoutIndex({ auth, cartItems, total, user, timestamp 
                                                 {item.name}
                                             </p>
                                             <p className="text-sm text-gray-500 dark:text-gray-400">
-                                                {item.unit_type === 'kg'
+                                                {item.unit_type === "kg"
                                                     ? `${item.quantity}g`
-                                                    : `${item.quantity} ${item.quantity > 1 ? 'pieces' : 'piece'}`}
+                                                    : `${item.quantity} ${
+                                                          item.quantity > 1
+                                                              ? "pieces"
+                                                              : "piece"
+                                                      }`}
                                             </p>
                                         </div>
                                         <div className="flex-shrink-0 text-sm font-medium text-gray-900 dark:text-white">
@@ -324,16 +499,28 @@ export default function CheckoutIndex({ auth, cartItems, total, user, timestamp 
 
                             <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mb-6">
                                 <div className="flex justify-between text-sm mb-2">
-                                    <span className="text-gray-500 dark:text-gray-400">Subtotal</span>
-                                    <span className="font-medium text-gray-900 dark:text-white">₱{total.toFixed(2)}</span>
+                                    <span className="text-gray-500 dark:text-gray-400">
+                                        Subtotal
+                                    </span>
+                                    <span className="font-medium text-gray-900 dark:text-white">
+                                        ₱{total.toFixed(2)}
+                                    </span>
                                 </div>
                                 <div className="flex justify-between text-sm mb-2">
-                                    <span className="text-gray-500 dark:text-gray-400">Shipping</span>
-                                    <span className="font-medium text-gray-900 dark:text-white">Free</span>
+                                    <span className="text-gray-500 dark:text-gray-400">
+                                        Shipping
+                                    </span>
+                                    <span className="font-medium text-gray-900 dark:text-white">
+                                        Free
+                                    </span>
                                 </div>
                                 <div className="flex justify-between text-base font-medium mt-4">
-                                    <span className="text-gray-900 dark:text-white">Total</span>
-                                    <span className="text-gray-900 dark:text-white">₱{total.toFixed(2)}</span>
+                                    <span className="text-gray-900 dark:text-white">
+                                        Total
+                                    </span>
+                                    <span className="text-gray-900 dark:text-white">
+                                        ₱{total.toFixed(2)}
+                                    </span>
                                 </div>
                             </div>
 
@@ -343,7 +530,7 @@ export default function CheckoutIndex({ auth, cartItems, total, user, timestamp 
                                 disabled={processing}
                                 className="w-full flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 dark:bg-indigo-500 hover:bg-indigo-700 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 disabled:opacity-50"
                             >
-                                {processing ? 'Processing...' : 'Place Order'}
+                                {processing ? "Processing..." : "Place Order"}
                             </button>
 
                             <div className="mt-4">
@@ -353,11 +540,25 @@ export default function CheckoutIndex({ auth, cartItems, total, user, timestamp 
                                     onClick={(e) => {
                                         e.preventDefault();
                                         // Force a full page reload with timestamp to ensure fresh data
-                                        window.location.href = route("cart.index") + "?t=" + new Date().getTime();
+                                        window.location.href =
+                                            route("cart.index") +
+                                            "?t=" +
+                                            new Date().getTime();
                                     }}
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-4 w-4 mr-1"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                                        />
                                     </svg>
                                     Return to cart
                                 </a>

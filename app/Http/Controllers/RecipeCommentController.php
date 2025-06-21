@@ -7,6 +7,7 @@ use App\Models\RecipeComment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use App\Events\RecipeCommentAdded;
 
 class RecipeCommentController extends Controller
 {
@@ -21,7 +22,7 @@ class RecipeCommentController extends Controller
             $comments = $recipe->comments()
                 ->where('is_hidden', false)
                 ->whereNull('parent_id')
-                ->with(['user', 'replies' => function($query) {
+                ->with(['user', 'replies' => function ($query) {
                     $query->where('is_hidden', false)->with('user');
                 }, 'reactions'])
                 ->orderBy('created_at', 'desc')
@@ -48,7 +49,6 @@ class RecipeCommentController extends Controller
                     return $comment;
                 });
             }
-
         } catch (\Exception $e) {
             \Log::error('Error loading comments for recipe ' . $recipe->id . ': ' . $e->getMessage());
             return response()->json(['error' => 'Failed to load comments: ' . $e->getMessage()], 500);
@@ -93,6 +93,9 @@ class RecipeCommentController extends Controller
         ]);
 
         $comment->load(['user', 'reactions']);
+
+        // Real-time event
+        event(new RecipeCommentAdded($recipe->id, $comment->toArray()));
 
         // Notify recipe author if someone comments (not self)
         if ($recipe->created_by !== Auth::id()) {
