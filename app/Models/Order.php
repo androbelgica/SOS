@@ -258,4 +258,28 @@ class Order extends Model
 
         return $summary;
     }
+
+    /**
+     * The delivery staff assigned to this order.
+     */
+    public function assignedTo(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'assigned_to');
+    }
+
+    /**
+     * Scope: Orders assigned to a specific delivery staff.
+     */
+    public function scopeAssignedToDelivery($query, $userId)
+    {
+        return $query->where('assigned_to', $userId);
+    }
+
+    /**
+     * Scope: Orders with a specific delivery status.
+     */
+    public function scopeWithDeliveryStatus($query, $status)
+    {
+        return $query->where('delivery_status', $status);
+    }
 }

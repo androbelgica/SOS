@@ -27,6 +27,8 @@ A mobile-friendly web application built with **Laravel 12** and **React Kit** (i
 
 ## 4. User Roles
 
+-   **See also:** [Delivery/Courier Staff Module PRD](./DELIVERY_COURIER_MODULE_PRD.md) for details on the delivery staff role and features.
+
 ### 1. Admin/Owner
 
 -   Login/logout
@@ -53,6 +55,10 @@ A mobile-friendly web application built with **Laravel 12** and **React Kit** (i
 -   View order history and status
 -   **Pay for orders using Cash on Delivery (COD).**
 -   **See GCash and Maya as payment options marked as 'coming soon.'**
+
+### 3. Delivery/Courier Staff
+
+For a detailed breakdown of the delivery/courier staff role, dashboard, and workflow, refer to the [Delivery/Courier Staff Module PRD](./DELIVERY_COURIER_MODULE_PRD.md).
 
 ## 5. Core Features
 
@@ -182,3 +188,7 @@ You can sketch or prototype the following views:
 -   **Reliability**: Payment confirmation and error handling for GCash and Maya (when available)
 -   **Scalability**: Code modularity and clean architecture
 -   **Accessibility**: Color contrast and text size for mobile users
+
+## 9. Related Documentation
+
+-   [Delivery/Courier Staff Module PRD](./DELIVERY_COURIER_MODULE_PRD.md)

@@ -119,4 +119,12 @@ class User extends Authenticatable
     {
         return $this->unreadNotifications()->count();
     }
+
+    /**
+     * Orders assigned to this delivery staff.
+     */
+    public function deliveryAssignedOrders(): HasMany
+    {
+        return $this->hasMany(Order::class, 'assigned_to');
+    }
 }

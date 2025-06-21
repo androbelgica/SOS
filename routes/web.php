@@ -11,6 +11,8 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductLabelController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProductRecognitionController;
+use App\Http\Controllers\DeliveryOrderController;
+use App\Http\Middleware\DeliveryMiddleware;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -101,11 +103,20 @@ Route::get('/orders/{order}/verify/{product}', [ProductLabelController::class, '
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
         $user = Auth::user();
-
         if ($user->role === 'admin') {
             return redirect()->route('admin.dashboard');
         }
-
+        if ($user->role === 'delivery') {
+            $orders = \App\Models\Order::where('assigned_to', $user->id)
+                ->whereIn('delivery_status', ['for_delivery', 'out_for_delivery'])
+                ->with(['user', 'items.product'])
+                ->latest()
+                ->get();
+            return Inertia::render('Delivery/Dashboard', [
+                'orders' => $orders
+            ]);
+        }
+        // Default: customer dashboard
         return Inertia::render('Customer/Dashboard', [
             'orders' => \App\Models\Order::where('user_id', $user->id)
                 ->with('products')
@@ -120,7 +131,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ]);
     })->name('dashboard');
 
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::get('/profile', function () {
+        $user = Auth::user();
+        if ($user->role === 'delivery') {
+            return Inertia::render('Profile/DeliveryEdit', [
+                'mustVerifyEmail' => $user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail,
+                'status' => session('status'),
+            ]);
+        }
+        return Inertia::render('Profile/Edit', [
+            'mustVerifyEmail' => $user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail,
+            'status' => session('status'),
+        ]);
+    })->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
@@ -286,6 +309,15 @@ Route::get('/test-google-config', function () {
 // Route to get a fresh CSRF token
 Route::get('/csrf-token', function () {
     return response()->json(['token' => csrf_token()]);
+});
+
+// Delivery staff routes
+Route::middleware(['auth', DeliveryMiddleware::class])->prefix('delivery')->name('delivery.')->group(function () {
+    Route::get('/orders', [DeliveryOrderController::class, 'index'])->name('orders.index');
+    Route::post('/orders/{order}/accept', [DeliveryOrderController::class, 'accept'])->name('orders.accept');
+    Route::post('/orders/{order}/delivered', [DeliveryOrderController::class, 'markDelivered'])->name('orders.delivered');
+    Route::post('/orders/{order}/cancelled', [DeliveryOrderController::class, 'markCancelled'])->name('orders.cancelled');
+    Route::post('/orders/lookup-qr', [DeliveryOrderController::class, 'lookupByQr'])->name('orders.lookup-qr');
 });
 
 require __DIR__ . '/auth.php';

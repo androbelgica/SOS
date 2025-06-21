@@ -33,6 +33,11 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        $user = Auth::user();
+        if ($user && $user->role === 'delivery') {
+            return redirect()->intended(route('delivery.orders.index', absolute: false));
+        }
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 
