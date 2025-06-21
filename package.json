@@ -29,6 +29,10 @@
         "@inertiajs/react": "^2.0.11",
         "framer-motion": "^11.0.0",
         "html5-qrcode": "^2.3.8",
-        "react-hot-toast": "^2.5.2"
+        "laravel-echo": "^2.1.6",
+        "pusher-js": "^8.4.0",
+        "react-hot-toast": "^2.5.2",
+        "ziggy": "^2.4.0",
+        "ziggy-js": "^2.5.3"
     }
 }
