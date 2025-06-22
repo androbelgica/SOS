@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
         User::create([
             'name' => 'Admin User',
             'email' => 'admin@example.com',
-            'password' => Hash::make('password'),
+            'password' => Hash::make('C&CPassword@admin'),
             'role' => 'admin'
         ]);
 
@@ -28,7 +28,7 @@ class DatabaseSeeder extends Seeder
         User::create([
             'name' => 'Test User',
             'email' => 'test@example.com',
-            'password' => Hash::make('password'),
+            'password' => Hash::make('C&CPassword@user'),
             'role' => 'customer'
         ]);
 
@@ -36,82 +36,10 @@ class DatabaseSeeder extends Seeder
         $delivery1 = User::create([
             'name' => 'Delivery Staff 1',
             'email' => 'delivery1@example.com',
-            'password' => Hash::make('password'),
-            'role' => 'delivery'
-        ]);
-        $delivery2 = User::create([
-            'name' => 'Delivery Staff 2',
-            'email' => 'delivery2@example.com',
-            'password' => Hash::make('password'),
+            'password' => Hash::make('C&CPassword@delivery'),
             'role' => 'delivery'
         ]);
 
-        // Create a customer for orders
-        $customer = User::where('role', 'customer')->first();
-        // Create products if none exist
-        if (Product::count() < 3) {
-            Product::factory()->count(3)->create();
-        }
-        $products = Product::inRandomOrder()->take(3)->get();
-
-        // Seed sample orders for delivery1
-        foreach (['for_delivery', 'out_for_delivery'] as $status) {
-            $order = Order::create([
-                'user_id' => $customer->id,
-                'order_number' => Order::generateOrderNumber(),
-                'total_amount' => 0,
-                'status' => 'processing',
-                'shipping_address' => '123 Test St',
-                'billing_address' => '123 Test St',
-                'payment_status' => $status === 'out_for_delivery' ? 'paid' : 'pending',
-                'payment_method' => 'cod',
-                'assigned_to' => $delivery1->id,
-                'delivery_status' => $status,
-            ]);
-            $total = 0;
-            foreach ($products as $product) {
-                $qty = rand(1, 3);
-                $price = $product->price;
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'product_id' => $product->id,
-                    'quantity' => $qty,
-                    'price' => $price,
-                ]);
-                $total += $qty * $price;
-            }
-            $order->total_amount = $total;
-            $order->save();
-        }
-        // Seed sample orders for delivery2
-        foreach (['for_delivery', 'out_for_delivery'] as $status) {
-            $order = Order::create([
-                'user_id' => $customer->id,
-                'order_number' => Order::generateOrderNumber(),
-                'total_amount' => 0,
-                'status' => 'processing',
-                'shipping_address' => '456 Test Ave',
-                'billing_address' => '456 Test Ave',
-                'payment_status' => $status === 'out_for_delivery' ? 'paid' : 'pending',
-                'payment_method' => 'cod',
-                'assigned_to' => $delivery2->id,
-                'delivery_status' => $status,
-            ]);
-            $total = 0;
-            foreach ($products as $product) {
-                $qty = rand(1, 2);
-                $price = $product->price;
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'product_id' => $product->id,
-                    'quantity' => $qty,
-                    'price' => $price,
-                ]);
-                $total += $qty * $price;
-            }
-            $order->total_amount = $total;
-            $order->save();
-        }
 
         // Run other seeders
         $this->call([
