@@ -27,6 +27,9 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
+Route::get('/health', fn() => 'OK');
+
+
 // Old welcome page moved to /home route
 Route::get('/home', function () {
     return Inertia::render('Welcome', [
