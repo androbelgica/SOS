@@ -1,26 +1,25 @@
-# 🌐 Base PHP image with Composer, PHP 8.2, and extensions needed by Laravel
-FROM composer:2.7 as php-builder
+FROM php:8.2-cli-alpine
 
-# 🧰 Install PHP extensions and Node
-RUN apt-get update && apt-get install -y \
+# Install PHP extensions and system dependencies
+RUN apk update && apk add --no-cache \
     git unzip curl zip \
-    php8.2-cli php8.2-mbstring php8.2-xml php8.2-curl php8.2-sqlite3 php8.2-gd php8.2-bcmath php8.2-tokenizer php8.2-fileinfo php8.2-pdo php8.2-pdo-sqlite php8.2-intl \
+    php8-pecl-pdo_sqlite php8-pecl-intl php8-pecl-mbstring php8-pecl-xml php8-pecl-curl php8-pecl-gd php8-pecl-bcmath \
     nodejs npm
 
-# ✅ Set working directory
+# Set working directory
 WORKDIR /app
 
-# 📁 Copy all files
+# Copy existing application
 COPY . .
 
-# 📦 Install backend dependencies
+# Install composer
+RUN curl -sS https://getcomposer.org/installer | php && \
+    mv composer.phar /usr/local/bin/composer
+
+# Install backend dependencies
 RUN composer install --optimize-autoloader --no-dev
 
-# 📦 Install frontend dependencies and build
+# Install frontend dependencies and build
 RUN npm install && npm run build
 
-# 🧼 Clean up
-RUN rm -rf node_modules && npm cache clean --force
-
-# 🚀 Start Laravel (optional: could be managed by a process manager or web server)
-CMD php artisan serve --host=0.0.0.0 --port=3000
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
