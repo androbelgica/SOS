@@ -6,7 +6,7 @@ import MainLayout from "@/Layouts/MainLayout";
 import { getImageProps } from "@/Utils/imageHelpers";
 import CommentSection from "@/Components/CommentSection";
 import ReactionButton from "@/Components/ReactionButton";
-import "../echo"; // Ensure Echo is initialized
+// mport "../echo"; // Ensure Echo is initialized
 
 // Function to convert YouTube URL to embed URL
 const getYouTubeEmbedUrl = (url) => {

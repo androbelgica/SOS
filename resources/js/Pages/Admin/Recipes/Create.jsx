@@ -19,9 +19,12 @@ export default function Create({ auth, products }) {
     const [imageBrowserOpen, setImageBrowserOpen] = useState(false);
 
     // AI generation states
-    const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
-    const [isGeneratingIngredients, setIsGeneratingIngredients] = useState(false);
-    const [isGeneratingInstructions, setIsGeneratingInstructions] = useState(false);
+    const [isGeneratingDescription, setIsGeneratingDescription] =
+        useState(false);
+    const [isGeneratingIngredients, setIsGeneratingIngredients] =
+        useState(false);
+    const [isGeneratingInstructions, setIsGeneratingInstructions] =
+        useState(false);
     const [generationError, setGenerationError] = useState(null);
 
     // For dynamic ingredients and instructions
@@ -35,7 +38,7 @@ export default function Create({ auth, products }) {
 
     // Function to generate recipe description using AI
     const generateRecipeDescription = async () => {
-        if (!data.title || data.title.trim() === '') {
+        if (!data.title || data.title.trim() === "") {
             setGenerationError("Please enter a recipe title first");
             return;
         }
@@ -44,21 +47,30 @@ export default function Create({ auth, products }) {
         setGenerationError(null);
 
         try {
-            const response = await axios.post(route('api.ai.generate-recipe-description'), {
-                recipe_title: data.title
-            });
+            const response = await axios.post(
+                route("api.ai.generate-recipe-description"),
+                {
+                    recipe_title: data.title,
+                }
+            );
 
             if (response.data.success) {
                 setData({
                     ...data,
-                    description: response.data.description || data.description
+                    description: response.data.description || data.description,
                 });
             } else {
-                setGenerationError(response.data.message || "Failed to generate recipe description");
+                setGenerationError(
+                    response.data.message ||
+                        "Failed to generate recipe description"
+                );
             }
         } catch (error) {
             console.error("AI Description Generation Error:", error);
-            setGenerationError(error.response?.data?.message || "An error occurred during description generation");
+            setGenerationError(
+                error.response?.data?.message ||
+                    "An error occurred during description generation"
+            );
         } finally {
             setIsGeneratingDescription(false);
         }
@@ -66,7 +78,7 @@ export default function Create({ auth, products }) {
 
     // Function to generate recipe ingredients using AI
     const generateRecipeIngredients = async () => {
-        if (!data.title || data.title.trim() === '') {
+        if (!data.title || data.title.trim() === "") {
             setGenerationError("Please enter a recipe title first");
             return;
         }
@@ -75,22 +87,35 @@ export default function Create({ auth, products }) {
         setGenerationError(null);
 
         try {
-            const response = await axios.post(route('api.ai.generate-recipe-ingredients'), {
-                recipe_title: data.title
-            });
+            const response = await axios.post(
+                route("api.ai.generate-recipe-ingredients"),
+                {
+                    recipe_title: data.title,
+                }
+            );
 
-            if (response.data.success && response.data.ingredients && response.data.ingredients.length > 0) {
+            if (
+                response.data.success &&
+                response.data.ingredients &&
+                response.data.ingredients.length > 0
+            ) {
                 setIngredients(response.data.ingredients);
                 setData({
                     ...data,
-                    ingredients: response.data.ingredients
+                    ingredients: response.data.ingredients,
                 });
             } else {
-                setGenerationError(response.data.message || "Failed to generate recipe ingredients");
+                setGenerationError(
+                    response.data.message ||
+                        "Failed to generate recipe ingredients"
+                );
             }
         } catch (error) {
             console.error("AI Ingredients Generation Error:", error);
-            setGenerationError(error.response?.data?.message || "An error occurred during ingredients generation");
+            setGenerationError(
+                error.response?.data?.message ||
+                    "An error occurred during ingredients generation"
+            );
         } finally {
             setIsGeneratingIngredients(false);
         }
@@ -98,7 +123,7 @@ export default function Create({ auth, products }) {
 
     // Function to generate recipe instructions using AI
     const generateRecipeInstructions = async () => {
-        if (!data.title || data.title.trim() === '') {
+        if (!data.title || data.title.trim() === "") {
             setGenerationError("Please enter a recipe title first");
             return;
         }
@@ -107,22 +132,35 @@ export default function Create({ auth, products }) {
         setGenerationError(null);
 
         try {
-            const response = await axios.post(route('api.ai.generate-recipe-instructions'), {
-                recipe_title: data.title
-            });
+            const response = await axios.post(
+                route("api.ai.generate-recipe-instructions"),
+                {
+                    recipe_title: data.title,
+                }
+            );
 
-            if (response.data.success && response.data.instructions && response.data.instructions.length > 0) {
+            if (
+                response.data.success &&
+                response.data.instructions &&
+                response.data.instructions.length > 0
+            ) {
                 setInstructions(response.data.instructions);
                 setData({
                     ...data,
-                    instructions: response.data.instructions
+                    instructions: response.data.instructions,
                 });
             } else {
-                setGenerationError(response.data.message || "Failed to generate recipe instructions");
+                setGenerationError(
+                    response.data.message ||
+                        "Failed to generate recipe instructions"
+                );
             }
         } catch (error) {
             console.error("AI Instructions Generation Error:", error);
-            setGenerationError(error.response?.data?.message || "An error occurred during instructions generation");
+            setGenerationError(
+                error.response?.data?.message ||
+                    "An error occurred during instructions generation"
+            );
         } finally {
             setIsGeneratingInstructions(false);
         }
@@ -159,7 +197,7 @@ export default function Create({ auth, products }) {
 
     // Handle selecting an existing image from the browser
     const handleExistingImageSelect = (image) => {
-        console.log('Selected image:', image);
+        console.log("Selected image:", image);
 
         // Set the image URL directly in the form data
         // We'll use a special format to indicate this is an existing image
@@ -170,47 +208,65 @@ export default function Create({ auth, products }) {
             // First try the original URL
             const img1 = new Image();
             img1.onload = () => {
-                console.log('Original URL loaded successfully:', originalUrl);
+                console.log("Original URL loaded successfully:", originalUrl);
                 callback(originalUrl);
             };
             img1.onerror = () => {
-                console.error('Original URL failed:', originalUrl);
+                console.error("Original URL failed:", originalUrl);
 
                 // Try alternative URL 1: add 'public/' after '/storage/'
-                const altUrl1 = originalUrl.replace('/storage/', '/storage/public/');
-                console.log('Trying alternative URL 1:', altUrl1);
+                const altUrl1 = originalUrl.replace(
+                    "/storage/",
+                    "/storage/public/"
+                );
+                console.log("Trying alternative URL 1:", altUrl1);
 
                 const img2 = new Image();
                 img2.onload = () => {
-                    console.log('Alternative URL 1 loaded successfully:', altUrl1);
+                    console.log(
+                        "Alternative URL 1 loaded successfully:",
+                        altUrl1
+                    );
                     callback(altUrl1);
                 };
                 img2.onerror = () => {
-                    console.error('Alternative URL 1 failed:', altUrl1);
+                    console.error("Alternative URL 1 failed:", altUrl1);
 
                     // Try alternative URL 2: try direct path for recipes
-                    const altUrl2 = originalUrl.replace('/storage/recipes/', '/storage/public/recipes/');
-                    console.log('Trying alternative URL 2:', altUrl2);
+                    const altUrl2 = originalUrl.replace(
+                        "/storage/recipes/",
+                        "/storage/public/recipes/"
+                    );
+                    console.log("Trying alternative URL 2:", altUrl2);
 
                     const img3 = new Image();
                     img3.onload = () => {
-                        console.log('Alternative URL 2 loaded successfully:', altUrl2);
+                        console.log(
+                            "Alternative URL 2 loaded successfully:",
+                            altUrl2
+                        );
                         callback(altUrl2);
                     };
                     img3.onerror = () => {
-                        console.error('Alternative URL 2 failed:', altUrl2);
+                        console.error("Alternative URL 2 failed:", altUrl2);
 
                         // Try alternative URL 3: try with double public
-                        const altUrl3 = originalUrl.replace('/storage/recipes/', '/storage/public/public/recipes/');
-                        console.log('Trying alternative URL 3:', altUrl3);
+                        const altUrl3 = originalUrl.replace(
+                            "/storage/recipes/",
+                            "/storage/public/public/recipes/"
+                        );
+                        console.log("Trying alternative URL 3:", altUrl3);
 
                         const img4 = new Image();
                         img4.onload = () => {
-                            console.log('Alternative URL 3 loaded successfully:', altUrl3);
+                            console.log(
+                                "Alternative URL 3 loaded successfully:",
+                                altUrl3
+                            );
                             callback(altUrl3);
                         };
                         img4.onerror = () => {
-                            console.error('Alternative URL 3 failed:', altUrl3);
+                            console.error("Alternative URL 3 failed:", altUrl3);
                             // Fall back to the original URL
                             callback(originalUrl);
                         };
@@ -246,7 +302,10 @@ export default function Create({ auth, products }) {
         const newIngredients = [...ingredients];
         newIngredients[index] = value;
         setIngredients(newIngredients);
-        setData("ingredients", newIngredients.filter(item => item.trim() !== ""));
+        setData(
+            "ingredients",
+            newIngredients.filter((item) => item.trim() !== "")
+        );
     };
 
     // Add new ingredient field
@@ -259,7 +318,10 @@ export default function Create({ auth, products }) {
         const newIngredients = [...ingredients];
         newIngredients.splice(index, 1);
         setIngredients(newIngredients);
-        setData("ingredients", newIngredients.filter(item => item.trim() !== ""));
+        setData(
+            "ingredients",
+            newIngredients.filter((item) => item.trim() !== "")
+        );
     };
 
     // Handle instruction changes
@@ -267,7 +329,10 @@ export default function Create({ auth, products }) {
         const newInstructions = [...instructions];
         newInstructions[index] = value;
         setInstructions(newInstructions);
-        setData("instructions", newInstructions.filter(item => item.trim() !== ""));
+        setData(
+            "instructions",
+            newInstructions.filter((item) => item.trim() !== "")
+        );
     };
 
     // Add new instruction field
@@ -280,15 +345,24 @@ export default function Create({ auth, products }) {
         const newInstructions = [...instructions];
         newInstructions.splice(index, 1);
         setInstructions(newInstructions);
-        setData("instructions", newInstructions.filter(item => item.trim() !== ""));
+        setData(
+            "instructions",
+            newInstructions.filter((item) => item.trim() !== "")
+        );
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
         // Update ingredients and instructions before submitting
-        setData("ingredients", ingredients.filter(item => item.trim() !== ""));
-        setData("instructions", instructions.filter(item => item.trim() !== ""));
+        setData(
+            "ingredients",
+            ingredients.filter((item) => item.trim() !== "")
+        );
+        setData(
+            "instructions",
+            instructions.filter((item) => item.trim() !== "")
+        );
 
         post(route("admin.recipes.store"), {
             forceFormData: true,
@@ -341,14 +415,14 @@ export default function Create({ auth, products }) {
                                             htmlFor="description"
                                             value="Description"
                                         />
-                                        <button
+                                        {/* <button
                                             type="button"
                                             onClick={generateRecipeDescription}
                                             disabled={isGeneratingDescription || !data.title}
                                             className="px-2 py-1 text-xs bg-green-600 dark:bg-green-500 text-white rounded-md hover:bg-green-700 dark:hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-green-400 dark:focus:ring-offset-gray-800 disabled:opacity-50"
                                         >
                                             {isGeneratingDescription ? "Generating..." : "Generate with AI"}
-                                        </button>
+                                        </button> */}
                                     </div>
                                     <textarea
                                         id="description"
@@ -368,9 +442,16 @@ export default function Create({ auth, products }) {
                                         className="mt-2"
                                     />
                                     {generationError && (
-                                        <div className="mt-2 bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded relative" role="alert">
-                                            <strong className="font-bold">Error: </strong>
-                                            <span className="block sm:inline">{generationError}</span>
+                                        <div
+                                            className="mt-2 bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded relative"
+                                            role="alert"
+                                        >
+                                            <strong className="font-bold">
+                                                Error:{" "}
+                                            </strong>
+                                            <span className="block sm:inline">
+                                                {generationError}
+                                            </span>
                                         </div>
                                     )}
                                 </div>
@@ -442,14 +523,17 @@ export default function Create({ auth, products }) {
                                         />
                                         <button
                                             type="button"
-                                            onClick={() => setImageBrowserOpen(true)}
+                                            onClick={() =>
+                                                setImageBrowserOpen(true)
+                                            }
                                             className="px-4 py-2 bg-indigo-600 dark:bg-indigo-500 text-white rounded-md hover:bg-indigo-700 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 dark:focus:ring-offset-gray-800 whitespace-nowrap"
                                         >
                                             Browse Existing Images
                                         </button>
                                     </div>
                                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                        Upload a new image or select an existing one from the recipes folder.
+                                        Upload a new image or select an existing
+                                        one from the recipes folder.
                                     </p>
                                     <InputError
                                         message={errors.image}
@@ -462,10 +546,14 @@ export default function Create({ auth, products }) {
                                                 alt="Preview"
                                                 className="h-32 w-32 object-cover rounded-md"
                                                 onError={(e) => {
-                                                    console.error('Image preview failed to load:', imagePreview);
+                                                    console.error(
+                                                        "Image preview failed to load:",
+                                                        imagePreview
+                                                    );
                                                     e.target.onerror = null;
                                                     // Use a data URI for the placeholder image
-                                                    e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIiBmaWxsPSIjYWFhYWFhIj5JbWFnZSBOb3QgRm91bmQ8L3RleHQ+PC9zdmc+';
+                                                    e.target.src =
+                                                        "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIiBmaWxsPSIjYWFhYWFhIj5JbWFnZSBOb3QgRm91bmQ8L3RleHQ+PC9zdmc+";
                                                 }}
                                             />
                                         </div>
@@ -485,7 +573,8 @@ export default function Create({ auth, products }) {
                                         accept="video/mp4,video/quicktime,video/x-msvideo,video/x-flv,video/x-ms-wmv"
                                     />
                                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                        Supported formats: MP4, MOV, AVI, FLV, WMV (max 20MB)
+                                        Supported formats: MP4, MOV, AVI, FLV,
+                                        WMV (max 20MB)
                                     </p>
                                     <InputError
                                         message={errors.video}
@@ -512,13 +601,17 @@ export default function Create({ auth, products }) {
                                         type="url"
                                         value={data.youtube_url}
                                         onChange={(e) =>
-                                            setData("youtube_url", e.target.value)
+                                            setData(
+                                                "youtube_url",
+                                                e.target.value
+                                            )
                                         }
                                         className="mt-1 block w-full"
                                         placeholder="https://www.youtube.com/watch?v=..."
                                     />
                                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                        Enter a YouTube video URL (e.g., https://www.youtube.com/watch?v=...)
+                                        Enter a YouTube video URL (e.g.,
+                                        https://www.youtube.com/watch?v=...)
                                     </p>
                                     <InputError
                                         message={errors.youtube_url}
@@ -528,7 +621,9 @@ export default function Create({ auth, products }) {
 
                                 {progress && (
                                     <div className="mt-2">
-                                        <p className="text-sm text-gray-600 mb-1">Uploading files...</p>
+                                        <p className="text-sm text-gray-600 mb-1">
+                                            Uploading files...
+                                        </p>
                                         <progress
                                             value={progress.percentage}
                                             max="100"
@@ -542,14 +637,14 @@ export default function Create({ auth, products }) {
                                 <div>
                                     <div className="flex justify-between items-center">
                                         <InputLabel value="Ingredients" />
-                                        <button
+                                        {/* <button
                                             type="button"
                                             onClick={generateRecipeIngredients}
                                             disabled={isGeneratingIngredients || !data.title}
                                             className="px-2 py-1 text-xs bg-green-600 dark:bg-green-500 text-white rounded-md hover:bg-green-700 dark:hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-green-400 dark:focus:ring-offset-gray-800 disabled:opacity-50"
                                         >
                                             {isGeneratingIngredients ? "Generating..." : "Generate with AI"}
-                                        </button>
+                                        </button> */}
                                     </div>
                                     {ingredients.map((ingredient, index) => (
                                         <div
@@ -600,14 +695,19 @@ export default function Create({ auth, products }) {
                                 <div>
                                     <div className="flex justify-between items-center">
                                         <InputLabel value="Instructions" />
-                                        <button
+                                        {/* <button
                                             type="button"
                                             onClick={generateRecipeInstructions}
-                                            disabled={isGeneratingInstructions || !data.title}
+                                            disabled={
+                                                isGeneratingInstructions ||
+                                                !data.title
+                                            }
                                             className="px-2 py-1 text-xs bg-green-600 dark:bg-green-500 text-white rounded-md hover:bg-green-700 dark:hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-green-400 dark:focus:ring-offset-gray-800 disabled:opacity-50"
                                         >
-                                            {isGeneratingInstructions ? "Generating..." : "Generate with AI"}
-                                        </button>
+                                            {isGeneratingInstructions
+                                                ? "Generating..."
+                                                : "Generate with AI"}
+                                        </button> */}
                                     </div>
                                     {instructions.map((instruction, index) => (
                                         <div
