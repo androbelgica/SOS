@@ -13,13 +13,10 @@ RUN curl -sS https://getcomposer.org/installer | php && \
 # Set working directory
 WORKDIR /app
 
-# Copy all source code
+# Copy app files
 COPY . .
 
-# Install dependencies and build
-RUN composer install --optimize-autoloader --no-dev && \
-    npm install && \
-    npm run build
-
-# Laravel serve
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=3000"]
+# Separate install steps for better error tracking
+RUN composer install --optimize-autoloader --no-dev
+RUN npm install
+RUN npm run build
