@@ -8,7 +8,11 @@ import InputError from "@/Components/InputError";
 import ImageBrowser from "@/Components/ImageBrowser";
 import CameraCapture from "@/Components/CameraCapture";
 import ProductRecognition from "@/Components/ProductRecognition";
-import { getImageProps, getImageUrl, getFallbackImage } from "@/Utils/imageHelpers";
+import {
+    getImageProps,
+    getImageUrl,
+    getFallbackImage,
+} from "@/Utils/imageHelpers";
 
 export default function Create({ auth, recipes, categories }) {
     const { asset } = usePage().props;
@@ -30,7 +34,7 @@ export default function Create({ auth, recipes, categories }) {
 
     // Function to generate product info using AI
     const generateProductInfo = async () => {
-        if (!data.name || data.name.trim() === '') {
+        if (!data.name || data.name.trim() === "") {
             setGenerationError("Please enter a product name first");
             return;
         }
@@ -39,22 +43,37 @@ export default function Create({ auth, recipes, categories }) {
         setGenerationError(null);
 
         try {
-            const response = await axios.post(route('api.ai.generate-product-info'), {
-                product_name: data.name
-            });
+            const response = await axios.post(
+                route("api.ai.generate-product-info"),
+                {
+                    product_name: data.name,
+                }
+            );
 
             if (response.data.success) {
-                setData({
-                    ...data,
-                    description: response.data.description || data.description,
-                    nutritional_facts: response.data.nutritional_facts || data.nutritional_facts
-                });
+                // ✅ Use individual field updates
+                if (response.data.description) {
+                    setData("description", response.data.description);
+                }
+
+                if (response.data.nutritional_facts) {
+                    setData(
+                        "nutritional_facts",
+                        response.data.nutritional_facts
+                    );
+                }
             } else {
-                setGenerationError(response.data.message || "Failed to generate product information");
+                setGenerationError(
+                    response.data.message ||
+                        "Failed to generate product information"
+                );
             }
         } catch (error) {
             console.error("AI Generation Error:", error);
-            setGenerationError(error.response?.data?.message || "An error occurred during generation");
+            setGenerationError(
+                error.response?.data?.message ||
+                    "An error occurred during generation"
+            );
         } finally {
             setIsGenerating(false);
         }
@@ -111,9 +130,9 @@ export default function Create({ auth, recipes, categories }) {
         setData("image_url", null);
         setImagePreview(null);
         // Reset the file input
-        const fileInput = document.getElementById('image');
+        const fileInput = document.getElementById("image");
         if (fileInput) {
-            fileInput.value = '';
+            fileInput.value = "";
         }
     };
 
@@ -122,36 +141,61 @@ export default function Create({ auth, recipes, categories }) {
         const analysis = recognitionData.analysis;
 
         // Auto-fill form fields based on recognition results
-        if (analysis.suggested_products && analysis.suggested_products.length > 0) {
+        if (
+            analysis.suggested_products &&
+            analysis.suggested_products.length > 0
+        ) {
             const topSuggestion = analysis.suggested_products[0];
 
             // Only fill empty fields to avoid overwriting user input
             if (!data.name && topSuggestion.name) {
-                setData(prev => ({ ...prev, name: topSuggestion.name }));
+                setData((prev) => ({ ...prev, name: topSuggestion.name }));
             }
             if (!data.description && topSuggestion.description) {
-                setData(prev => ({ ...prev, description: topSuggestion.description }));
+                setData((prev) => ({
+                    ...prev,
+                    description: topSuggestion.description,
+                }));
             }
             if (!data.price && topSuggestion.price) {
-                setData(prev => ({ ...prev, price: topSuggestion.price.toString() }));
+                setData((prev) => ({
+                    ...prev,
+                    price: topSuggestion.price.toString(),
+                }));
             }
         }
 
         // Set category based on detected seafood type
-        if (analysis.seafood_detected && analysis.labels && analysis.labels.length > 0) {
+        if (
+            analysis.seafood_detected &&
+            analysis.labels &&
+            analysis.labels.length > 0
+        ) {
             const topLabel = analysis.labels[0].description.toLowerCase();
-            let suggestedCategory = '';
+            let suggestedCategory = "";
 
-            if (topLabel.includes('fish') || topLabel.includes('salmon') || topLabel.includes('tuna')) {
-                suggestedCategory = 'fish';
-            } else if (topLabel.includes('shrimp') || topLabel.includes('crab') || topLabel.includes('lobster')) {
-                suggestedCategory = 'crustaceans';
-            } else if (topLabel.includes('oyster') || topLabel.includes('mussel') || topLabel.includes('clam')) {
-                suggestedCategory = 'shellfish';
+            if (
+                topLabel.includes("fish") ||
+                topLabel.includes("salmon") ||
+                topLabel.includes("tuna")
+            ) {
+                suggestedCategory = "fish";
+            } else if (
+                topLabel.includes("shrimp") ||
+                topLabel.includes("crab") ||
+                topLabel.includes("lobster")
+            ) {
+                suggestedCategory = "crustaceans";
+            } else if (
+                topLabel.includes("oyster") ||
+                topLabel.includes("mussel") ||
+                topLabel.includes("clam")
+            ) {
+                suggestedCategory = "shellfish";
             }
 
             if (suggestedCategory && !data.category) {
-                setData(prev => ({ ...prev, category: suggestedCategory }));
+                setData((prev) => ({ ...prev, category: suggestedCategory }));
             }
         }
 
@@ -187,10 +231,15 @@ export default function Create({ auth, recipes, categories }) {
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 <div>
                                     <div className="flex justify-between items-center">
-                                        <InputLabel htmlFor="name" value="Name" />
+                                        <InputLabel
+                                            htmlFor="name"
+                                            value="Name"
+                                        />
                                         <button
                                             type="button"
-                                            onClick={() => setRecognitionOpen(true)}
+                                            onClick={() =>
+                                                setRecognitionOpen(true)
+                                            }
                                             className="px-3 py-1 text-xs bg-purple-600 dark:bg-purple-500 text-white rounded-md hover:bg-purple-700 dark:hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 dark:focus:ring-purple-400 dark:focus:ring-offset-gray-800"
                                         >
                                             🔍 Scan Product
@@ -221,10 +270,14 @@ export default function Create({ auth, recipes, categories }) {
                                         <button
                                             type="button"
                                             onClick={generateProductInfo}
-                                            disabled={isGenerating || !data.name}
+                                            disabled={
+                                                isGenerating || !data.name
+                                            }
                                             className="px-2 py-1 text-xs bg-green-600 dark:bg-green-500 text-white rounded-md hover:bg-green-700 dark:hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-green-400 dark:focus:ring-offset-gray-800 disabled:opacity-50"
                                         >
-                                            {isGenerating ? "Generating..." : "Generate with AI"}
+                                            {isGenerating
+                                                ? "Generating..."
+                                                : "Generate with AI"}
                                         </button>
                                     </div>
                                     <textarea
@@ -253,7 +306,16 @@ export default function Create({ auth, recipes, categories }) {
                                     />
                                     <textarea
                                         id="nutritional_facts"
-                                        value={data.nutritional_facts}
+                                        value={
+                                            typeof data.nutritional_facts ===
+                                            "object"
+                                                ? JSON.stringify(
+                                                      data.nutritional_facts,
+                                                      null,
+                                                      2
+                                                  )
+                                                : data.nutritional_facts
+                                        }
                                         onChange={(e) =>
                                             setData(
                                                 "nutritional_facts",
@@ -271,9 +333,16 @@ export default function Create({ auth, recipes, categories }) {
                                 </div>
 
                                 {generationError && (
-                                    <div className="bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded relative" role="alert">
-                                        <strong className="font-bold">Error: </strong>
-                                        <span className="block sm:inline">{generationError}</span>
+                                    <div
+                                        className="bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded relative"
+                                        role="alert"
+                                    >
+                                        <strong className="font-bold">
+                                            Error:{" "}
+                                        </strong>
+                                        <span className="block sm:inline">
+                                            {generationError}
+                                        </span>
                                     </div>
                                 )}
 
@@ -346,11 +415,16 @@ export default function Create({ auth, recipes, categories }) {
                                             <option value="">
                                                 Select a category
                                             </option>
-                                            {categories && categories.map((category) => (
-                                                <option key={category.value} value={category.value}>
-                                                    {category.icon} {category.label}
-                                                </option>
-                                            ))}
+                                            {categories &&
+                                                categories.map((category) => (
+                                                    <option
+                                                        key={category.value}
+                                                        value={category.value}
+                                                    >
+                                                        {category.icon}{" "}
+                                                        {category.label}
+                                                    </option>
+                                                ))}
                                         </select>
                                         <InputError
                                             message={errors.category}
@@ -375,8 +449,12 @@ export default function Create({ auth, recipes, categories }) {
                                             className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-300 dark:focus:border-blue-400 focus:ring focus:ring-blue-200 dark:focus:ring-blue-400"
                                             required
                                         >
-                                            <option value="piece">By Piece</option>
-                                            <option value="kg">By Kilogram (kg)</option>
+                                            <option value="piece">
+                                                By Piece
+                                            </option>
+                                            <option value="kg">
+                                                By Kilogram (kg)
+                                            </option>
                                         </select>
                                         <InputError
                                             message={errors.unit_type}
@@ -401,14 +479,18 @@ export default function Create({ auth, recipes, categories }) {
                                         <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                                             <button
                                                 type="button"
-                                                onClick={() => setCameraOpen(true)}
+                                                onClick={() =>
+                                                    setCameraOpen(true)
+                                                }
                                                 className="px-4 py-2 bg-green-600 dark:bg-green-500 text-white rounded-md hover:bg-green-700 dark:hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-green-400 dark:focus:ring-offset-gray-800 whitespace-nowrap"
                                             >
                                                 📷 Take Photo
                                             </button>
                                             <button
                                                 type="button"
-                                                onClick={() => setImageBrowserOpen(true)}
+                                                onClick={() =>
+                                                    setImageBrowserOpen(true)
+                                                }
                                                 className="px-4 py-2 bg-indigo-600 dark:bg-indigo-500 text-white rounded-md hover:bg-indigo-700 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 dark:focus:ring-offset-gray-800 whitespace-nowrap"
                                             >
                                                 Browse Existing Images
@@ -425,7 +507,9 @@ export default function Create({ auth, recipes, categories }) {
                                         </div>
                                     </div>
                                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                        Upload a new image, take a photo with your camera, or select an existing one from the products folder.
+                                        Upload a new image, take a photo with
+                                        your camera, or select an existing one
+                                        from the products folder.
                                     </p>
                                     {progress && (
                                         <div className="mt-2">
@@ -448,7 +532,9 @@ export default function Create({ auth, recipes, categories }) {
                                     />
                                     <div className="mt-4">
                                         <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-                                            {imagePreview ? "Image Preview:" : "No image selected:"}
+                                            {imagePreview
+                                                ? "Image Preview:"
+                                                : "No image selected:"}
                                         </p>
                                         {imagePreview ? (
                                             // New image preview from file input
@@ -456,17 +542,24 @@ export default function Create({ auth, recipes, categories }) {
                                                 <img
                                                     src={imagePreview}
                                                     alt="Product preview"
-                                                    className="h-32 w-32 object-cover rounded-lg border border-gray-200 dark:border-gray-700"
+                                                    className="h-32 w-32 object-contain rounded-lg border border-gray-200 dark:border-gray-700 bg-white"
                                                 />
-                                                <div className="absolute top-0 right-0 bg-green-500 text-white text-xs px-1 rounded-bl">New</div>
+
+                                                <div className="absolute top-0 right-0 bg-green-500 text-white text-xs px-1 rounded-bl">
+                                                    New
+                                                </div>
                                             </div>
                                         ) : (
                                             // No image placeholder - use a simple div instead of trying to load an image
                                             <div className="relative">
                                                 <div className="h-32 w-32 flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-700">
-                                                    <span className="text-gray-400 dark:text-gray-500">No image</span>
+                                                    <span className="text-gray-400 dark:text-gray-500">
+                                                        No image
+                                                    </span>
                                                 </div>
-                                                <div className="absolute top-0 right-0 bg-gray-500 text-white text-xs px-1 rounded-bl">Placeholder</div>
+                                                <div className="absolute top-0 right-0 bg-gray-500 text-white text-xs px-1 rounded-bl">
+                                                    Placeholder
+                                                </div>
                                             </div>
                                         )}
                                     </div>

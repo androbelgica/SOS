@@ -13,12 +13,15 @@ export default function Index({ auth, orders }) {
         sort_by: "created_at",
         sort_direction: "desc",
     });
-
     const statusColors = {
         pending:
             "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200",
         processing:
             "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200",
+        for_delivery:
+            "bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200",
+        out_for_delivery:
+            "bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200",
         delivered:
             "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200",
         cancelled: "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200",
@@ -35,6 +38,7 @@ export default function Index({ auth, orders }) {
             "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200",
         paid: "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200",
         failed: "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200",
+        cancelled: "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200",
     };
 
     // Filter orders based on all criteria
@@ -695,7 +699,7 @@ export default function Index({ auth, orders }) {
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                     <div className="flex flex-col sm:flex-row gap-2">
-                                                        <select
+                                                        {/* <select
                                                             className="rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-indigo-500 focus:border-indigo-500"
                                                             value={order.status}
                                                             onChange={(e) =>
@@ -722,7 +726,7 @@ export default function Index({ auth, orders }) {
                                                             <option value="cancelled">
                                                                 Cancelled
                                                             </option>
-                                                        </select>
+                                                        </select> */}
                                                         <Link
                                                             href={route(
                                                                 "admin.orders.show",
@@ -754,7 +758,7 @@ export default function Index({ auth, orders }) {
                                                                     d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
                                                                 />
                                                             </svg>
-                                                            View Details
+                                                            View
                                                         </Link>
                                                     </div>
                                                 </td>

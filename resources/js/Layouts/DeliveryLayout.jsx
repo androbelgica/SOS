@@ -13,7 +13,20 @@ const DeliveryLayout = ({ children }) => {
                 <div className="max-w-4xl mx-auto flex items-center justify-between py-4 px-4">
                     <div className="flex items-center gap-4">
                         <Link href="/">
-                            <ApplicationLogo className="h-8 w-auto text-blue-600" />
+                            <img
+                                src="/storage/brand/C&C_image.png"
+                                alt="Cart & Cook"
+                                className="h-12 w-auto"
+                                onError={(e) => {
+                                    console.error("Failed to load logo image");
+                                    // Try with a different path as fallback
+                                    e.target.src = "/brand/C&C_image.png";
+                                    // If that fails too, use a text fallback
+                                    e.target.onerror = () => {
+                                        e.target.style.display = "none";
+                                    };
+                                }}
+                            />
                         </Link>
                         <Link
                             href="/dashboard"

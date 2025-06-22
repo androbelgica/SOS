@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Log;
 class OpenAIService
 {
     protected $apiKey;
-    protected $baseUrl = 'https://api.openai.com/v1';
+    protected $baseUrl = 'https://openrouter.ai/api/v1';
     protected $model = 'gpt-3.5-turbo';
 
     public function __construct()
@@ -25,23 +25,12 @@ class OpenAIService
     public function generateProductInfo(string $productName): array
     {
         try {
-            // For testing purposes, generate enhanced mock data based on product name
-            $fishData = $this->getFishData($productName);
-
-            return [
-                'success' => true,
-                'description' => $fishData['description'],
-                'nutritional_facts' => $fishData['nutritional_facts']
-            ];
-
-            /*
-            // Disable SSL verification in local environment to avoid certificate issues
             $http = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $this->apiKey,
                 'Content-Type' => 'application/json',
+                'HTTP-Referer' => 'https://127.0.0.1', // Replace with your actual domain
             ]);
 
-            // Disable SSL verification in development environments
             if (app()->environment('local')) {
                 $http->withoutVerifying();
             }
@@ -55,17 +44,40 @@ class OpenAIService
                     ],
                     [
                         'role' => 'user',
-                        'content' => "Generate a detailed product description and nutritional facts for the seafood product: {$productName}.
-                        Format your response as JSON with two fields: 'description' and 'nutritional_facts'.
-                        The description should be 2-3 sentences highlighting the product's qualities, taste, and potential uses.
-                        The nutritional facts should include calories, protein, fats, and other relevant nutritional information per 100g serving."
+                        'content' => "Generate a detailed product description and nutritional facts for the seafood product: {$productName}. Format your response as JSON with two fields: 'description' and 'nutritional_facts'."
                     ]
                 ],
                 'temperature' => 0.7,
                 'max_tokens' => 500,
                 'response_format' => ['type' => 'json_object']
             ]);
-            */
+
+            $data = $response->json();
+
+            $content = $data['choices'][0]['message']['content'] ?? '';
+
+            // Decode AI JSON string
+            $parsed = json_decode($content, true);
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                return [
+                    'success' => false,
+                    'message' => 'Invalid JSON returned by the AI model.'
+                ];
+            }
+
+            // If nutritional_facts is an object, convert it to readable string
+            $nutritionalFacts = $parsed['nutritional_facts'] ?? '';
+
+            if (is_array($nutritionalFacts)) {
+                $nutritionalFacts = $this->formatNutritionalFacts($nutritionalFacts);
+            }
+
+            return [
+                'success' => true,
+                'description' => $parsed['description'] ?? '',
+                'nutritional_facts' => $nutritionalFacts
+            ];
         } catch (\Exception $e) {
             Log::error('OpenAI Service Exception', [
                 'message' => $e->getMessage(),
@@ -78,6 +90,49 @@ class OpenAIService
             ];
         }
     }
+    /**
+     * Converts an array of nutritional facts to a human-readable string
+     */
+    private function formatNutritionalFacts(array $facts): string
+    {
+        $map = [
+            'calories' => 'Calories',
+            'protein' => 'Protein',
+            'total_fat' => 'Fat',
+            'saturated_fat' => 'Saturated Fat',
+            'cholesterol' => 'Cholesterol',
+            'sodium' => 'Sodium',
+            'carbohydrates' => 'Carbohydrates',
+            'fiber' => 'Fiber',
+            'sugars' => 'Sugars',
+            'serving_size' => 'Serving Size',
+        ];
+
+        $units = [
+            'calories' => 'kcal',
+            'protein' => 'g',
+            'total_fat' => 'g',
+            'saturated_fat' => 'g',
+            'cholesterol' => 'mg',
+            'sodium' => 'mg',
+            'carbohydrates' => 'g',
+            'fiber' => 'g',
+            'sugars' => 'g',
+        ];
+
+        $formatted = [];
+
+        foreach ($map as $key => $label) {
+            if (isset($facts[$key])) {
+                $value = $facts[$key];
+                $unit = $units[$key] ?? '';
+                $formatted[] = "{$label}: {$value} {$unit}";
+            }
+        }
+
+        return implode(', ', $formatted);
+    }
+
 
     /**
      * Generate recipe description based on recipe title
