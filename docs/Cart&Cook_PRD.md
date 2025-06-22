@@ -35,6 +35,7 @@ A mobile-friendly web application built with **Laravel 12** and **React Kit** (i
 -   Manage products (CRUD) across all categories (seafood, meat, vegetables, fruits)
 -   Manage inventory (stock levels)
 -   View and manage customer orders
+-   **Assign delivery staff when updating order status to 'For Delivery'**
 -   **Moderate user-generated recipes** (approve/reject/edit/delete)
 -   **Review and approve pending recipes** before publication
 -   View recipe usage reports (optional future feature)
@@ -58,6 +59,10 @@ A mobile-friendly web application built with **Laravel 12** and **React Kit** (i
 
 ### 3. Delivery/Courier Staff
 
+-   Receive delivery assignments from admin when orders are marked 'For Delivery'
+-   Get notified of new delivery assignments
+-   View assigned deliveries and update delivery status (see [Delivery/Courier Staff Module PRD](./DELIVERY_COURIER_MODULE_PRD.md))
+
 For a detailed breakdown of the delivery/courier staff role, dashboard, and workflow, refer to the [Delivery/Courier Staff Module PRD](./DELIVERY_COURIER_MODULE_PRD.md).
 
 ## 5. Core Features
@@ -78,7 +83,9 @@ For a detailed breakdown of the delivery/courier staff role, dashboard, and work
     -   **Maya (coming soon)**
 -   At checkout, users can see all options, but only COD is selectable. GCash and Maya are marked as "coming soon."
 -   Payment status tracking (Pending, Paid, Failed, Refunded)
--   Order status (Pending, Processing, Delivered, Canceled)
+-   Order status (Pending, Processing, **For Delivery**, Delivered, Canceled)
+-   **Admin must assign an available delivery staff when updating order status to 'For Delivery'.**
+-   **Notifications are sent to both the customer and the assigned delivery staff when an order is marked 'For Delivery'.**
 -   Payment confirmation and receipt generation
 
 > **Note:** GCash and Maya payment integrations are planned for future releases. For now, users can only complete orders using Cash on Delivery (COD). Attempts to use GCash or Maya will be prevented, and users will see a message such as "Payment option coming soon."
@@ -155,9 +162,9 @@ For a detailed breakdown of the delivery/courier staff role, dashboard, and work
 
 ## 6. Database Tables (Schema Outline)
 
--   **users**: id, name, email, password, role (admin/customer)
+-   **users**: id, name, email, password, role (admin/customer/delivery)
 -   **products**: id, name, description, price, stock, image, available (bool), category
--   **orders**: id, user_id, status, total_price, **payment_status, payment_method (cod, gcash, maya), payment_reference, payment_proof_url, payment_date**, created_at
+-   **orders**: id, user_id, status, total_price, **delivery_staff_id (nullable, references users), payment_status, payment_method (cod, gcash, maya), payment_reference, payment_proof_url, payment_date**, created_at
 -   **order_items**: id, order_id, product_id, quantity, price
 -   **recipes**: id, title, description, image, video_url, created_by
 -   **recipe_product**: id, recipe_id, product_id (pivot table for many-to-many, supports all categories)

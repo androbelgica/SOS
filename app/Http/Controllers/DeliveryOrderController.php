@@ -21,8 +21,12 @@ class DeliveryOrderController extends Controller
             ->latest()
             ->get();
 
+        // Fetch latest notifications for the delivery staff
+        $notifications = collect(); // Initialize empty collection for notifications
+
         return Inertia::render('Delivery/Dashboard', [
-            'orders' => $orders
+            'orders' => $orders,
+            'notifications' => $notifications,
         ]);
     }
 

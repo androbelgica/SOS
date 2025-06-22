@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Inertia } from "@inertiajs/inertia";
 import DeliveryLayout from "@/Layouts/DeliveryLayout";
 
-const DeliveryDashboard = ({ orders }) => {
+const DeliveryDashboard = ({ orders, notifications = [] }) => {
     const [qrCode, setQrCode] = useState("");
     const [cancelReason, setCancelReason] = useState("");
     const [cancelOrderId, setCancelOrderId] = useState(null);
@@ -33,6 +33,33 @@ const DeliveryDashboard = ({ orders }) => {
 
     return (
         <DeliveryLayout>
+            {/* Notifications Section */}
+            {notifications.length > 0 && (
+                <div className="mb-6">
+                    <h2 className="text-lg font-bold mb-2 text-blue-700 dark:text-blue-300">
+                        Recent Notifications
+                    </h2>
+                    <ul className="space-y-2">
+                        {notifications.map((n) => (
+                            <li
+                                key={n.id}
+                                className="bg-blue-50 dark:bg-gray-700 border-l-4 border-blue-400 dark:border-blue-500 p-3 rounded shadow-sm"
+                            >
+                                <div className="font-semibold text-blue-800 dark:text-blue-200">
+                                    {n.data?.title || n.title}
+                                </div>
+                                <div className="text-gray-700 dark:text-gray-100 text-sm">
+                                    {n.data?.message || n.message}
+                                </div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    {new Date(n.created_at).toLocaleString()}
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
+
             <form onSubmit={handleQrLookup} className="mb-6 flex gap-2">
                 <input
                     type="text"

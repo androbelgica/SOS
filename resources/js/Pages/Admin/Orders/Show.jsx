@@ -2,13 +2,14 @@ import React, { useState } from "react";
 import { Head, Link, useForm, router } from "@inertiajs/react";
 import AdminLayout from "@/Layouts/AdminLayout";
 
-export default function Show({ auth, order }) {
+export default function Show({ auth, order, deliveryStaff }) {
     const [isUpdating, setIsUpdating] = useState(false);
     const [isUpdatingPayment, setIsUpdatingPayment] = useState(false);
     const [isGeneratingLabels, setIsGeneratingLabels] = useState(false);
 
     const { data, setData, put, processing, errors, reset } = useForm({
         status: order.status,
+        assigned_to: order.assigned_to || "",
     });
 
     const {
@@ -41,6 +42,10 @@ export default function Show({ auth, order }) {
 
     const handleStatusChange = (e) => {
         setData("status", e.target.value);
+        // Reset assigned_to if not for_delivery
+        if (e.target.value !== "for_delivery") {
+            setData("assigned_to", "");
+        }
     };
 
     const handlePaymentStatusChange = (e) => {
@@ -401,6 +406,9 @@ export default function Show({ auth, order }) {
                                         <option value="processing">
                                             Processing
                                         </option>
+                                        <option value="for_delivery">
+                                            For Delivery
+                                        </option>
                                         <option
                                             value="delivered"
                                             disabled={
@@ -423,15 +431,67 @@ export default function Show({ auth, order }) {
                                             </p>
                                         )}
                                 </div>
+                                {/* Delivery Staff Dropdown */}
+                                {data.status === "for_delivery" && (
+                                    <div className="mb-4">
+                                        <label
+                                            htmlFor="assigned_to"
+                                            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                                        >
+                                            Assign Delivery Staff
+                                        </label>
+                                        <select
+                                            id="assigned_to"
+                                            name="assigned_to"
+                                            value={data.assigned_to}
+                                            onChange={(e) =>
+                                                setData(
+                                                    "assigned_to",
+                                                    e.target.value
+                                                )
+                                            }
+                                            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                                            required
+                                        >
+                                            <option value="">
+                                                Select Delivery Staff
+                                            </option>
+                                            {deliveryStaff &&
+                                            deliveryStaff.length > 0 ? (
+                                                deliveryStaff.map((staff) => (
+                                                    <option
+                                                        key={staff.id}
+                                                        value={staff.id}
+                                                    >
+                                                        {staff.name}
+                                                    </option>
+                                                ))
+                                            ) : (
+                                                <option value="" disabled>
+                                                    No delivery staff available
+                                                </option>
+                                            )}
+                                        </select>
+                                        {errors.assigned_to && (
+                                            <p className="text-xs text-red-500 mt-1">
+                                                {errors.assigned_to}
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
                                 <button
                                     type="submit"
                                     disabled={
                                         processing ||
-                                        data.status === order.status
+                                        data.status === order.status ||
+                                        (data.status === "for_delivery" &&
+                                            !data.assigned_to)
                                     }
                                     className={`w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
                                         processing ||
-                                        data.status === order.status
+                                        data.status === order.status ||
+                                        (data.status === "for_delivery" &&
+                                            !data.assigned_to)
                                             ? "opacity-50 cursor-not-allowed"
                                             : ""
                                     }`}

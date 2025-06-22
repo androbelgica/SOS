@@ -13,6 +13,7 @@ use App\Notifications\OrderStatusChanged;
 use App\Notifications\OrderPaymentStatusChanged;
 use App\Services\LabelGenerationService;
 use App\Events\OrderStatusChanged as OrderStatusChangedEvent;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
@@ -223,31 +224,36 @@ class OrderController extends Controller
     public function adminShow(Order $order)
     {
         $order->load(['user', 'items.product']);
-
+        $deliveryStaff = \App\Models\User::where('role', 'delivery')->get(['id', 'name']);
         return Inertia::render('Admin/Orders/Show', [
-            'order' => $order
+            'order' => $order,
+            'deliveryStaff' => $deliveryStaff,
         ]);
     }
 
     public function updateStatus(Request $request, Order $order)
     {
         $validated = $request->validate([
-            'status' => 'required|in:pending,processing,delivered,cancelled'
+            'status' => 'required|in:pending,processing,for_delivery,delivered,cancelled',
+            'assigned_to' => 'required_if:status,for_delivery|nullable|exists:users,id',
         ]);
 
-        // Backend enforcement: Prevent delivered if payment is not paid
+        // Prevent delivered if payment is not paid
         if ($validated['status'] === 'delivered' && $order->payment_status !== 'paid') {
             return redirect()->back()->withErrors(['status' => 'Cannot mark as delivered unless payment is paid.']);
         }
 
         $oldStatus = $order->status;
-        $order->update([
-            'status' => $validated['status']
-        ]);
+        $order->status = $validated['status'];
+        // If status is for_delivery, assign delivery staff
+        if ($validated['status'] === 'for_delivery') {
+            $order->assigned_to = $validated['assigned_to'];
+            $order->delivery_status = 'for_delivery';
+        }
+        $order->save();
 
         // Send notification if status has changed
         if ($oldStatus !== $validated['status']) {
-            // Use custom notification model
             $items = $order->items->map(function ($item) {
                 return [
                     'product' => $item->product->name,
@@ -263,12 +269,30 @@ class OrderController extends Controller
                 $items,
                 $order->total_amount
             );
-            // Real-time event
             event(new OrderStatusChangedEvent($order->id, $order->user_id, $order->status, $order->payment_status, 'Order status updated.'));
             // Generate labels if status is changed to processing
             if ($validated['status'] === 'processing') {
                 $this->labelService->generateLabelsForOrder($order);
                 return redirect()->back()->with('success', 'Order status updated successfully. Product labels have been generated.');
+            }
+            // Send notification to delivery staff if assigned
+            if ($validated['status'] === 'for_delivery' && $order->assigned_to) {
+                $deliveryStaff = \App\Models\User::find($order->assigned_to);
+                Log::info('Attempting to notify delivery staff', ['delivery_staff_id' => $order->assigned_to, 'order_id' => $order->id]);
+                if ($deliveryStaff) {
+                    // Use custom notification model for delivery assignment
+                    \App\Models\Notification::createDeliveryAssignment(
+                        $deliveryStaff->id,
+                        $order->id,
+                        $order->order_number,
+                        $order->status,
+                        $items,
+                        $order->total_amount
+                    );
+                    Log::info('Delivery staff notified (custom notification)', ['delivery_staff_id' => $order->assigned_to, 'order_id' => $order->id]);
+                } else {
+                    Log::warning('Delivery staff not found', ['delivery_staff_id' => $order->assigned_to, 'order_id' => $order->id]);
+                }
             }
         }
 

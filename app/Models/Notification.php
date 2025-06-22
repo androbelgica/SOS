@@ -300,4 +300,23 @@ class Notification extends Model
             ]
         ]);
     }
+
+    public static function createDeliveryAssignment($userId, $orderId, $orderNumber, $status, $items, $totalAmount)
+    {
+        return self::create([
+            'user_id' => $userId,
+            'type' => 'delivery_assignment',
+            'title' => 'New Delivery Assignment',
+            'message' => 'You have been assigned a new delivery order.',
+            'data' => [
+                'order_id' => $orderId,
+                'order_number' => $orderNumber,
+                'status' => $status,
+                'items' => $items,
+                'total_amount' => $totalAmount,
+                'type' => 'delivery_assignment',
+                'created_at' => now(),
+            ]
+        ]);
+    }
 }
