@@ -277,6 +277,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/product-recognition', [ProductRecognitionController::class, 'index'])->name('product-recognition.index');
         Route::get('/product-recognition/{recognition}', [ProductRecognitionController::class, 'show'])->name('product-recognition.show');
         Route::delete('/product-recognition/{recognition}', [ProductRecognitionController::class, 'destroy'])->name('product-recognition.destroy');
+
+        // Delivery Staff Management (Admin Only)
+        Route::get('delivery-staff', [\App\Http\Controllers\Admin\DeliveryStaffController::class, 'index'])->name('delivery-staff.index');
+        Route::post('delivery-staff', [\App\Http\Controllers\Admin\DeliveryStaffController::class, 'store'])->name('delivery-staff.store');
+        Route::put('delivery-staff/{user}', [\App\Http\Controllers\Admin\DeliveryStaffController::class, 'update'])->name('delivery-staff.update');
+        Route::delete('delivery-staff/{user}', [\App\Http\Controllers\Admin\DeliveryStaffController::class, 'destroy'])->name('delivery-staff.destroy');
+        Route::post('delivery-staff/{user}/toggle-status', [\App\Http\Controllers\Admin\DeliveryStaffController::class, 'toggleStatus'])->name('delivery-staff.toggle-status');
+        Route::post('delivery-staff/{user}/reset-password', [\App\Http\Controllers\Admin\DeliveryStaffController::class, 'resetPassword'])->name('delivery-staff.reset-password');
     });
 });
 
