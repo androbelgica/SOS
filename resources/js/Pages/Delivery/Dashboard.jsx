@@ -123,6 +123,16 @@ const DeliveryDashboard = ({ orders, notifications = [] }) => {
                             {order.payment_status})
                         </div>
                         <div className="flex gap-2 mt-2">
+                            <button
+                                className="bg-gray-500 text-white px-3 py-1 rounded dark:bg-gray-600"
+                                onClick={() =>
+                                    Inertia.visit(
+                                        `/delivery/orders/${order.id}`
+                                    )
+                                }
+                            >
+                                View
+                            </button>
                             {order.delivery_status === "for_delivery" && (
                                 <button
                                     className="bg-green-600 text-white px-3 py-1 rounded dark:bg-green-500"

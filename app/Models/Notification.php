@@ -210,7 +210,7 @@ class Notification extends Model
             'user_id' => $userId,
             'type' => 'order_status_changed',
             'title' => 'Order Status Updated',
-            'message' => "Your order status has been updated to: " . ucfirst($status),
+            'message' => "Order {$orderNumber} status has been updated to: " . ucfirst($status),
             'data' => [
                 'order_id' => $orderId,
                 'order_number' => $orderNumber,

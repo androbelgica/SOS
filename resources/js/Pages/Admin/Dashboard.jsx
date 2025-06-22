@@ -5,7 +5,7 @@ import AdminLayout from "@/Layouts/AdminLayout";
 export default function AdminDashboard({ auth, stats, recentOrders }) {
     return (
         <AdminLayout auth={auth} title="Dashboard Overview">
-            <Head title="Admin Dashboard - Seafood Online Store" />
+            <Head title="Admin Dashboard - Cart and Cook" />
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -44,8 +44,19 @@ export default function AdminDashboard({ auth, stats, recentOrders }) {
                                 className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium flex items-center"
                             >
                                 View all orders
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-4 w-4 ml-1"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M9 5l7 7-7 7"
+                                    />
                                 </svg>
                             </Link>
                         </div>
@@ -77,7 +88,10 @@ export default function AdminDashboard({ auth, stats, recentOrders }) {
                                     Revenue (Today)
                                 </h2>
                                 <p className="mt-1 text-3xl font-semibold text-gray-900 dark:text-white">
-                                    ₱{parseFloat(stats?.revenue?.today || 0).toFixed(2)}
+                                    ₱
+                                    {parseFloat(
+                                        stats?.revenue?.today || 0
+                                    ).toFixed(2)}
                                 </p>
                             </div>
                         </div>
@@ -120,12 +134,25 @@ export default function AdminDashboard({ auth, stats, recentOrders }) {
                         </div>
                         <div className="mt-4">
                             <Link
-                                href={route("admin.products.index", { filter: "low-stock" })}
+                                href={route("admin.products.index", {
+                                    filter: "low-stock",
+                                })}
                                 className="text-sm text-yellow-600 dark:text-yellow-400 hover:text-yellow-800 dark:hover:text-yellow-300 font-medium flex items-center"
                             >
                                 View low stock items
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-4 w-4 ml-1"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M9 5l7 7-7 7"
+                                    />
                                 </svg>
                             </Link>
                         </div>
@@ -167,8 +194,19 @@ export default function AdminDashboard({ auth, stats, recentOrders }) {
                                 className="text-sm text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 font-medium flex items-center"
                             >
                                 Manage products
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-4 w-4 ml-1"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M9 5l7 7-7 7"
+                                    />
                                 </svg>
                             </Link>
                         </div>
@@ -179,8 +217,19 @@ export default function AdminDashboard({ auth, stats, recentOrders }) {
             {/* Quick Actions */}
             <div className="mt-8">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-6 w-6 mr-2 text-indigo-600 dark:text-indigo-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M13 10V3L4 14h7v7l9-11h-7z"
+                        />
                     </svg>
                     Quick Actions
                 </h2>
@@ -292,8 +341,19 @@ export default function AdminDashboard({ auth, stats, recentOrders }) {
             {/* Order Statistics */}
             <div className="mt-8">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-6 w-6 mr-2 text-indigo-600 dark:text-indigo-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                        />
                     </svg>
                     Order Statistics
                 </h2>
@@ -301,152 +361,365 @@ export default function AdminDashboard({ auth, stats, recentOrders }) {
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-6">
                     {/* Order Status Breakdown */}
                     <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-5 border border-gray-200 dark:border-gray-700">
-                        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Order Status</h3>
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+                            Order Status
+                        </h3>
                         <div className="space-y-3">
                             <div className="flex justify-between items-center">
-                                <span className="text-sm text-gray-500 dark:text-gray-400">Pending</span>
+                                <span className="text-sm text-gray-500 dark:text-gray-400">
+                                    Pending
+                                </span>
                                 <div className="flex items-center">
-                                    <span className="text-sm font-medium text-gray-900 dark:text-white mr-2">{stats?.orders?.pending || 0}</span>
+                                    <span className="text-sm font-medium text-gray-900 dark:text-white mr-2">
+                                        {stats?.orders?.pending || 0}
+                                    </span>
                                     <span className="px-2 py-1 text-xs rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">
-                                        {stats?.orders?.total ? Math.round((stats.orders.pending / stats.orders.total) * 100) : 0}%
+                                        {stats?.orders?.total
+                                            ? Math.round(
+                                                  (stats.orders.pending /
+                                                      stats.orders.total) *
+                                                      100
+                                              )
+                                            : 0}
+                                        %
                                     </span>
                                 </div>
                             </div>
                             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                <div className="bg-yellow-500 h-2 rounded-full" style={{ width: `${stats?.orders?.total ? (stats.orders.pending / stats.orders.total) * 100 : 0}%` }}></div>
+                                <div
+                                    className="bg-yellow-500 h-2 rounded-full"
+                                    style={{
+                                        width: `${
+                                            stats?.orders?.total
+                                                ? (stats.orders.pending /
+                                                      stats.orders.total) *
+                                                  100
+                                                : 0
+                                        }%`,
+                                    }}
+                                ></div>
                             </div>
 
                             <div className="flex justify-between items-center">
-                                <span className="text-sm text-gray-500 dark:text-gray-400">Processing</span>
+                                <span className="text-sm text-gray-500 dark:text-gray-400">
+                                    Processing
+                                </span>
                                 <div className="flex items-center">
-                                    <span className="text-sm font-medium text-gray-900 dark:text-white mr-2">{stats?.orders?.processing || 0}</span>
+                                    <span className="text-sm font-medium text-gray-900 dark:text-white mr-2">
+                                        {stats?.orders?.processing || 0}
+                                    </span>
                                     <span className="px-2 py-1 text-xs rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
-                                        {stats?.orders?.total ? Math.round((stats.orders.processing / stats.orders.total) * 100) : 0}%
+                                        {stats?.orders?.total
+                                            ? Math.round(
+                                                  (stats.orders.processing /
+                                                      stats.orders.total) *
+                                                      100
+                                              )
+                                            : 0}
+                                        %
                                     </span>
                                 </div>
                             </div>
                             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                <div className="bg-blue-500 h-2 rounded-full" style={{ width: `${stats?.orders?.total ? (stats.orders.processing / stats.orders.total) * 100 : 0}%` }}></div>
+                                <div
+                                    className="bg-blue-500 h-2 rounded-full"
+                                    style={{
+                                        width: `${
+                                            stats?.orders?.total
+                                                ? (stats.orders.processing /
+                                                      stats.orders.total) *
+                                                  100
+                                                : 0
+                                        }%`,
+                                    }}
+                                ></div>
                             </div>
 
                             <div className="flex justify-between items-center">
-                                <span className="text-sm text-gray-500 dark:text-gray-400">Delivered</span>
+                                <span className="text-sm text-gray-500 dark:text-gray-400">
+                                    Delivered
+                                </span>
                                 <div className="flex items-center">
-                                    <span className="text-sm font-medium text-gray-900 dark:text-white mr-2">{stats?.orders?.delivered || 0}</span>
+                                    <span className="text-sm font-medium text-gray-900 dark:text-white mr-2">
+                                        {stats?.orders?.delivered || 0}
+                                    </span>
                                     <span className="px-2 py-1 text-xs rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                                        {stats?.orders?.total ? Math.round((stats.orders.delivered / stats.orders.total) * 100) : 0}%
+                                        {stats?.orders?.total
+                                            ? Math.round(
+                                                  (stats.orders.delivered /
+                                                      stats.orders.total) *
+                                                      100
+                                              )
+                                            : 0}
+                                        %
                                     </span>
                                 </div>
                             </div>
                             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                <div className="bg-green-500 h-2 rounded-full" style={{ width: `${stats?.orders?.total ? (stats.orders.delivered / stats.orders.total) * 100 : 0}%` }}></div>
+                                <div
+                                    className="bg-green-500 h-2 rounded-full"
+                                    style={{
+                                        width: `${
+                                            stats?.orders?.total
+                                                ? (stats.orders.delivered /
+                                                      stats.orders.total) *
+                                                  100
+                                                : 0
+                                        }%`,
+                                    }}
+                                ></div>
                             </div>
 
                             <div className="flex justify-between items-center">
-                                <span className="text-sm text-gray-500 dark:text-gray-400">Cancelled</span>
+                                <span className="text-sm text-gray-500 dark:text-gray-400">
+                                    Cancelled
+                                </span>
                                 <div className="flex items-center">
-                                    <span className="text-sm font-medium text-gray-900 dark:text-white mr-2">{stats?.orders?.cancelled || 0}</span>
+                                    <span className="text-sm font-medium text-gray-900 dark:text-white mr-2">
+                                        {stats?.orders?.cancelled || 0}
+                                    </span>
                                     <span className="px-2 py-1 text-xs rounded-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">
-                                        {stats?.orders?.total ? Math.round((stats.orders.cancelled / stats.orders.total) * 100) : 0}%
+                                        {stats?.orders?.total
+                                            ? Math.round(
+                                                  (stats.orders.cancelled /
+                                                      stats.orders.total) *
+                                                      100
+                                              )
+                                            : 0}
+                                        %
                                     </span>
                                 </div>
                             </div>
                             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                <div className="bg-red-500 h-2 rounded-full" style={{ width: `${stats?.orders?.total ? (stats.orders.cancelled / stats.orders.total) * 100 : 0}%` }}></div>
+                                <div
+                                    className="bg-red-500 h-2 rounded-full"
+                                    style={{
+                                        width: `${
+                                            stats?.orders?.total
+                                                ? (stats.orders.cancelled /
+                                                      stats.orders.total) *
+                                                  100
+                                                : 0
+                                        }%`,
+                                    }}
+                                ></div>
                             </div>
                         </div>
                     </div>
 
                     {/* Payment Status Breakdown */}
                     <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-5 border border-gray-200 dark:border-gray-700">
-                        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Payment Status</h3>
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+                            Payment Status
+                        </h3>
                         <div className="space-y-3">
                             <div className="flex justify-between items-center">
-                                <span className="text-sm text-gray-500 dark:text-gray-400">Pending</span>
+                                <span className="text-sm text-gray-500 dark:text-gray-400">
+                                    Pending
+                                </span>
                                 <div className="flex items-center">
-                                    <span className="text-sm font-medium text-gray-900 dark:text-white mr-2">{stats?.payments?.pending || 0}</span>
+                                    <span className="text-sm font-medium text-gray-900 dark:text-white mr-2">
+                                        {stats?.payments?.pending || 0}
+                                    </span>
                                     <span className="px-2 py-1 text-xs rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">
-                                        {stats?.orders?.total ? Math.round((stats.payments.pending / stats.orders.total) * 100) : 0}%
+                                        {stats?.orders?.total
+                                            ? Math.round(
+                                                  (stats.payments.pending /
+                                                      stats.orders.total) *
+                                                      100
+                                              )
+                                            : 0}
+                                        %
                                     </span>
                                 </div>
                             </div>
                             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                <div className="bg-yellow-500 h-2 rounded-full" style={{ width: `${stats?.orders?.total ? (stats.payments.pending / stats.orders.total) * 100 : 0}%` }}></div>
+                                <div
+                                    className="bg-yellow-500 h-2 rounded-full"
+                                    style={{
+                                        width: `${
+                                            stats?.orders?.total
+                                                ? (stats.payments.pending /
+                                                      stats.orders.total) *
+                                                  100
+                                                : 0
+                                        }%`,
+                                    }}
+                                ></div>
                             </div>
 
                             <div className="flex justify-between items-center">
-                                <span className="text-sm text-gray-500 dark:text-gray-400">Paid</span>
+                                <span className="text-sm text-gray-500 dark:text-gray-400">
+                                    Paid
+                                </span>
                                 <div className="flex items-center">
-                                    <span className="text-sm font-medium text-gray-900 dark:text-white mr-2">{stats?.payments?.paid || 0}</span>
+                                    <span className="text-sm font-medium text-gray-900 dark:text-white mr-2">
+                                        {stats?.payments?.paid || 0}
+                                    </span>
                                     <span className="px-2 py-1 text-xs rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                                        {stats?.orders?.total ? Math.round((stats.payments.paid / stats.orders.total) * 100) : 0}%
+                                        {stats?.orders?.total
+                                            ? Math.round(
+                                                  (stats.payments.paid /
+                                                      stats.orders.total) *
+                                                      100
+                                              )
+                                            : 0}
+                                        %
                                     </span>
                                 </div>
                             </div>
                             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                <div className="bg-green-500 h-2 rounded-full" style={{ width: `${stats?.orders?.total ? (stats.payments.paid / stats.orders.total) * 100 : 0}%` }}></div>
+                                <div
+                                    className="bg-green-500 h-2 rounded-full"
+                                    style={{
+                                        width: `${
+                                            stats?.orders?.total
+                                                ? (stats.payments.paid /
+                                                      stats.orders.total) *
+                                                  100
+                                                : 0
+                                        }%`,
+                                    }}
+                                ></div>
                             </div>
 
                             <div className="flex justify-between items-center">
-                                <span className="text-sm text-gray-500 dark:text-gray-400">Failed</span>
+                                <span className="text-sm text-gray-500 dark:text-gray-400">
+                                    Failed
+                                </span>
                                 <div className="flex items-center">
-                                    <span className="text-sm font-medium text-gray-900 dark:text-white mr-2">{stats?.payments?.failed || 0}</span>
+                                    <span className="text-sm font-medium text-gray-900 dark:text-white mr-2">
+                                        {stats?.payments?.failed || 0}
+                                    </span>
                                     <span className="px-2 py-1 text-xs rounded-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">
-                                        {stats?.orders?.total ? Math.round((stats.payments.failed / stats.orders.total) * 100) : 0}%
+                                        {stats?.orders?.total
+                                            ? Math.round(
+                                                  (stats.payments.failed /
+                                                      stats.orders.total) *
+                                                      100
+                                              )
+                                            : 0}
+                                        %
                                     </span>
                                 </div>
                             </div>
                             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                <div className="bg-red-500 h-2 rounded-full" style={{ width: `${stats?.orders?.total ? (stats.payments.failed / stats.orders.total) * 100 : 0}%` }}></div>
+                                <div
+                                    className="bg-red-500 h-2 rounded-full"
+                                    style={{
+                                        width: `${
+                                            stats?.orders?.total
+                                                ? (stats.payments.failed /
+                                                      stats.orders.total) *
+                                                  100
+                                                : 0
+                                        }%`,
+                                    }}
+                                ></div>
                             </div>
                         </div>
                     </div>
 
                     {/* Revenue Overview */}
                     <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-5 border border-gray-200 dark:border-gray-700">
-                        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Revenue Overview</h3>
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+                            Revenue Overview
+                        </h3>
                         <div className="space-y-4">
                             <div>
                                 <div className="flex justify-between mb-1">
-                                    <span className="text-sm text-gray-500 dark:text-gray-400">Today</span>
-                                    <span className="text-sm font-medium text-gray-900 dark:text-white">₱{parseFloat(stats?.revenue?.today || 0).toFixed(2)}</span>
+                                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                                        Today
+                                    </span>
+                                    <span className="text-sm font-medium text-gray-900 dark:text-white">
+                                        ₱
+                                        {parseFloat(
+                                            stats?.revenue?.today || 0
+                                        ).toFixed(2)}
+                                    </span>
                                 </div>
                                 <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                    <div className="bg-green-500 h-2 rounded-full" style={{ width: '100%' }}></div>
+                                    <div
+                                        className="bg-green-500 h-2 rounded-full"
+                                        style={{ width: "100%" }}
+                                    ></div>
                                 </div>
                             </div>
 
                             <div>
                                 <div className="flex justify-between mb-1">
-                                    <span className="text-sm text-gray-500 dark:text-gray-400">Yesterday</span>
-                                    <span className="text-sm font-medium text-gray-900 dark:text-white">₱{parseFloat(stats?.revenue?.yesterday || 0).toFixed(2)}</span>
+                                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                                        Yesterday
+                                    </span>
+                                    <span className="text-sm font-medium text-gray-900 dark:text-white">
+                                        ₱
+                                        {parseFloat(
+                                            stats?.revenue?.yesterday || 0
+                                        ).toFixed(2)}
+                                    </span>
                                 </div>
                                 <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                    <div className="bg-blue-500 h-2 rounded-full" style={{
-                                        width: `${stats?.revenue?.today && stats.revenue.today > 0
-                                            ? Math.min(100, (stats.revenue.yesterday / stats.revenue.today) * 100)
-                                            : (stats?.revenue?.yesterday > 0 ? 100 : 0)}%`
-                                    }}></div>
+                                    <div
+                                        className="bg-blue-500 h-2 rounded-full"
+                                        style={{
+                                            width: `${
+                                                stats?.revenue?.today &&
+                                                stats.revenue.today > 0
+                                                    ? Math.min(
+                                                          100,
+                                                          (stats.revenue
+                                                              .yesterday /
+                                                              stats.revenue
+                                                                  .today) *
+                                                              100
+                                                      )
+                                                    : stats?.revenue
+                                                          ?.yesterday > 0
+                                                    ? 100
+                                                    : 0
+                                            }%`,
+                                        }}
+                                    ></div>
                                 </div>
                             </div>
 
                             <div>
                                 <div className="flex justify-between mb-1">
-                                    <span className="text-sm text-gray-500 dark:text-gray-400">This Week</span>
-                                    <span className="text-sm font-medium text-gray-900 dark:text-white">₱{parseFloat(stats?.revenue?.thisWeek || 0).toFixed(2)}</span>
+                                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                                        This Week
+                                    </span>
+                                    <span className="text-sm font-medium text-gray-900 dark:text-white">
+                                        ₱
+                                        {parseFloat(
+                                            stats?.revenue?.thisWeek || 0
+                                        ).toFixed(2)}
+                                    </span>
                                 </div>
                                 <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                    <div className="bg-indigo-500 h-2 rounded-full" style={{ width: '100%' }}></div>
+                                    <div
+                                        className="bg-indigo-500 h-2 rounded-full"
+                                        style={{ width: "100%" }}
+                                    ></div>
                                 </div>
                             </div>
 
                             <div>
                                 <div className="flex justify-between mb-1">
-                                    <span className="text-sm text-gray-500 dark:text-gray-400">This Month</span>
-                                    <span className="text-sm font-medium text-gray-900 dark:text-white">₱{parseFloat(stats?.revenue?.thisMonth || 0).toFixed(2)}</span>
+                                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                                        This Month
+                                    </span>
+                                    <span className="text-sm font-medium text-gray-900 dark:text-white">
+                                        ₱
+                                        {parseFloat(
+                                            stats?.revenue?.thisMonth || 0
+                                        ).toFixed(2)}
+                                    </span>
                                 </div>
                                 <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                    <div className="bg-purple-500 h-2 rounded-full" style={{ width: '100%' }}></div>
+                                    <div
+                                        className="bg-purple-500 h-2 rounded-full"
+                                        style={{ width: "100%" }}
+                                    ></div>
                                 </div>
                             </div>
                         </div>
@@ -454,19 +727,32 @@ export default function AdminDashboard({ auth, stats, recentOrders }) {
 
                     {/* Total Orders Summary */}
                     <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-5 border border-gray-200 dark:border-gray-700">
-                        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Orders Summary</h3>
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+                            Orders Summary
+                        </h3>
                         <div className="flex flex-col h-full justify-between">
                             <div>
                                 <div className="flex items-center justify-between mb-4">
-                                    <span className="text-sm text-gray-500 dark:text-gray-400">Total Orders</span>
-                                    <span className="text-2xl font-bold text-gray-900 dark:text-white">{stats?.orders?.total || 0}</span>
+                                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                                        Total Orders
+                                    </span>
+                                    <span className="text-2xl font-bold text-gray-900 dark:text-white">
+                                        {stats?.orders?.total || 0}
+                                    </span>
                                 </div>
 
                                 <div className="flex items-center justify-between mb-2">
-                                    <span className="text-sm text-gray-500 dark:text-gray-400">Average Order Value</span>
+                                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                                        Average Order Value
+                                    </span>
                                     <span className="text-lg font-semibold text-gray-900 dark:text-white">
-                                        ₱{stats?.orders?.total && stats?.revenue?.thisMonth
-                                            ? (stats.revenue.thisMonth / stats.orders.total).toFixed(2)
+                                        ₱
+                                        {stats?.orders?.total &&
+                                        stats?.revenue?.thisMonth
+                                            ? (
+                                                  stats.revenue.thisMonth /
+                                                  stats.orders.total
+                                              ).toFixed(2)
                                             : "0.00"}
                                     </span>
                                 </div>
@@ -477,8 +763,19 @@ export default function AdminDashboard({ auth, stats, recentOrders }) {
                                 className="mt-4 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                             >
                                 View All Orders
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-4 w-4 ml-1"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M9 5l7 7-7 7"
+                                    />
                                 </svg>
                             </Link>
                         </div>
@@ -489,28 +786,48 @@ export default function AdminDashboard({ auth, stats, recentOrders }) {
                 {recentOrders && recentOrders.length > 0 && (
                     <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
                         <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                            <h3 className="text-lg font-medium text-gray-900 dark:text-white">Recent Orders</h3>
+                            <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                                Recent Orders
+                            </h3>
                         </div>
                         <div className="overflow-x-auto">
                             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                                 <thead className="bg-gray-50 dark:bg-gray-700">
                                     <tr>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        <th
+                                            scope="col"
+                                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                                        >
                                             Order ID
                                         </th>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        <th
+                                            scope="col"
+                                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                                        >
                                             Customer
                                         </th>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        <th
+                                            scope="col"
+                                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                                        >
                                             Amount
                                         </th>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        <th
+                                            scope="col"
+                                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                                        >
                                             Status
                                         </th>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        <th
+                                            scope="col"
+                                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                                        >
                                             Date
                                         </th>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        <th
+                                            scope="col"
+                                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                                        >
                                             Action
                                         </th>
                                     </tr>
@@ -518,14 +835,21 @@ export default function AdminDashboard({ auth, stats, recentOrders }) {
                                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                     {recentOrders.map((order) => {
                                         const statusColors = {
-                                            pending: "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200",
-                                            processing: "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200",
-                                            delivered: "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200",
-                                            cancelled: "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200",
+                                            pending:
+                                                "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200",
+                                            processing:
+                                                "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200",
+                                            delivered:
+                                                "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200",
+                                            cancelled:
+                                                "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200",
                                         };
 
                                         return (
-                                            <tr key={order.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                            <tr
+                                                key={order.id}
+                                                className="hover:bg-gray-50 dark:hover:bg-gray-700"
+                                            >
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                                                     #{order.id}
                                                 </td>
@@ -533,19 +857,38 @@ export default function AdminDashboard({ auth, stats, recentOrders }) {
                                                     {order.user.name}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                                    ₱{parseFloat(order.total_amount).toFixed(2)}
+                                                    ₱
+                                                    {parseFloat(
+                                                        order.total_amount
+                                                    ).toFixed(2)}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
-                                                    <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${statusColors[order.status]}`}>
-                                                        {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                                                    <span
+                                                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                                            statusColors[
+                                                                order.status
+                                                            ]
+                                                        }`}
+                                                    >
+                                                        {order.status
+                                                            .charAt(0)
+                                                            .toUpperCase() +
+                                                            order.status.slice(
+                                                                1
+                                                            )}
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                                    {new Date(order.created_at).toLocaleDateString()}
+                                                    {new Date(
+                                                        order.created_at
+                                                    ).toLocaleDateString()}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                     <Link
-                                                        href={route("admin.orders.show", order.id)}
+                                                        href={route(
+                                                            "admin.orders.show",
+                                                            order.id
+                                                        )}
                                                         className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300"
                                                     >
                                                         View

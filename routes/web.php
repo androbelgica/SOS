@@ -314,10 +314,12 @@ Route::get('/csrf-token', function () {
 // Delivery staff routes
 Route::middleware(['auth', DeliveryMiddleware::class])->prefix('delivery')->name('delivery.')->group(function () {
     Route::get('/orders', [DeliveryOrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{order}', [DeliveryOrderController::class, 'show'])->name('orders.show');
     Route::post('/orders/{order}/accept', [DeliveryOrderController::class, 'accept'])->name('orders.accept');
     Route::post('/orders/{order}/delivered', [DeliveryOrderController::class, 'markDelivered'])->name('orders.delivered');
     Route::post('/orders/{order}/cancelled', [DeliveryOrderController::class, 'markCancelled'])->name('orders.cancelled');
     Route::post('/orders/lookup-qr', [DeliveryOrderController::class, 'lookupByQr'])->name('orders.lookup-qr');
+    Route::post('/orders/{order}/settle-payment', [DeliveryOrderController::class, 'settlePayment'])->name('orders.settle-payment');
 });
 
 require __DIR__ . '/auth.php';
