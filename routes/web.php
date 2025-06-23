@@ -27,7 +27,11 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-Route::get('/health', fn() => 'OK');
+Route::get('/check-manifest', function () {
+    return file_exists(public_path('build/manifest.json')) 
+        ? 'Manifest found ✅' 
+        : 'Manifest missing ❌';
+});
 
 
 // Old welcome page moved to /home route
