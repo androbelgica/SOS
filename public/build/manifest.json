@@ -385,17 +385,17 @@
     ]
   },
   "resources/js/Pages/Auth/Login.jsx": {
-    "file": "Login-CdS_JIGR.js",
+    "file": "Login-8WBVr2y4.js",
     "name": "Login",
     "src": "resources/js/Pages/Auth/Login.jsx",
     "isDynamicEntry": true,
     "imports": [
+      "resources/js/app.jsx",
       "_InputError-Cl59onRG.js",
       "_InputLabel-B7p3SMX7.js",
       "_PrimaryButton-B0xtY6gN.js",
       "_GoogleButton-CTcnpIZU.js",
-      "_GuestLayout-CuhAke8P.js",
-      "resources/js/app.jsx"
+      "_GuestLayout-CuhAke8P.js"
     ]
   },
   "resources/js/Pages/Auth/Register.jsx": {
