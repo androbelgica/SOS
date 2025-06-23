@@ -21,7 +21,7 @@ COPY . .
 RUN composer install --no-dev --optimize-autoloader
 
 # Install Node dependencies and build assets
-RUN npm ci && npm run build
+# RUN npm ci && npm run build
 
 # Ensure storage and cache directories exist and have correct permissions
 RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views storage/logs \
