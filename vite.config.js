@@ -14,5 +14,15 @@ export default defineConfig({
     build: {
         manifest: true,
         outDir: "public/build",
+        // Add this line to ensure manifest is at the root of build output
+        manifest: true,
+        rollupOptions: {
+            output: {
+                // Ensure no subfolder for manifest
+                entryFileNames: "[name].js",
+                chunkFileNames: "[name]-[hash].js",
+                assetFileNames: "[name][extname]",
+            },
+        },
     },
 });
