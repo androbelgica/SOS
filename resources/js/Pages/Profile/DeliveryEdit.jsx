@@ -1,3 +1,4 @@
+import React from "react";
 import DeliveryLayout from "@/Layouts/DeliveryLayout";
 import { Head } from "@inertiajs/react";
 import UpdatePasswordForm from "./Partials/UpdatePasswordForm";
