@@ -21,18 +21,13 @@ COPY . .
 RUN composer install --no-dev --optimize-autoloader
 
 # Install Node dependencies and build assets
-RUN npm install && npm run build
+RUN npm ci && npm run build
 
 # Ensure storage and cache directories exist and have correct permissions
 RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views storage/logs \
     && chown -R www-data:www-data storage bootstrap/cache
 
-# Create SQLite database file if using SQLite
-RUN if [ "$DB_CONNECTION" = "sqlite" ]; then \
-    mkdir -p /app/database && touch /app/database/database.sqlite && chown -R www-data:www-data /app/database; \
-    fi
-
-# Laravel optimizations
+# Laravel optimizations and storage symlink
 RUN php artisan config:clear \
     && php artisan cache:clear \
     && php artisan route:clear \
