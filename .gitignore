@@ -2,7 +2,7 @@
 /.env.example
 /node_modules
 /vendor
-/public/build
+# /public/build
 /public/hot
 /public/storage
 /.phpunit.cache
