@@ -3,9 +3,8 @@
     "type": "module",
    "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "postinstall": "npm run build"
-  },
+    "build": "vite build"
+    },
 
     
     "devDependencies": {
