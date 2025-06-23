@@ -1,0 +1,1 @@
+import{R as m}from"./app2.js";function o({value:t,className:e="",children:a,...r}){return m.createElement("label",{...r,className:"block text-sm font-medium text-gray-700 dark:text-gray-300 "+e},t||a)}export{o as I};

@@ -1,3 +1,4 @@
+import React from 'react';
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 
 export default forwardRef(function TextInput(

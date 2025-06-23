@@ -1,3 +1,4 @@
+import React from 'react';
 export default function InputError({ message, className = '', ...props }) {
     return message ? (
         <p
