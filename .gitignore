@@ -5,7 +5,7 @@
 /vendor
 # /public/build
 /public/hot
-/public/storage
+# /public/storage
 /.phpunit.cache
 .phpunit.result.cache
 /storage/*.key
