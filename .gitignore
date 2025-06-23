@@ -5,7 +5,7 @@
 /vendor
 # /public/build
 /public/hot
-/public/storage
+# /public/storage
 /.phpunit.cache
 .phpunit.result.cache
 /storage/*.key
@@ -14,3 +14,4 @@
 npm-debug.log
 yarn-error.log
 .env
+/.env
