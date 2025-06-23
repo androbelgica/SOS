@@ -19,6 +19,8 @@ export default defineConfig({
                 entryFileNames: "[name].js",
                 chunkFileNames: "[name]-[hash].js",
                 assetFileNames: "[name][extname]",
+                // Add this line to force manifest to root of build dir
+                manualChunks: undefined,
             },
         },
     },
