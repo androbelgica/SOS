@@ -1,12 +1,18 @@
 Global 
-1. default behaviour when clicking arecord in a table, navigate to view/show details.
+1. default behaviour when clicking a record in a table, navigate to view/show details.
 
 
 Customer mobile web view
 1. notification icon is not showing
+2. fix cart labels and components, quantity is overlapping with product description
+3. recipe submitting is not succesfull on first submit, it needs to click submit button twice
+4. order details button is not well arranged, 
 
 
-
+Delivery mobile view
+1.delivery layout has no logo and is not adjusted for mobile view
+2.order detail must show products card view not table
+4. payment modal is not adjusted for mobile view
 
 
 
@@ -15,4 +21,8 @@ Customer mobile web view
 
 Admin Products
 1. generate with ai (Error: Invalid JSON returned by the AI model.)
-2. 
+2.recipe detail must shown current status of recipe submission
+3. when a notification message related to recipe is clicked, it did not navigate on recipe detail
+
+Additional Feature
+1.generate receiot in pdf and downloable by admin or customer
