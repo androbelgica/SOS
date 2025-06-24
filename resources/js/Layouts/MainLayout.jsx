@@ -374,6 +374,12 @@ export default function MainLayout({ auth, children, title = "Cart & Cook" }) {
                         mobileMenuOpen ? "block" : "hidden"
                     } sm:hidden`}
                 >
+                    {/* Notification icon for mobile */}
+                    {auth?.user && (
+                        <div className="px-4 pt-2 pb-1">
+                            <NotificationDropdown auth={auth} isMobile={true} />
+                        </div>
+                    )}
                     <div className="pt-2 pb-3 space-y-1">
                         <Link
                             href={getProductsRoute()}
