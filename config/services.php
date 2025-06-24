@@ -43,7 +43,7 @@ return [
     ],
 
     'openai' => [
-        'api_key' => env('OPENAI_API_KEY', 'sk-or-v1-4782e35202daf7b9e23d2a1b481f142eec8a893e47827b97e181df5223c36f6ey'),
+        'api_key' => env('OPENAI_API_KEY', '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'),
     ],
 
 ];
