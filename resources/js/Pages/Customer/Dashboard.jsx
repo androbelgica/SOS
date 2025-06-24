@@ -2,39 +2,21 @@ import React from "react";
 import { Head, Link } from "@inertiajs/react";
 import MainLayout from "@/Layouts/MainLayout";
 import { getImageProps } from "@/Utils/imageHelpers";
+import NotificationDropdown from "@/Components/NotificationDropdown";
 
 export default function CustomerDashboard({ auth, orders, recentRecipes }) {
     return (
         <MainLayout auth={auth} title={`Welcome, ${auth.user.name}!`}>
             <Head title="Dashboard - Seafood Online Store" />
 
-            {/* Header with Notification Icon */}
+            {/* Header with Notification Dropdown Always Visible */}
             <div className="flex items-center justify-between mb-6">
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                     Welcome, {auth.user.name}!
                 </h1>
-                <button
-                    type="button"
-                    className="relative p-2 rounded-full text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                    aria-label="View notifications"
-                >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-7 w-7"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                    >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                        />
-                    </svg>
-                    {/* Notification dot (optional) */}
-                    {/* <span className="absolute top-1 right-1 block h-2 w-2 rounded-full ring-2 ring-white bg-red-500"></span> */}
-                </button>
+                <div className="flex items-center">
+                    <NotificationDropdown auth={auth} />
+                </div>
             </div>
 
             {/* Stats Cards */}
