@@ -290,49 +290,55 @@ export default function OrdersIndex({ auth, orders }) {
                                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                     {filteredOrders.length > 0 ? (
                                         filteredOrders.map((order) => (
-                                        <tr key={order.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150">
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm font-medium text-gray-900 dark:text-white">
-                                                    {order.order_number || '#' + order.id}
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-500 dark:text-gray-400">
-                                                    {new Date(order.created_at).toLocaleDateString()}
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm font-medium text-indigo-600 dark:text-indigo-400">
-                                                    ₱{parseFloat(order.total_amount).toFixed(2)}
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[order.status] || "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"}`}>
-                                                    {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                <div className="flex space-x-2">
-                                                    <Link
-                                                        href={route("orders.show", order.id)}
-                                                        className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300"
-                                                    >
-                                                        View Details
-                                                    </Link>
-                                                    {order.status === 'delivered' && (
+                                            <tr
+                                                key={order.id}
+                                                className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150 cursor-pointer"
+                                                onClick={() => window.location.href = route("orders.show", order.id)}
+                                            >
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="text-sm font-medium text-gray-900 dark:text-white">
+                                                        {order.order_number || '#' + order.id}
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                                                        {new Date(order.created_at).toLocaleDateString()}
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="text-sm font-medium text-indigo-600 dark:text-indigo-400">
+                                                        ₱{parseFloat(order.total_amount).toFixed(2)}
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[order.status] || "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"}`}>
+                                                        {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                    <div className="flex space-x-2">
                                                         <Link
-                                                            href={route("orders.scanner", order.id)}
-                                                            className="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 ml-2"
-                                                            title="Verify Products"
+                                                            href={route("orders.show", order.id)}
+                                                            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300"
+                                                            onClick={e => e.stopPropagation()}
                                                         >
-                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-                                                            </svg>
+                                                            View Details
                                                         </Link>
-                                                    )}
-                                                </div>
-                                            </td>
-                                        </tr>
+                                                        {order.status === 'delivered' && (
+                                                            <Link
+                                                                href={route("orders.scanner", order.id)}
+                                                                className="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 ml-2"
+                                                                title="Verify Products"
+                                                                onClick={e => e.stopPropagation()}
+                                                            >
+                                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                                                                </svg>
+                                                            </Link>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                            </tr>
                                         ))
                                     ) : (
                                         <tr>

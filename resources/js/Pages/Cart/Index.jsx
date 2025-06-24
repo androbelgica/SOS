@@ -180,18 +180,18 @@ export default function CartIndex({ auth, cartItems: initialCartItems, total: in
                                 {cartItems.map((item) => (
                                     <div
                                         key={item.id}
-                                        className="flex items-center justify-between border-b pb-4"
+                                        className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b pb-4 gap-4"
                                     >
                                         <div className="flex items-center space-x-4">
                                             <img
                                                 {...getImageProps({
                                                     src: item.image_url || "/images/placeholder.jpg",
                                                     alt: item.name,
-                                                    className: "w-16 h-16 object-cover rounded",
+                                                    className: "w-20 h-20 object-cover rounded mx-auto sm:mx-0",
                                                     type: "product"
                                                 })}
                                             />
-                                            <div>
+                                            <div className="text-center sm:text-left">
                                                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                                                     {item.name}
                                                 </h3>
@@ -208,8 +208,8 @@ export default function CartIndex({ auth, cartItems: initialCartItems, total: in
                                             </div>
                                         </div>
 
-                                        <div className="flex items-center space-x-4">
-                                            <div className="flex items-center border rounded dark:border-gray-600">
+                                        <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 w-full sm:w-auto">
+                                            <div className="flex items-center border rounded dark:border-gray-600 mx-auto sm:mx-0">
                                                 <button
                                                     type="button"
                                                     className="px-3 py-1 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
@@ -279,7 +279,7 @@ export default function CartIndex({ auth, cartItems: initialCartItems, total: in
                                                     +
                                                 </button>
                                             </div>
-                                            <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
+                                            <span className="text-xs text-gray-500 dark:text-gray-400 ml-0 sm:ml-2">
                                                 {item.unit_type === 'kg' ? 'g' : 'pcs'}
                                             </span>
 
