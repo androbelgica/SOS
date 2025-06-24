@@ -25,50 +25,44 @@ class OpenAIService
     public function generateProductInfo(string $productName): array
     {
         try {
-            $http = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $this->apiKey,
+            $apiKey = config('services.google_genai.api_key');
+            $endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+
+            $prompt = "Generate a detailed product description and nutritional facts for the seafood product: {$productName}. Respond in JSON with two fields: 'description' and 'nutritional_facts'.";
+
+            $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
-                'HTTP-Referer' => 'https://127.0.0.1', // Replace with your actual domain
-            ]);
-
-            if (app()->environment('local')) {
-                $http->withoutVerifying();
-            }
-
-            $response = $http->post($this->baseUrl . '/chat/completions', [
-                'model' => $this->model,
-                'messages' => [
+            ])->post($endpoint . '?key=' . $apiKey, [
+                'contents' => [
                     [
-                        'role' => 'system',
-                        'content' => 'You are a helpful assistant that generates detailed product descriptions and nutritional facts for seafood products. Provide accurate and appealing information.'
-                    ],
-                    [
-                        'role' => 'user',
-                        'content' => "Generate a detailed product description and nutritional facts for the seafood product: {$productName}. Format your response as JSON with two fields: 'description' and 'nutritional_facts'."
+                        'parts' => [
+                            ['text' => $prompt]
+                        ]
                     ]
-                ],
-                'temperature' => 0.7,
-                'max_tokens' => 500,
-                'response_format' => ['type' => 'json_object']
+                ]
             ]);
 
             $data = $response->json();
 
-            $content = $data['choices'][0]['message']['content'] ?? '';
-
-            // Decode AI JSON string
-            $parsed = json_decode($content, true);
-
-            if (json_last_error() !== JSON_ERROR_NONE) {
+            // Gemini returns the generated text in a nested structure
+            $text = $data['candidates'][0]['content']['parts'][0]['text'] ?? null;
+            if (!$text) {
                 return [
                     'success' => false,
-                    'message' => 'Invalid JSON returned by the AI model.'
+                    'message' => 'No content returned by Gemini API.'
                 ];
             }
 
-            // If nutritional_facts is an object, convert it to readable string
-            $nutritionalFacts = $parsed['nutritional_facts'] ?? '';
+            // Try to decode the JSON from the AI's response
+            $parsed = json_decode($text, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                return [
+                    'success' => false,
+                    'message' => 'Invalid JSON returned by Gemini: ' . $text
+                ];
+            }
 
+            $nutritionalFacts = $parsed['nutritional_facts'] ?? '';
             if (is_array($nutritionalFacts)) {
                 $nutritionalFacts = $this->formatNutritionalFacts($nutritionalFacts);
             }
@@ -79,11 +73,10 @@ class OpenAIService
                 'nutritional_facts' => $nutritionalFacts
             ];
         } catch (\Exception $e) {
-            Log::error('OpenAI Service Exception', [
+            Log::error('Google Generative AI Service Exception', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-
             return [
                 'success' => false,
                 'message' => 'An error occurred: ' . $e->getMessage()
