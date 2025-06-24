@@ -11,8 +11,10 @@ export default function CustomerDashboard({ auth, orders, recentRecipes }) {
 
             {/* Header with Notification Dropdown Always Visible */}
             <div className="flex items-center justify-between mb-6">
-               
-                <div className="flex items-center">
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                    Welcome, {auth.user.name}!
+                </h1>
+                <div className="flex items-center justify-end w-full">
                     <NotificationDropdown auth={auth} />
                 </div>
             </div>
@@ -258,7 +260,6 @@ export default function CustomerDashboard({ auth, orders, recentRecipes }) {
                                     />
                                 </svg>
                             </div>
-                            </div>
                             <div className="ml-4">
                                 <h3 className="text-lg font-medium text-gray-900 dark:text-white">
                                     Explore Recipes
@@ -267,6 +268,7 @@ export default function CustomerDashboard({ auth, orders, recentRecipes }) {
                                     Discover delicious seafood recipes
                                 </p>
                             </div>
+                        </div>
                         </div>
                     </Link>
 
