@@ -1,0 +1,2 @@
+1. remove sym link on local, remove on gitignore /public/storage
+2. on dockerfile add sym link command
