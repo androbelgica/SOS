@@ -26,6 +26,8 @@ The Featured Product Module allows administrators to highlight specific products
 
 ```sql
 ALTER TABLE products ADD COLUMN featured BOOLEAN DEFAULT 0;
+-- For MySQL, you may use:
+-- ALTER TABLE products ADD COLUMN featured TINYINT(1) DEFAULT 0;
 ```
 
 ## 4. API Endpoints

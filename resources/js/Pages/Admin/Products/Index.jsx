@@ -373,6 +373,12 @@ export default function AdminProducts({
                                         </th>
                                         <th
                                             scope="col"
+                                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                                        >
+                                            Featured
+                                        </th>
+                                        <th
+                                            scope="col"
                                             className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                                         >
                                             Actions
@@ -487,6 +493,17 @@ export default function AdminProducts({
                                                     {product.is_available ? "Available" : "Unavailable"}
                                                 </span>
                                             </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                {product.featured ? (
+                                                    <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">
+                                                        Featured
+                                                    </span>
+                                                ) : (
+                                                    <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300">
+                                                        Not Featured
+                                                    </span>
+                                                )}
+                                            </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                                 <Link
                                                     href={route("admin.products.edit", product.id)}
@@ -507,6 +524,15 @@ export default function AdminProducts({
                                                     </svg>
                                                     Delete
                                                 </button>
+                                                {product.featured ? (
+                                                    <form method="POST" action={`/products/${product.id}/feature`} onSubmit={e => { e.preventDefault(); router.delete(`/products/${product.id}/feature`); }} className="inline">
+                                                        <button type="submit" className="ml-2 px-2 py-1 text-xs bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded hover:bg-gray-400 dark:hover:bg-gray-700">Unfeature</button>
+                                                    </form>
+                                                ) : (
+                                                    <form method="POST" action={`/products/${product.id}/feature`} onSubmit={e => { e.preventDefault(); router.post(`/products/${product.id}/feature`); }} className="inline">
+                                                        <button type="submit" className="ml-2 px-2 py-1 text-xs bg-yellow-400 dark:bg-yellow-600 text-white rounded hover:bg-yellow-500 dark:hover:bg-yellow-700">Feature</button>
+                                                    </form>
+                                                )}
                                             </td>
                                         </tr>
                                     ))}

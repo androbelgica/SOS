@@ -26,7 +26,8 @@ class Product extends Model
     protected $casts = [
         'price' => 'decimal:2',
         'is_available' => 'boolean',
-        'unit_type' => 'string'
+        'unit_type' => 'string',
+        'featured' => 'boolean',
     ];
 
     // Accessor to ensure unit_type is always properly formatted

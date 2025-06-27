@@ -2,7 +2,7 @@
 
 ## 1. Project Overview
 
-A mobile-friendly web application built with **Laravel 12** and **React Kit** (integrated via Inertia.js) using **SQLite** as the database. The platform is designed to manage product listings (including seafood, meat, vegetables, and fruits), handle inventory, process orders, and include a unique section where the admin/owner and users can post and discover recipes tied to specific products.
+A mobile-friendly web application built with **Laravel 12** and **React Kit** (integrated via Inertia.js) using **MySQL** as the database. The platform is designed to manage product listings (including seafood, meat, vegetables, and fruits), handle inventory, process orders, and include a unique section where the admin/owner and users can post and discover recipes tied to specific products.
 
 ## 2. Project Objectives
 
@@ -19,7 +19,7 @@ A mobile-friendly web application built with **Laravel 12** and **React Kit** (i
 | ----------------------- | ------------------------------------------------------------------------------- |
 | Backend                 | Laravel 12                                                                      |
 | Frontend                | React Kit (Inertia.js)                                                          |
-| Database                | SQLite                                                                          |
+| Database                | MySQL                                                                           |
 | UI Framework            | Tailwind CSS (default with React Kit)                                           |
 | Hosting/Server          | Optional: Shared Hosting / Localhost                                            |
 | Deployment Tools        | Laravel Sail / Vite / Git                                                       |

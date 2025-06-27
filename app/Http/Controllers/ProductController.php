@@ -546,4 +546,41 @@ class ProductController extends Controller
         return redirect()->route('admin.products.index')
             ->with('success', 'Product deleted successfully. (Note: Product image has been preserved for future reuse)');
     }
+
+    /**
+     * Mark a product as featured (admin only)
+     */
+    public function feature($id)
+    {
+        $product = Product::findOrFail($id);
+        $product->featured = true;
+        $product->save();
+        return redirect()->back()->with('success', 'Product marked as featured.');
+    }
+
+    /**
+     * Unmark a product as featured (admin only)
+     */
+    public function unfeature($id)
+    {
+        $product = Product::findOrFail($id);
+        $product->featured = false;
+        $product->save();
+        return redirect()->back()->with('success', 'Product unmarked as featured.');
+    }
+
+    /**
+     * Get featured products for the dashboard (limit 5)
+     */
+    public function featuredProducts()
+    {
+        $products = Product::where('featured', true)
+            ->where('is_available', true)
+            ->latest('updated_at')
+            ->take(5)
+            ->get();
+        return Inertia::render('Customer/FeaturedProducts', [
+            'featuredProducts' => $products
+        ]);
+    }
 }

@@ -28,8 +28,8 @@ Route::get('/', function () {
 });
 
 Route::get('/check-manifest', function () {
-    return file_exists(public_path('build/manifest.json')) 
-        ? 'Manifest found ✅' 
+    return file_exists(public_path('build/manifest.json'))
+        ? 'Manifest found ✅'
         : 'Manifest missing ❌';
 });
 
@@ -336,6 +336,13 @@ Route::middleware(['auth', DeliveryMiddleware::class])->prefix('delivery')->name
     Route::post('/orders/lookup-qr', [DeliveryOrderController::class, 'lookupByQr'])->name('orders.lookup-qr');
     Route::post('/orders/{order}/settle-payment', [DeliveryOrderController::class, 'settlePayment'])->name('orders.settle-payment');
 });
+
+// Featured products routes
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::post('/products/{id}/feature', [ProductController::class, 'feature']);
+    Route::delete('/products/{id}/feature', [ProductController::class, 'unfeature']);
+});
+Route::get('/featured-products', [ProductController::class, 'featuredProducts']);
 
 require __DIR__ . '/auth.php';
 
