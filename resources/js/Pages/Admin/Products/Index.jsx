@@ -18,6 +18,9 @@ export default function AdminProducts({
     const [editingStock, setEditingStock] = useState({});
     const [deleteConfirmation, setDeleteConfirmation] = useState(null);
     const [clientTimestamp, setClientTimestamp] = useState(Date.now());
+    const [statusFilter, setStatusFilter] = useState('');
+    const [featuredFilter, setFeaturedFilter] = useState('');
+    const [togglingFeatured, setTogglingFeatured] = useState(null);
 
     // Use server timestamp if available, otherwise use client timestamp
     const cacheTimestamp = timestamp || clientTimestamp;
@@ -129,6 +132,19 @@ export default function AdminProducts({
             onSuccess: () => setEditingStock({}),
         });
     };
+
+    // Filtered products based on status and featured
+    const filteredProducts = products.data.filter(product => {
+        let statusMatch = true;
+        let featuredMatch = true;
+        if (statusFilter) {
+            statusMatch = statusFilter === 'available' ? product.is_available : !product.is_available;
+        }
+        if (featuredFilter) {
+            featuredMatch = featuredFilter === 'featured' ? product.featured : !product.featured;
+        }
+        return statusMatch && featuredMatch;
+    });
 
     return (
         <AdminLayout auth={auth} title="Products Management">
@@ -251,34 +267,62 @@ export default function AdminProducts({
 
             {/* Search and Actions Bar */}
             <div className="mb-6 bg-white dark:bg-gray-800 shadow-md rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-                <div className="max-w-lg w-full">
-                    <label htmlFor="search" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Search Products
-                    </label>
-                    <div className="relative rounded-md shadow-sm">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg
-                                className="h-5 w-5 text-gray-400 dark:text-gray-500"
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                            >
-                                <path
-                                    fillRule="evenodd"
-                                    d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                                    clipRule="evenodd"
-                                />
-                            </svg>
+                <div className="flex flex-col md:flex-row md:items-end md:space-x-4 space-y-3 md:space-y-0">
+                    <div className="max-w-lg w-full">
+                        <label htmlFor="search" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Search Products
+                        </label>
+                        <div className="relative rounded-md shadow-sm">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg
+                                    className="h-5 w-5 text-gray-400 dark:text-gray-500"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                >
+                                    <path
+                                        fillRule="evenodd"
+                                        d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                                        clipRule="evenodd"
+                                    />
+                                </svg>
+                            </div>
+                            <input
+                                id="search"
+                                className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-colors duration-200"
+                                placeholder="Search by name or description..."
+                                type="search"
+                                value={searchQuery}
+                                onChange={handleSearchChange}
+                                onBlur={() => debouncedSearch(searchQuery)}
+                            />
                         </div>
-                        <input
-                            id="search"
-                            className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-colors duration-200"
-                            placeholder="Search by name or description..."
-                            type="search"
-                            value={searchQuery}
-                            onChange={handleSearchChange}
-                            onBlur={() => debouncedSearch(searchQuery)}
-                        />
+                    </div>
+                    <div className="flex space-x-3">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
+                            <select
+                                className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                value={statusFilter}
+                                onChange={e => setStatusFilter(e.target.value)}
+                            >
+                                <option value="">All</option>
+                                <option value="available">Available</option>
+                                <option value="unavailable">Unavailable</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Featured</label>
+                            <select
+                                className="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                value={featuredFilter}
+                                onChange={e => setFeaturedFilter(e.target.value)}
+                            >
+                                <option value="">All</option>
+                                <option value="featured">Featured</option>
+                                <option value="not_featured">Not Featured</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -386,39 +430,34 @@ export default function AdminProducts({
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                    {products.data.map((product) => (
+                                    {filteredProducts.map((product) => (
                                         <tr key={product.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150">
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center">
-                                                    <div className="flex-shrink-0 h-12 w-12 relative">
+                                                    <div className="flex-shrink-0 h-12 w-12 relative overflow-hidden rounded-lg">
                                                         {(() => {
-                                                            // For external URLs (like Unsplash), use them directly
                                                             if (product.image_url) {
                                                                 return (
-                                                                    <>
-                                                                        <img
-                                                                            key={`product-image-${product.id}-${cacheTimestamp}`}
-                                                                            src={product.image_url.includes('?') ?
-                                                                                `${product.image_url}&t=${cacheTimestamp}` :
-                                                                                `${product.image_url}?t=${cacheTimestamp}`}
-                                                                            alt={product.name}
-                                                                            className="h-12 w-12 rounded-lg object-cover border border-gray-200 dark:border-gray-600 shadow-sm"
-                                                                            onError={(e) => {
-                                                                                // Replace with a div on error
-                                                                                const parent = e.target.parentNode;
-                                                                                if (parent) {
-                                                                                    const div = document.createElement('div');
-                                                                                    div.className = "h-12 w-12 rounded-lg flex items-center justify-center bg-indigo-100 dark:bg-indigo-900 border border-gray-200 dark:border-gray-600 shadow-sm";
-                                                                                    div.innerHTML = `<span class="text-indigo-700 dark:text-indigo-300 font-bold text-lg">${product.name.charAt(0).toUpperCase()}</span>`;
-                                                                                    parent.replaceChild(div, e.target);
-                                                                                }
-                                                                            }}
-                                                                        />
-                                                                    </>
+                                                                    <img
+                                                                        key={`product-image-${product.id}-${cacheTimestamp}`}
+                                                                        src={product.image_url.includes('?') ?
+                                                                            `${product.image_url}&t=${cacheTimestamp}` :
+                                                                            `${product.image_url}?t=${cacheTimestamp}`}
+                                                                        alt={product.name}
+                                                                        className="w-12 h-8 object-fill rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm bg-white dark:bg-gray-900"
+                                                                        style={{ width: '48px', height: '36px' }}
+                                                                        onError={(e) => {
+                                                                            const parent = e.target.parentNode;
+                                                                            if (parent) {
+                                                                                const div = document.createElement('div');
+                                                                                div.className = "h-8 w-12 rounded-lg flex items-center justify-center bg-indigo-100 dark:bg-indigo-900 border border-gray-200 dark:border-gray-600 shadow-sm";
+                                                                                div.innerHTML = `<span class=\"text-indigo-700 dark:text-indigo-300 font-bold text-lg\">${product.name.charAt(0).toUpperCase()}</span>`;
+                                                                                parent.replaceChild(div, e.target);
+                                                                            }
+                                                                        }}
+                                                                    />
                                                                 );
                                                             }
-
-                                                            // For missing images, use a div with the first letter
                                                             return (
                                                                 <div className="h-12 w-12 rounded-lg flex items-center justify-center bg-indigo-100 dark:bg-indigo-900 border border-gray-200 dark:border-gray-600 shadow-sm">
                                                                     <span className="text-indigo-700 dark:text-indigo-300 font-bold text-lg">
@@ -494,15 +533,36 @@ export default function AdminProducts({
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                {product.featured ? (
-                                                    <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">
-                                                        Featured
-                                                    </span>
-                                                ) : (
-                                                    <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300">
-                                                        Not Featured
-                                                    </span>
-                                                )}
+                                                {/* Toggle Switch for Featured */}
+                                                <label className="ml-2 inline-flex items-center cursor-pointer">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={product.featured === true || product.featured === 1}
+                                                        disabled={togglingFeatured === product.id}
+                                                        onChange={async e => {
+                                                            setTogglingFeatured(product.id);
+                                                            if (e.target.checked) {
+                                                                await router.post(`/products/${product.id}/feature`, {}, {
+                                                                    onFinish: () => {
+                                                                        setTogglingFeatured(null);
+                                                                        router.reload({ only: ['products'] });
+                                                                    }
+                                                                });
+                                                            } else {
+                                                                await router.delete(`/products/${product.id}/feature`, {
+                                                                    onFinish: () => {
+                                                                        setTogglingFeatured(null);
+                                                                        router.reload({ only: ['products'] });
+                                                                    }
+                                                                });
+                                                            }
+                                                        }}
+                                                        className="sr-only peer"
+                                                    />
+                                                    <div className={`w-10 h-5 bg-gray-200 dark:bg-gray-700 rounded-full peer peer-checked:bg-yellow-400 dark:peer-checked:bg-yellow-600 transition-colors duration-200 relative ${togglingFeatured === product.id ? 'opacity-60' : ''}`}>
+                                                        <div className="absolute left-1 top-1 bg-white dark:bg-gray-300 w-3 h-3 rounded-full transition-transform duration-200 peer-checked:translate-x-5"></div>
+                                                    </div>
+                                                </label>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                                 <Link
@@ -512,7 +572,7 @@ export default function AdminProducts({
                                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                     </svg>
-                                                    Edit
+                                                 
                                                 </Link>
                                                 <button
                                                     type="button"
@@ -522,17 +582,8 @@ export default function AdminProducts({
                                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                     </svg>
-                                                    Delete
+                                                  
                                                 </button>
-                                                {product.featured ? (
-                                                    <form method="POST" action={`/products/${product.id}/feature`} onSubmit={e => { e.preventDefault(); router.delete(`/products/${product.id}/feature`); }} className="inline">
-                                                        <button type="submit" className="ml-2 px-2 py-1 text-xs bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded hover:bg-gray-400 dark:hover:bg-gray-700">Unfeature</button>
-                                                    </form>
-                                                ) : (
-                                                    <form method="POST" action={`/products/${product.id}/feature`} onSubmit={e => { e.preventDefault(); router.post(`/products/${product.id}/feature`); }} className="inline">
-                                                        <button type="submit" className="ml-2 px-2 py-1 text-xs bg-yellow-400 dark:bg-yellow-600 text-white rounded hover:bg-yellow-500 dark:hover:bg-yellow-700">Feature</button>
-                                                    </form>
-                                                )}
                                             </td>
                                         </tr>
                                     ))}

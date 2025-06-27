@@ -48,13 +48,11 @@ export default function Index({ auth, products, filters, categories }) {
 
     return (
         <MainLayout auth={auth} title="Fresh Grocery Products">
-            <Head title="Products - Online Grocery Store" />
+            <Head title="Products - Cart and Cook" />
 
             {/* Header */}
             <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                    Fresh Grocery Products
-                </h1>
+              
                 <p className="text-gray-600 dark:text-gray-400 text-lg">
                     Discover our premium selection of fresh groceries, from seafood and meat to vegetables and fruits.
                 </p>

@@ -125,6 +125,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         }
         // Default: customer dashboard
         return Inertia::render('Customer/Dashboard', [
+            // 'auth' => $user,
             'orders' => \App\Models\Order::where('user_id', $user->id)
                 ->with('products')
                 ->latest()
@@ -134,6 +135,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 ->withAvg('reviews', 'rating')
                 ->latest()
                 ->take(3)
+                ->get(),
+            'featuredProducts' => Product::where('featured', true)
+                ->where('is_available', true)
+                ->latest('updated_at')
+                ->take(5)
                 ->get(),
         ]);
     })->name('dashboard');

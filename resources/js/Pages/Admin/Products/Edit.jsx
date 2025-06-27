@@ -387,57 +387,66 @@ export default function Edit({ auth, product, recipes, categories, timestamp }) 
                                         message={errors.image}
                                         className="mt-2"
                                     />
-                                    <div className="mt-4">
-                                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-                                            {imagePreview ? "Image Preview:" : "Current Image:"}
-                                        </p>
+                              <div className="mt-4">
+    <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+        {imagePreview ? "Image Preview:" : "Current Image:"}
+    </p>
 
-                                        {/* Show either the new image preview or the existing product image */}
-                                        {imagePreview ? (
-                                            // New image preview from file input or camera
-                                            <div className="relative">
-                                                <img
-                                                    src={imagePreview}
-                                                    alt={data.name}
-                                                    className="h-32 w-32 object-cover rounded-lg border border-gray-200 dark:border-gray-700"
-                                                />
-                                                <div className="absolute top-0 right-0 bg-green-500 text-white text-xs px-1 rounded-bl">New</div>
-                                            </div>
-                                        ) : product.image_url ? (
-                                            // Existing product image (both external URLs and local storage)
-                                            <div className="relative">
-                                                <img
-                                                    key={`product-image-${product.id}-${cacheTimestamp}`}
-                                                    src={product.image_url.includes('?') ?
-                                                        `${product.image_url}&t=${cacheTimestamp}` :
-                                                        `${product.image_url}?t=${cacheTimestamp}`}
-                                                    alt={data.name}
-                                                    className="h-32 w-32 object-cover rounded-lg border border-gray-200 dark:border-gray-700"
-                                                    onError={(e) => {
-                                                        // Replace with a div on error
-                                                        const parent = e.target.parentNode;
-                                                        if (parent) {
-                                                            const div = document.createElement('div');
-                                                            div.className = "h-32 w-32 flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-700";
-                                                            div.innerHTML = `<span class="text-gray-700 dark:text-gray-300 font-bold text-2xl">${data.name.charAt(0).toUpperCase()}</span>`;
-                                                            parent.replaceChild(div, e.target);
-                                                        }
-                                                    }}
-                                                />
-                                                <div className="absolute top-0 right-0 bg-blue-500 text-white text-xs px-1 rounded-bl">
-                                                    {product.image_url.startsWith('http') ? 'External' : 'Current'}
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            // No image - show placeholder
-                                            <div className="relative">
-                                                <div className="h-32 w-32 flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-700">
-                                                    <span className="text-gray-700 dark:text-gray-300 font-bold text-2xl">{data.name.charAt(0).toUpperCase()}</span>
-                                                </div>
-                                                <div className="absolute top-0 right-0 bg-gray-500 text-white text-xs px-1 rounded-bl">No Image</div>
-                                            </div>
-                                        )}
-                                    </div>
+    <div className="relative max-w-xs max-h-64 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-800 p-2 flex items-center justify-center">
+        {imagePreview ? (
+            // New image preview from file input or camera
+            <>
+                <img
+                    src={imagePreview}
+                    alt={data.name}
+                    className="max-w-full max-h-60 object-contain rounded"
+                />
+                <div className="absolute top-0 right-0 bg-green-500 text-white text-xs px-1 rounded-bl">
+                    New
+                </div>
+            </>
+        ) : product.image_url ? (
+            // Existing product image (external or local)
+            <>
+                <img
+                    key={`product-image-${product.id}-${cacheTimestamp}`}
+                    src={
+                        product.image_url.includes('?')
+                            ? `${product.image_url}&t=${cacheTimestamp}`
+                            : `${product.image_url}?t=${cacheTimestamp}`
+                    }
+                    alt={data.name}
+                    className="max-w-full max-h-60 object-contain rounded"
+                    onError={(e) => {
+                        const parent = e.target.parentNode;
+                        if (parent) {
+                            const div = document.createElement('div');
+                            div.className = "w-full h-full flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded";
+                            div.innerHTML = `<span class='text-gray-700 dark:text-gray-300 font-bold text-2xl'>${data.name.charAt(0).toUpperCase()}</span>`;
+                            parent.replaceChild(div, e.target);
+                        }
+                    }}
+                />
+                <div className="absolute top-0 right-0 bg-blue-500 text-white text-xs px-1 rounded-bl">
+                    {product.image_url.startsWith("http") ? "External" : "Current"}
+                </div>
+            </>
+        ) : (
+            // No image - show fallback
+            <>
+                <div className="w-full h-full flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded">
+                    <span className="text-gray-700 dark:text-gray-300 font-bold text-2xl">
+                        {data.name.charAt(0).toUpperCase()}
+                    </span>
+                </div>
+                <div className="absolute top-0 right-0 bg-gray-500 text-white text-xs px-1 rounded-bl">
+                    No Image
+                </div>
+            </>
+        )}
+    </div>
+</div>
+
                                 </div>
 
                                 <div>

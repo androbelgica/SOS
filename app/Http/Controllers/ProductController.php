@@ -111,7 +111,7 @@ class ProductController extends Controller
         $productsQuery = Product::query()
             ->with('recipes')
             ->withCount('recipes')
-            ->select('id', 'name', 'description', 'price', 'stock_quantity', 'category', 'unit_type', 'image_url', 'is_available', 'created_at', 'updated_at') // Explicitly select all needed fields
+            ->select('id', 'name', 'description', 'price', 'stock_quantity', 'category', 'unit_type', 'image_url', 'is_available', 'featured', 'created_at', 'updated_at') // Added 'featured' to select
             ->when(request('search'), function ($query, $search) {
                 $query->where('name', 'like', "%{$search}%")
                     ->orWhere('description', 'like', "%{$search}%");
@@ -553,8 +553,7 @@ class ProductController extends Controller
     public function feature($id)
     {
         $product = Product::findOrFail($id);
-        $product->featured = true;
-        $product->save();
+        $product->update(['featured' => true]);
         return redirect()->back()->with('success', 'Product marked as featured.');
     }
 
@@ -564,8 +563,7 @@ class ProductController extends Controller
     public function unfeature($id)
     {
         $product = Product::findOrFail($id);
-        $product->featured = false;
-        $product->save();
+        $product->update(['featured' => false]);
         return redirect()->back()->with('success', 'Product unmarked as featured.');
     }
 
