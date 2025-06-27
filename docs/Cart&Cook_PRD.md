@@ -72,6 +72,8 @@ For a detailed breakdown of the delivery/courier staff role, dashboard, and work
 -   Product name, description, price, image, stock quantity, category (seafood, meat, vegetables, fruits)
 -   Product availability toggle
 -   Inventory alerts (optional)
+-   **Featured Product Management:** Admin can add, update, and remove featured products to be showcased on the customer dashboard.
+-   **Featured Recipe Management:** Admin can add, update, and remove featured recipes to be showcased on the customer dashboard.
 
 ### 🧾 Orders & Payment Module
 
@@ -186,6 +188,8 @@ You can sketch or prototype the following views:
 -   **Recipe comments section** (below recipe details)
 -   **Comment thread view** (nested replies)
 -   **User interaction dashboard** (user's comments and reactions history)
+-   **Featured Product Showcase** (React component on customer dashboard displaying featured products)
+-   **Featured Recipe Showcase** (React component on customer dashboard displaying featured recipes)
 
 ## 8. Non-Functional Requirements
 
