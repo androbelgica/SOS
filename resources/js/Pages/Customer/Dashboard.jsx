@@ -15,12 +15,17 @@ export default function CustomerDashboard({ auth, orders, recentRecipes, feature
 
             {/* Header with Notification Dropdown Always Visible */}
             <div className="flex items-center justify-between mb-6">
-               <div>
-               <FeaturedProducts featuredProducts={safeFeaturedProducts} />
-               </div>
+                <div className="flex-1">
+                    {/* Remove FeaturedProducts from header */}
+                </div>
                 <div className="flex items-center justify-end w-full">
                     <NotificationDropdown auth={auth} />
                 </div>
+            </div>
+
+            {/* Place FeaturedProducts as a full-width section below header */}
+            <div className="w-full mb-8 px-0 sm:px-2">
+                <FeaturedProducts featuredProducts={safeFeaturedProducts} />
             </div>
 
             {/* Stats Cards */}
