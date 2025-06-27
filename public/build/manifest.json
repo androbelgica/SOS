@@ -270,7 +270,7 @@
     ]
   },
   "resources/js/Pages/Admin/Products/Edit.jsx": {
-    "file": "Edit-LAkd5Qq4.js",
+    "file": "Edit-65wWyE1a.js",
     "name": "Edit",
     "src": "resources/js/Pages/Admin/Products/Edit.jsx",
     "isDynamicEntry": true,
@@ -288,7 +288,7 @@
     ]
   },
   "resources/js/Pages/Admin/Products/Index.jsx": {
-    "file": "Index-BcfIVfUC.js",
+    "file": "Index-5arPUz75.js",
     "name": "Index",
     "src": "resources/js/Pages/Admin/Products/Index.jsx",
     "isDynamicEntry": true,
@@ -444,7 +444,7 @@
     ]
   },
   "resources/js/Pages/Cart/Index.jsx": {
-    "file": "Index-KsgUqIzT.js",
+    "file": "Index-BUPWfTbG.js",
     "name": "Index",
     "src": "resources/js/Pages/Cart/Index.jsx",
     "isDynamicEntry": true,
@@ -473,7 +473,7 @@
     ]
   },
   "resources/js/Pages/Customer/Dashboard.jsx": {
-    "file": "Dashboard-BEtvDQyr.js",
+    "file": "Dashboard-Z_5stmbF.js",
     "name": "Dashboard",
     "src": "resources/js/Pages/Customer/Dashboard.jsx",
     "isDynamicEntry": true,
@@ -482,19 +482,6 @@
       "_MainLayout-DgPacG7F.js",
       "_NotificationDropdown-Bq8s4d9o.js",
       "_FlashMessage-CcTVzuzS.js",
-      "_transition-Cpe-sHT0.js"
-    ]
-  },
-  "resources/js/Pages/Customer/FeaturedProducts.jsx": {
-    "file": "FeaturedProducts-GBO446z7.js",
-    "name": "FeaturedProducts",
-    "src": "resources/js/Pages/Customer/FeaturedProducts.jsx",
-    "isDynamicEntry": true,
-    "imports": [
-      "resources/js/app.jsx",
-      "_MainLayout-DgPacG7F.js",
-      "_FlashMessage-CcTVzuzS.js",
-      "_NotificationDropdown-Bq8s4d9o.js",
       "_transition-Cpe-sHT0.js"
     ]
   },
@@ -658,7 +645,7 @@
     ]
   },
   "resources/js/Pages/Products/Index.jsx": {
-    "file": "Index-C9M3hZoV.js",
+    "file": "Index-BffQen6I.js",
     "name": "Index",
     "src": "resources/js/Pages/Products/Index.jsx",
     "isDynamicEntry": true,
@@ -880,7 +867,6 @@
       "resources/js/Pages/Cart/Index.jsx",
       "resources/js/Pages/Checkout/Index.jsx",
       "resources/js/Pages/Customer/Dashboard.jsx",
-      "resources/js/Pages/Customer/FeaturedProducts.jsx",
       "resources/js/Pages/Dashboard.jsx",
       "resources/js/Pages/Delivery/Dashboard.jsx",
       "resources/js/Pages/Delivery/OrderDetails.jsx",
