@@ -1,8 +1,6 @@
 # Ignore SQLite database from Docker context
 database/database.sqlite
 
-# Ignore .env for better security (optional)
-.env
 
 # Node and Composer cache
 node_modules
