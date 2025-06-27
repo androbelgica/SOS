@@ -13,5 +13,11 @@
 .phpactor.json
 npm-debug.log
 yarn-error.log
+<<<<<<< HEAD
 # /.env
 # .env
+=======
+# .env
+# /.env
+/database/database.sqlite
+>>>>>>> parent of f7ca21e2 (db mysql)
