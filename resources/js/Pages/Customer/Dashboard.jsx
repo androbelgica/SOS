@@ -3,17 +3,21 @@ import { Head, Link } from "@inertiajs/react";
 import MainLayout from "@/Layouts/MainLayout";
 import { getImageProps } from "@/Utils/imageHelpers";
 import NotificationDropdown from "@/Components/NotificationDropdown";
+import FeaturedProducts from "@/Components/FeaturedProducts";
 
-export default function CustomerDashboard({ auth, orders, recentRecipes }) {
+export default function CustomerDashboard({ auth, orders, recentRecipes, featuredProducts }) {
+    // Defensive: ensure featuredProducts is always an array
+    const safeFeaturedProducts = Array.isArray(featuredProducts) ? featuredProducts.filter(p => p && p.name) : [];
+
     return (
-        <MainLayout auth={auth} title={`Welcome, ${auth.user.name}!`}>
+        <MainLayout auth={auth} title={`Welcome, ${auth?.user?.name || 'Customer'}!`}>
             <Head title="Dashboard - Seafood Online Store" />
 
             {/* Header with Notification Dropdown Always Visible */}
             <div className="flex items-center justify-between mb-6">
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                    Welcome, {auth.user.name}!
-                </h1>
+               <div>
+               <FeaturedProducts featuredProducts={safeFeaturedProducts} />
+               </div>
                 <div className="flex items-center justify-end w-full">
                     <NotificationDropdown auth={auth} />
                 </div>

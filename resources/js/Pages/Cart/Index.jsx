@@ -187,7 +187,7 @@ export default function CartIndex({ auth, cartItems: initialCartItems, total: in
                                                 {...getImageProps({
                                                     src: item.image_url || "/images/placeholder.jpg",
                                                     alt: item.name,
-                                                    className: "w-20 h-20 object-cover rounded mx-auto sm:mx-0",
+                                                    className: "w-60 h-40 object-contain rounded mx-auto sm:mx-0",
                                                     type: "product"
                                                 })}
                                             />

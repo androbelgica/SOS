@@ -20,7 +20,8 @@ class Product extends Model
         'image_url',
         'category',
         'unit_type',
-        'is_available'
+        'is_available',
+        'featured', // Add featured to fillable for mass assignment
     ];
 
     protected $casts = [
