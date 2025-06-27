@@ -1,5 +1,5 @@
 # Ignore SQLite database from Docker context
-database/database.sqlite
+# database/database.sqlite
 
 
 # Node and Composer cache
