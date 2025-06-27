@@ -9,7 +9,7 @@ export default defineConfig({
         }),
     ],
     server: {
-        https: true, // for local dev only
+        https: false, // for local dev only
     },
     build: {
         outDir: "public/build",
