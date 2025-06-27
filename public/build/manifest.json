@@ -1,6 +1,6 @@
 {
-  "_AdminLayout-Cv-SYGq4.js": {
-    "file": "AdminLayout-Cv-SYGq4.js",
+  "_AdminLayout-DjLq5ClJ.js": {
+    "file": "AdminLayout-DjLq5ClJ.js",
     "name": "AdminLayout",
     "imports": [
       "resources/js/app.jsx",
@@ -196,52 +196,52 @@
     "isEntry": true
   },
   "resources/js/Pages/Admin/Dashboard.jsx": {
-    "file": "Dashboard-BzBBVCCb.js",
+    "file": "Dashboard-CtlUOi6r.js",
     "name": "Dashboard",
     "src": "resources/js/Pages/Admin/Dashboard.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_AdminLayout-Cv-SYGq4.js",
+      "_AdminLayout-DjLq5ClJ.js",
       "_FlashMessage-CcTVzuzS.js",
       "_NotificationDropdown-Bq8s4d9o.js",
       "_transition-Cpe-sHT0.js"
     ]
   },
   "resources/js/Pages/Admin/DeliveryStaffManagement.jsx": {
-    "file": "DeliveryStaffManagement-C62MAq8q.js",
+    "file": "DeliveryStaffManagement-QYK5f3Du.js",
     "name": "DeliveryStaffManagement",
     "src": "resources/js/Pages/Admin/DeliveryStaffManagement.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_AdminLayout-Cv-SYGq4.js",
+      "_AdminLayout-DjLq5ClJ.js",
       "_FlashMessage-CcTVzuzS.js",
       "_NotificationDropdown-Bq8s4d9o.js",
       "_transition-Cpe-sHT0.js"
     ]
   },
   "resources/js/Pages/Admin/Orders/Index.jsx": {
-    "file": "Index-Zpa5dPeI.js",
+    "file": "Index-DF60nRCf.js",
     "name": "Index",
     "src": "resources/js/Pages/Admin/Orders/Index.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_AdminLayout-Cv-SYGq4.js",
+      "_AdminLayout-DjLq5ClJ.js",
       "_FlashMessage-CcTVzuzS.js",
       "_NotificationDropdown-Bq8s4d9o.js",
       "_transition-Cpe-sHT0.js"
     ]
   },
   "resources/js/Pages/Admin/Orders/Show.jsx": {
-    "file": "Show-B9If7Mym.js",
+    "file": "Show-rg3S6l6V.js",
     "name": "Show",
     "src": "resources/js/Pages/Admin/Orders/Show.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_AdminLayout-Cv-SYGq4.js",
+      "_AdminLayout-DjLq5ClJ.js",
       "_FlashMessage-CcTVzuzS.js",
       "_NotificationDropdown-Bq8s4d9o.js",
       "_transition-Cpe-sHT0.js"
@@ -288,13 +288,13 @@
     ]
   },
   "resources/js/Pages/Admin/Products/Index.jsx": {
-    "file": "Index-5arPUz75.js",
+    "file": "Index-FuaHpozU.js",
     "name": "Index",
     "src": "resources/js/Pages/Admin/Products/Index.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_AdminLayout-Cv-SYGq4.js",
+      "_AdminLayout-DjLq5ClJ.js",
       "_lodash-CLZAINnb.js",
       "_CategoryBadge-76tlJxyn.js",
       "_FlashMessage-CcTVzuzS.js",
@@ -338,13 +338,13 @@
     ]
   },
   "resources/js/Pages/Admin/Recipes/Index.jsx": {
-    "file": "Index-i6jHWYEK.js",
+    "file": "Index-CAm83Yr4.js",
     "name": "Index",
     "src": "resources/js/Pages/Admin/Recipes/Index.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_AdminLayout-Cv-SYGq4.js",
+      "_AdminLayout-DjLq5ClJ.js",
       "_imageHelpers-CwpBxbIF.js",
       "_lodash-CLZAINnb.js",
       "_FlashMessage-CcTVzuzS.js",
@@ -353,13 +353,13 @@
     ]
   },
   "resources/js/Pages/Admin/Recipes/Show.jsx": {
-    "file": "Show-DZm6-QiL.js",
+    "file": "Show-C0jbuLkA.js",
     "name": "Show",
     "src": "resources/js/Pages/Admin/Recipes/Show.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_AdminLayout-Cv-SYGq4.js",
+      "_AdminLayout-DjLq5ClJ.js",
       "_imageHelpers-CwpBxbIF.js",
       "_FlashMessage-CcTVzuzS.js",
       "_NotificationDropdown-Bq8s4d9o.js",
@@ -473,7 +473,7 @@
     ]
   },
   "resources/js/Pages/Customer/Dashboard.jsx": {
-    "file": "Dashboard-Z_5stmbF.js",
+    "file": "Dashboard-DrZ9jTuy.js",
     "name": "Dashboard",
     "src": "resources/js/Pages/Customer/Dashboard.jsx",
     "isDynamicEntry": true,
@@ -607,14 +607,14 @@
     ]
   },
   "resources/js/Pages/ProductRecognition/Index.jsx": {
-    "file": "Index-IwOCnhV4.js",
+    "file": "Index-B_wUb-u5.js",
     "name": "Index",
     "src": "resources/js/Pages/ProductRecognition/Index.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
       "_MainLayout-DgPacG7F.js",
-      "_AdminLayout-Cv-SYGq4.js",
+      "_AdminLayout-DjLq5ClJ.js",
       "_SparklesIcon-Cbt0i-M0.js",
       "_CheckCircleIcon-C2jnGy7x.js",
       "_XCircleIcon-Bp7te63t.js",
@@ -626,14 +626,14 @@
     ]
   },
   "resources/js/Pages/ProductRecognition/Show.jsx": {
-    "file": "Show-C3YRKj7i.js",
+    "file": "Show-CBl3cA5o.js",
     "name": "Show",
     "src": "resources/js/Pages/ProductRecognition/Show.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
       "_MainLayout-DgPacG7F.js",
-      "_AdminLayout-Cv-SYGq4.js",
+      "_AdminLayout-DjLq5ClJ.js",
       "_SparklesIcon-Cbt0i-M0.js",
       "_TrashIcon-CkX595jR.js",
       "_CheckCircleIcon-C2jnGy7x.js",

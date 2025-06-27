@@ -140,30 +140,29 @@ export default function AdminLayout({ children, title = "Admin Dashboard" }) {
                                         <Link
                                             href={safeRoute("profile.edit")}
                                             className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                            onClick={() => setDropdownOpen(false)}
                                         >
                                             Your Profile
                                         </Link>
                                         <Link
                                             href="/"
                                             className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                            onClick={() => setDropdownOpen(false)}
                                         >
                                             View Store
                                         </Link>
-                                        <DarkModeToggle />
+                                        <div onClick={() => setDropdownOpen(false)}>
+                                            <DarkModeToggle />
+                                        </div>
                                         <button
                                             onClick={() => {
+                                                setDropdownOpen(false);
                                                 try {
-                                                    router.post(
-                                                        route("logout")
-                                                    );
+                                                    router.post(route("logout"));
                                                 } catch (error) {
-                                                    console.error(
-                                                        "Logout error:",
-                                                        error
-                                                    );
+                                                    console.error("Logout error:", error);
                                                     // Fallback to window location
-                                                    window.location.href =
-                                                        "/logout";
+                                                    window.location.href = "/logout";
                                                 }
                                             }}
                                             className="w-full text-left block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
