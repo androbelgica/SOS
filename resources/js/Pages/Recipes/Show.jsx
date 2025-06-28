@@ -273,24 +273,19 @@ export default function RecipeShow({ auth, recipe, relatedRecipes }) {
                         </p>
 
                         {/* Ingredients */}
-                        <div className="mt-6">
-                            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                                Ingredients
-                            </h2>
-                            <div className="mt-2 grid grid-cols-1 gap-4">
+                        <div className="mt-8">
+                            <div className="flex items-center mb-2">
+                                <svg className="h-6 w-6 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Ingredients</h2>
+                            </div>
+                            <ul className="mt-2 space-y-2 list-disc list-inside">
                                 {recipe.products.map((product) => (
-                                    <div
-                                        key={product.id}
-                                        className="flex items-center justify-between border-b border-gray-100 dark:border-gray-700 pb-2"
-                                    >
-                                        <span className="text-gray-600 dark:text-gray-300">
-                                            {product.name}
-                                        </span>
+                                    <li key={product.id} className="flex items-center justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                                        <span className="text-gray-600 dark:text-gray-300">{product.name}</span>
                                         <Link
-                                            href={route(
-                                                "products.show",
-                                                product.id
-                                            )}
+                                            href={route("products.show", product.id)}
                                             className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 flex items-center"
                                         >
                                             <span>View Product</span>
@@ -309,20 +304,29 @@ export default function RecipeShow({ auth, recipe, relatedRecipes }) {
                                                 />
                                             </svg>
                                         </Link>
-                                    </div>
+                                    </li>
                                 ))}
-                            </div>
+                            </ul>
                         </div>
 
                         {/* Instructions */}
-                        <div className="mt-6">
-                            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                                Instructions
-                            </h2>
+                        <div className="mt-8">
+                            <div className="flex items-center mb-2">
+                                <svg className="h-6 w-6 text-blue-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 17l4 4 4-4m-4-5v9" />
+                                </svg>
+                                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Instructions</h2>
+                            </div>
                             <div className="mt-2 prose prose-indigo dark:prose-invert dark:text-gray-300">
-                                <div className="text-gray-600 dark:text-gray-300">
-                                    {recipe.instructions}
-                                </div>
+                                {recipe.instructions && recipe.instructions.includes('\n') ? (
+                                    <ol className="list-decimal list-inside space-y-1">
+                                        {recipe.instructions.split(/\n+/).map((step, idx) => (
+                                            <li key={idx} className="text-gray-600 dark:text-gray-300">{step.trim()}</li>
+                                        ))}
+                                    </ol>
+                                ) : (
+                                    <div className="text-gray-600 dark:text-gray-300">{recipe.instructions}</div>
+                                )}
                             </div>
                         </div>
                     </div>

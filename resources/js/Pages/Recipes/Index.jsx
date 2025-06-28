@@ -7,8 +7,8 @@ export default function Index({ auth, recipes }) {
     const [cacheTimestamp, setCacheTimestamp] = useState(Date.now());
 
     return (
-        <MainLayout auth={auth} title="Delicious Seafood Recipes">
-            <Head title="Recipes - Seafood Online Store" />
+        <MainLayout auth={auth} title="Delicious Recipes">
+            <Head title="Recipes - Cart and Cook" />
 
             {/* Header with Create Recipe Button */}
             {auth.user && (
