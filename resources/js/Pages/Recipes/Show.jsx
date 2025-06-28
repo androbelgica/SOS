@@ -110,19 +110,6 @@ export default function RecipeShow({ auth, recipe, relatedRecipes }) {
                 <div className="flex flex-col lg:flex-row">
                     {/* Recipe Image and Video */}
                     <div className="lg:w-1/2">
-                        {/* Inline YouTube Video if present */}
-                        {recipe.video_url && (recipe.video_url.includes("youtube.com") || recipe.video_url.includes("youtu.be")) && (
-                            <div className="mb-4">
-                                <iframe
-                                    src={getYouTubeEmbedUrl(recipe.video_url)}
-                                    className="w-full aspect-video rounded-lg"
-                                    title={`${recipe.title} Video`}
-                                    frameBorder="0"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                    allowFullScreen
-                                ></iframe>
-                            </div>
-                        )}
                         <div className="relative">
                             <img
                                 {...getImageProps({
@@ -135,6 +122,7 @@ export default function RecipeShow({ auth, recipe, relatedRecipes }) {
                                     timestamp: cacheTimestamp,
                                 })}
                             />
+
                             {recipe.video_url && (
                                 <div className="absolute bottom-4 right-4">
                                     <button
