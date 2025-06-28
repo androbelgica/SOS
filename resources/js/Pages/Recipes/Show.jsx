@@ -105,7 +105,7 @@ export default function RecipeShow({ auth, recipe, relatedRecipes }) {
 
     return (
         <MainLayout auth={auth} title={recipe.title}>
-            <Head title={`${recipe.title} - Seafood Online Store`} />
+            <Head title={`${recipe.title} - Cart and Cook`} />
             <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-md rounded-lg">
                 <div className="flex flex-col lg:flex-row">
                     {/* Recipe Image and Video */}
@@ -280,6 +280,20 @@ export default function RecipeShow({ auth, recipe, relatedRecipes }) {
                                 </svg>
                                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Ingredients</h2>
                             </div>
+                            {/* Render all ingredients if present */}
+                            {recipe.ingredients && (
+                                <ul className="mb-4 space-y-2 list-disc list-inside">
+                                    {(Array.isArray(recipe.ingredients)
+                                        ? recipe.ingredients
+                                        : typeof recipe.ingredients === 'string'
+                                            ? recipe.ingredients.split(/\n|,/).map(i => i.trim()).filter(Boolean)
+                                            : []
+                                    ).map((ingredient, idx) => (
+                                        <li key={"ingredient-" + idx} className="text-gray-700 dark:text-gray-200">{ingredient}</li>
+                                    ))}
+                                </ul>
+                            )}
+                            {/* Render related products */}
                             <ul className="mt-2 space-y-2 list-disc list-inside">
                                 {recipe.products.map((product) => (
                                     <li key={product.id} className="flex items-center justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
@@ -317,17 +331,30 @@ export default function RecipeShow({ auth, recipe, relatedRecipes }) {
                                 </svg>
                                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Instructions</h2>
                             </div>
-                            <div className="mt-2 prose prose-indigo dark:prose-invert dark:text-gray-300">
-                                {recipe.instructions && recipe.instructions.includes('\n') ? (
-                                    <ol className="list-decimal list-inside space-y-1">
-                                        {recipe.instructions.split(/\n+/).map((step, idx) => (
-                                            <li key={idx} className="text-gray-600 dark:text-gray-300">{step.trim()}</li>
-                                        ))}
-                                    </ol>
-                                ) : (
-                                    <div className="text-gray-600 dark:text-gray-300">{recipe.instructions}</div>
-                                )}
-                            </div>
+                            {/* Render all instructions if present */}
+                            {recipe.instructions && (
+                                <div className="mt-2 prose prose-indigo dark:prose-invert dark:text-gray-300">
+                                    {(Array.isArray(recipe.instructions)
+                                        ? recipe.instructions
+                                        : typeof recipe.instructions === 'string'
+                                            ? recipe.instructions.split(/\n|\r|\d+\.|\d+\)/).map(i => i.trim()).filter(Boolean)
+                                            : []
+                                    ).length > 1 ? (
+                                        <ol className="list-decimal list-inside space-y-1">
+                                            {(Array.isArray(recipe.instructions)
+                                                ? recipe.instructions
+                                                : typeof recipe.instructions === 'string'
+                                                    ? recipe.instructions.split(/\n|\r|\d+\.|\d+\)/).map(i => i.trim()).filter(Boolean)
+                                                    : []
+                                            ).map((step, idx) => (
+                                                <li key={"instruction-" + idx} className="text-gray-600 dark:text-gray-300">{step}</li>
+                                            ))}
+                                        </ol>
+                                    ) : (
+                                        <div className="text-gray-600 dark:text-gray-300">{recipe.instructions}</div>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
