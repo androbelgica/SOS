@@ -254,4 +254,93 @@ class RecipeController extends Controller
             'product_categories' => $productCategories->values(),
         ]);
     }
+
+    /**
+     * Store a newly created recipe.
+     */
+    public function store(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'ingredients' => 'required|array',
+            'instructions' => 'required|array',
+            'cooking_time' => 'required|integer|min:1',
+            'difficulty_level' => 'required|string',
+            'image_url' => 'nullable|string',
+            'video_url' => 'nullable|string',
+            'category' => 'required|string',
+        ]);
+        $recipe = Recipe::create($validated);
+        // Optionally attach products if provided
+        if ($request->has('product_ids')) {
+            $recipe->products()->sync($request->input('product_ids'));
+        }
+        return response()->json($recipe, 201);
+    }
+
+    /**
+     * Update the specified recipe.
+     */
+    public function update(Request $request, Recipe $recipe): JsonResponse
+    {
+        $validated = $request->validate([
+            'title' => 'sometimes|required|string|max:255',
+            'description' => 'nullable|string',
+            'ingredients' => 'sometimes|required|array',
+            'instructions' => 'sometimes|required|array',
+            'cooking_time' => 'sometimes|required|integer|min:1',
+            'difficulty_level' => 'sometimes|required|string',
+            'image_url' => 'nullable|string',
+            'video_url' => 'nullable|string',
+            'category' => 'sometimes|required|string',
+        ]);
+        $recipe->update($validated);
+        // Optionally update attached products
+        if ($request->has('product_ids')) {
+            $recipe->products()->sync($request->input('product_ids'));
+        }
+        return response()->json($recipe);
+    }
+
+    /**
+     * Remove the specified recipe.
+     */
+    public function destroy(Recipe $recipe): JsonResponse
+    {
+        $recipe->delete();
+        return response()->json(['message' => 'Recipe deleted successfully']);
+    }
+
+    /**
+     * Approve a recipe
+     */
+    public function approve(Recipe $recipe): JsonResponse
+    {
+        $recipe->status = 'approved';
+        $recipe->approved_at = now();
+        $recipe->save();
+        return response()->json(['message' => 'Recipe approved']);
+    }
+
+    /**
+     * Reject a recipe
+     */
+    public function reject(Request $request, Recipe $recipe): JsonResponse
+    {
+        $recipe->status = 'rejected';
+        $recipe->rejection_reason = $request->input('reason', '');
+        $recipe->save();
+        return response()->json(['message' => 'Recipe rejected']);
+    }
+
+    /**
+     * Set a recipe to under review
+     */
+    public function setUnderReview(Recipe $recipe): JsonResponse
+    {
+        $recipe->status = 'under_review';
+        $recipe->save();
+        return response()->json(['message' => 'Recipe set to under review']);
+    }
 }

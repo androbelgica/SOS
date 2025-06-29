@@ -174,3 +174,54 @@ A native Android application designed for **Cart & Cook** to serve two main user
 -   In-app chat between customer and courier
 -   Ratings and feedback for deliveries
 -   Recipe creation and engagement (if not in v1)
+
+---
+
+## 11. Enhancement Recommendations
+
+### 1. Address Management API
+- Add RESTful endpoints for managing user delivery addresses:
+    - `GET /addresses` (list)
+    - `POST /addresses` (create)
+    - `PUT /addresses/{id}` (update)
+    - `DELETE /addresses/{id}` (delete)
+- Enables server-side address book and sync across devices.
+
+### 2. Real-Time Courier Location
+- Add endpoint or WebSocket for live courier location updates:
+    - `POST /delivery/location` (courier updates location)
+    - `GET /orders/{order}/courier-location` (customer fetches courier location)
+- Enables real-time map tracking for customers.
+
+### 3. Proof of Delivery
+- Add endpoints for uploading delivery proof:
+    - `POST /delivery/orders/{order}/proof` (upload photo/signature)
+    - `GET /delivery/orders/{order}/proof` (view proof)
+- Supports photo or signature capture at delivery.
+
+### 4. Ratings & Feedback
+- Add endpoints for order/delivery feedback:
+    - `POST /orders/{order}/rating` (customer rates delivery)
+    - `GET /orders/{order}/rating` (view rating)
+- Enables customer feedback and quality tracking.
+
+### 5. In-App Chat (Future)
+- Add endpoints for chat between customer and courier:
+    - `GET /chats/{order}` (fetch chat history)
+    - `POST /chats/{order}` (send message)
+- Requires real-time backend (WebSocket or polling).
+
+### 6. Payment Integration (Future)
+- Add endpoints for GCash/Maya payments when enabled:
+    - `POST /orders/{order}/pay` (initiate payment)
+    - `GET /orders/{order}/payment-status` (check status)
+
+### 7. Recipe Creation (Optional/Future)
+- Add endpoints for user-generated recipes:
+    - `POST /recipes` (create)
+    - `PUT /recipes/{id}` (update)
+    - `DELETE /recipes/{id}` (delete)
+
+---
+
+> These enhancements will further future-proof the app, improve user experience, and support advanced features as your platform grows.

@@ -193,4 +193,118 @@ class ProductController extends Controller
 
         return response()->json($categoryCounts);
     }
+
+    /**
+     * Store a newly created product.
+     */
+    public function store(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'nutritional_facts' => 'nullable|string',
+            'price' => 'required|numeric|min:0',
+            'stock_quantity' => 'required|integer|min:0',
+            'image_url' => 'nullable|string',
+            'category' => 'required|string',
+            'unit_type' => 'nullable|string',
+            'is_available' => 'boolean',
+            'featured' => 'boolean',
+        ]);
+        $product = Product::create($validated);
+        return response()->json($product, 201);
+    }
+
+    /**
+     * Update the specified product.
+     */
+    public function update(Request $request, Product $product): JsonResponse
+    {
+        $validated = $request->validate([
+            'name' => 'sometimes|required|string|max:255',
+            'description' => 'nullable|string',
+            'nutritional_facts' => 'nullable|string',
+            'price' => 'sometimes|required|numeric|min:0',
+            'stock_quantity' => 'sometimes|required|integer|min:0',
+            'image_url' => 'nullable|string',
+            'category' => 'sometimes|required|string',
+            'unit_type' => 'nullable|string',
+            'is_available' => 'boolean',
+            'featured' => 'boolean',
+        ]);
+        $product->update($validated);
+        return response()->json($product);
+    }
+
+    /**
+     * Remove the specified product.
+     */
+    public function destroy(Product $product): JsonResponse
+    {
+        $product->delete();
+        return response()->json(['message' => 'Product deleted successfully']);
+    }
+
+    /**
+     * Get featured products
+     */
+    public function featuredProducts(): JsonResponse
+    {
+        $products = Product::where('featured', true)
+            ->where('is_available', true)
+            ->latest('updated_at')
+            ->take(5)
+            ->get();
+        return response()->json($products);
+    }
+
+    /**
+     * Feature a product
+     */
+    public function feature($id): JsonResponse
+    {
+        $product = Product::findOrFail($id);
+        $product->featured = true;
+        $product->save();
+        return response()->json(['message' => 'Product featured successfully']);
+    }
+
+    /**
+     * Unfeature a product
+     */
+    public function unfeature($id): JsonResponse
+    {
+        $product = Product::findOrFail($id);
+        $product->featured = false;
+        $product->save();
+        return response()->json(['message' => 'Product unfeatured successfully']);
+    }
+
+    /**
+     * Update product stock
+     */
+    public function updateStock(Request $request, Product $product): JsonResponse
+    {
+        $validated = $request->validate([
+            'stock_quantity' => 'required|integer|min:0',
+        ]);
+        $product->update($validated);
+        return response()->json(['message' => 'Stock updated successfully']);
+    }
+
+    /**
+     * Batch update product stock
+     */
+    public function batchUpdateStock(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'products' => 'required|array',
+            'products.*.id' => 'required|integer|exists:products,id',
+            'products.*.stock_quantity' => 'required|integer|min:0',
+        ]);
+        foreach ($validated['products'] as $item) {
+            Product::where('id', $item['id'])->update(['stock_quantity' => $item['stock_quantity']]);
+        }
+        return response()->json(['message' => 'Batch stock update successful']);
+    }
 }
